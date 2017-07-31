@@ -93,18 +93,18 @@
 
 
 
-<meta name="description" content="搭建前的步骤 在GitHub上创建好Repository，name必须以username.github.io的形式来命名，否则不能成功部署 提前安装好Git和Node.js（已安装的略过） 安装Hexo：安装Node.js后即可通过npm来安装Hexo：1$ npm install hexo-cli -g   初始化项目执行以下命名创建并初始化项目，会自动帮我们下载/生成好相关模板文件，关于各文件">
+<meta name="description" content="前言现在用GitHub+各种静态博客框架来搭建博客系统已经非常常见了，如：Hexo、Jekyll、Octopress、WordPress…等。由于其博客系统维护方便、配置简单、原生支持MD语法等优点等一直深受码农们的喜爱。经过一番查找与对比，博主最终还是选择了Hexo，理由有以下：主题选择多且美、配置异常简单、编译文章速度极快等优点…好了，话不多说，咱们一探究竟。 搭建前的步骤 在GitHub上创">
 <meta name="keywords" content="Hexo,GitHub">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用Hexo+GitHub搭建及配置个人博客">
 <meta property="og:url" content="http://yoursite.com/2017/07/31/hexo-guide/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="搭建前的步骤 在GitHub上创建好Repository，name必须以username.github.io的形式来命名，否则不能成功部署 提前安装好Git和Node.js（已安装的略过） 安装Hexo：安装Node.js后即可通过npm来安装Hexo：1$ npm install hexo-cli -g   初始化项目执行以下命名创建并初始化项目，会自动帮我们下载/生成好相关模板文件，关于各文件">
+<meta property="og:description" content="前言现在用GitHub+各种静态博客框架来搭建博客系统已经非常常见了，如：Hexo、Jekyll、Octopress、WordPress…等。由于其博客系统维护方便、配置简单、原生支持MD语法等优点等一直深受码农们的喜爱。经过一番查找与对比，博主最终还是选择了Hexo，理由有以下：主题选择多且美、配置异常简单、编译文章速度极快等优点…好了，话不多说，咱们一探究竟。 搭建前的步骤 在GitHub上创">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-07-30T17:21:09.000Z">
+<meta property="og:updated_time" content="2017-07-31T14:49:42.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Hexo+GitHub搭建及配置个人博客">
-<meta name="twitter:description" content="搭建前的步骤 在GitHub上创建好Repository，name必须以username.github.io的形式来命名，否则不能成功部署 提前安装好Git和Node.js（已安装的略过） 安装Hexo：安装Node.js后即可通过npm来安装Hexo：1$ npm install hexo-cli -g   初始化项目执行以下命名创建并初始化项目，会自动帮我们下载/生成好相关模板文件，关于各文件">
+<meta name="twitter:description" content="前言现在用GitHub+各种静态博客框架来搭建博客系统已经非常常见了，如：Hexo、Jekyll、Octopress、WordPress…等。由于其博客系统维护方便、配置简单、原生支持MD语法等优点等一直深受码农们的喜爱。经过一番查找与对比，博主最终还是选择了Hexo，理由有以下：主题选择多且美、配置异常简单、编译文章速度极快等优点…好了，话不多说，咱们一探究竟。 搭建前的步骤 在GitHub上创">
 
 
 
@@ -341,7 +341,8 @@
       
 
       
-        <h2 id="搭建前的步骤"><a href="#搭建前的步骤" class="headerlink" title="搭建前的步骤"></a>搭建前的步骤</h2><ol>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>现在用GitHub+各种静态博客框架来搭建博客系统已经非常常见了，如：Hexo、Jekyll、Octopress、WordPress…等。由于其博客系统维护方便、配置简单、原生支持MD语法等优点等一直深受码农们的喜爱。经过一番查找与对比，博主最终还是选择了Hexo，理由有以下：主题选择多且美、配置异常简单、编译文章速度极快等优点…好了，话不多说，咱们一探究竟。</p>
+<h2 id="搭建前的步骤"><a href="#搭建前的步骤" class="headerlink" title="搭建前的步骤"></a>搭建前的步骤</h2><ol>
 <li>在GitHub上创建好Repository，name必须以<code>username.github.io</code>的形式来命名，否则不能成功部署</li>
 <li>提前安装好<a href="https://git-scm.com/" target="_blank" rel="external">Git</a>和<a href="https://nodejs.org/en/" target="_blank" rel="external">Node.js</a>（已安装的略过）</li>
 <li>安装<a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>：安装Node.js后即可通过npm来安装Hexo：<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm install hexo-cli -g</div></pre></td></tr></table></figure>
@@ -350,9 +351,9 @@
 <h2 id="初始化项目"><a href="#初始化项目" class="headerlink" title="初始化项目"></a>初始化项目</h2><p>执行以下命名创建并初始化项目，会自动帮我们下载/生成好相关模板文件，关于各文件及文件夹的意义，可参考<a href="https://hexo.io/zh-cn/docs/setup.html" target="_blank" rel="external">官方文档</a>：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ hexo init &lt;folder&gt;</div><div class="line">$ <span class="built_in">cd</span> &lt;folder&gt;</div><div class="line">$ npm install</div></pre></td></tr></table></figure></p>
 <p>初始化完后，先安装<code>hexo-deployer-git</code>插件，因为后续我们将把代码上传至GitHub：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ npm install hexo-deployer-git --save</div></pre></td></tr></table></figure></p>
 <h2 id="站点基本配置"><a href="#站点基本配置" class="headerlink" title="站点基本配置"></a>站点基本配置</h2><p>在主目录下的<code>_config.yml</code>中，配置以下基础信息，其中<code>language</code>修改为<code>zh-Hans</code>即可改成简体中文，对应主题文件夹中的<code>languages</code>文件夹下的<code>zh-Hans.yml</code>，自己看着来改就好了，有些主题是<code>zh-CN.yml</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># Site</div><div class="line">title: codezjx&apos;s Home</div><div class="line">subtitle: </div><div class="line">description: </div><div class="line">author: codezjx</div><div class="line">language: zh-Hans</div><div class="line">timezone:</div></pre></td></tr></table></figure></p>
-<p>接下来配置GitHub设置，类型设置为git，指定好repo地址，branch必须设置为master，因为GitHub Page只会从mater分支生成。（<strong>注意有坑</strong>：这里我们需要单独设置好在GitHub上使用name和email，否则将会使用global的user.name和user.email，囧~~~）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">deploy:</div><div class="line">  type: git</div><div class="line">  repo: https://github.com/codezjx/codezjx.github.io.git</div><div class="line">  name: codezjx</div><div class="line">  email: code.zjx@gmail.com</div><div class="line">  branch: master</div></pre></td></tr></table></figure></p>
+<p>接下来配置GitHub设置，类型设置为git，指定好repo地址，branch必须设置为master，因为GitHub Page只会从mater分支生成。（<strong>注意有坑</strong>：这里我们需要单独设置好在GitHub上使用name和email，否则将会使用global的user.name和user.email，囧~~）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">deploy:</div><div class="line">  type: git</div><div class="line">  repo: https://github.com/codezjx/codezjx.github.io.git</div><div class="line">  name: codezjx</div><div class="line">  email: code.zjx@gmail.com</div><div class="line">  branch: master</div></pre></td></tr></table></figure></p>
 <p>题外话，这里简单说一下<code>hexo-deployer-git</code>插件的工作流程：当执行部署操作的时候，首先会自动初始化git仓库（位置在.deploy_git中），并关联到指定repo与branch，后续public文件夹中自动生成的页面代码将会拷贝至此目录中进行代码管理。若修改了name和email，需要删掉整个.deploy_git再重新部署才会生效。有兴趣的可以看下<a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="external">hexo-deployer-git</a>的源码。</p>
-<h2 id="主题配置"><a href="#主题配置" class="headerlink" title="主题配置"></a>主题配置</h2><p>首先当然是下载主题了，题主用得是Hexo上比较热门的<a href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="external">Next</a>主题，简洁大方好看嘿嘿，clone到themes目录中即可：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">cd</span> your-hexo-site</div><div class="line">$ git <span class="built_in">clone</span> https://github.com/iissnan/hexo-theme-next themes/next</div></pre></td></tr></table></figure></p>
+<h2 id="主题配置"><a href="#主题配置" class="headerlink" title="主题配置"></a>主题配置</h2><p>首先当然是下载主题了，博主用得是Hexo上比较热门的<a href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="external">Next</a>主题，简洁大方好看嘿嘿，clone到themes目录中即可：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">cd</span> your-hexo-site</div><div class="line">$ git <span class="built_in">clone</span> https://github.com/iissnan/hexo-theme-next themes/next</div></pre></td></tr></table></figure></p>
 <p>修改主目录下的<code>_config.yml</code>，指向我们刚刚clone的主题：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">theme: next</div></pre></td></tr></table></figure></p>
 <p>在对应主题目录下，同样有个<code>_config.yml</code>文件，可以对主题进行一些个性化的定制。例如在Next主题中，我们可以设置社交账号及其对应的icons。若对Next主题有兴趣的，可以参考官方的<a href="http://theme-next.iissnan.com/getting-started.html" target="_blank" rel="external">配置文档</a>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">social:</div><div class="line">  GitHub: https://github.com/codezjx</div><div class="line">  Twitter: https://twitter.com/codezjx</div><div class="line">  StackOverflow: https://stackoverflow.com/users/3919425</div><div class="line">  Weibo: http://weibo.com/2350975412</div><div class="line"></div><div class="line">social_icons:</div><div class="line">  enable: true</div><div class="line">  GitHub: github</div><div class="line">  Twitter: twitter</div><div class="line">  StackOverflow: stack-overflow</div><div class="line">  Weibo: weibo</div></pre></td></tr></table></figure></p>
 <h2 id="部署到GitHub上"><a href="#部署到GitHub上" class="headerlink" title="部署到GitHub上"></a>部署到GitHub上</h2><p>主要用的是三部曲：</p>
@@ -365,7 +366,11 @@
 <ul>
 <li><code>hexo clean</code>: 清除缓存文件 (db.json) 和已生成的静态文件 (public)。在某些情况（尤其是更换主题后），如果发现您对站点的更改无论如何也不生效，您可能需要运行该命令。</li>
 </ul>
-<p>最后，打开我们创建好的GitHub Page页面：<code>username.github.io</code>，这个时候应该能看到Next主题默认的样式了，此时博客系统已基本搭好了，Have fun~</p>
+<p>最后，打开我们创建好的GitHub Page页面：<code>username.github.io</code>，这个时候应该能看到Next主题默认的样式了。</p>
+<h2 id="关于分支"><a href="#关于分支" class="headerlink" title="关于分支"></a>关于分支</h2><p>前面已经提到了，GitHub Page会根据master分支的内容来生成页面，并且master分支的内容也只包含public文件夹里自动生成的文件。那么我们hexo的配置、主题、Markdown源文件该存储到哪呢？这样以后重装了系统，或者切换了电脑，我们也可以愉快的写博客了。</p>
+<p>有两种方式，可以新建一个独立的Repo来管理（感觉有点多余），或者直接新建一条分支。博主采用是新建分支的方式，直接<code>$ git branch hexo</code>来新建一条hexo分支，并把相关文件提交上去即可。</p>
+<p>那么该提交什么文件呢？其实在最初执行<code>$ hexo init &lt;folder&gt;</code>的时候，hexo会自动生成一个<code>.gitignore</code>文件（按照hexo的本意，主目录里面的各种源文件也是得托管的），按照里面的指示排除掉相关文件即可。最终提交的应该有以下文件夹：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">├── _config.yml</div><div class="line">├── package.json</div><div class="line">├── .gitignore</div><div class="line">├── scaffolds</div><div class="line">│    ├──draft.md</div><div class="line">│    ├──page.md</div><div class="line">│    └──post.md</div><div class="line">├── source</div><div class="line">│    └── _posts</div><div class="line">└── themes</div></pre></td></tr></table></figure></p>
+<p>至此，博客系统已经基本搭好了，跟着hexo官网的<a href="https://hexo.io/zh-cn/docs/writing.html" target="_blank" rel="external">writing</a>章节开始愉快的写博客吧。当然，想更加个性化一点的话，可以上万网去买个域名，好吧先写到这，Have fun~</p>
 
       
     </div>
@@ -577,7 +582,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建前的步骤"><span class="nav-number">1.</span> <span class="nav-text">搭建前的步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化项目"><span class="nav-number">2.</span> <span class="nav-text">初始化项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#站点基本配置"><span class="nav-number">3.</span> <span class="nav-text">站点基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主题配置"><span class="nav-number">4.</span> <span class="nav-text">主题配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署到GitHub上"><span class="nav-number">5.</span> <span class="nav-text">部署到GitHub上</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建前的步骤"><span class="nav-number">2.</span> <span class="nav-text">搭建前的步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化项目"><span class="nav-number">3.</span> <span class="nav-text">初始化项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#站点基本配置"><span class="nav-number">4.</span> <span class="nav-text">站点基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主题配置"><span class="nav-number">5.</span> <span class="nav-text">主题配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署到GitHub上"><span class="nav-number">6.</span> <span class="nav-text">部署到GitHub上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于分支"><span class="nav-number">7.</span> <span class="nav-text">关于分支</span></a></li></ol></div>
             
 
           </div>
