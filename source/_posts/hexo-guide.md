@@ -4,6 +4,9 @@ date: 2017-07-31 01:09:13
 tags: [Hexo, GitHub]
 ---
 
+## 前言
+现在用GitHub+各种静态博客框架来搭建博客系统已经非常常见了，如：Hexo、Jekyll、Octopress、WordPress...等。由于其博客系统维护方便、配置简单、原生支持MD语法等优点等一直深受码农们的喜爱。经过一番查找与对比，博主最终还是选择了Hexo，理由有以下：主题选择多且美、配置异常简单、编译文章速度极快等优点...好了，话不多说，咱们一探究竟。
+
 ## 搭建前的步骤
 1. 在GitHub上创建好Repository，name必须以`username.github.io`的形式来命名，否则不能成功部署
 2. 提前安装好[Git](https://git-scm.com/)和[Node.js](https://nodejs.org/en/)（已安装的略过）
@@ -36,7 +39,7 @@ language: zh-Hans
 timezone:
 ```
 
-接下来配置GitHub设置，类型设置为git，指定好repo地址，branch必须设置为master，因为GitHub Page只会从mater分支生成。（**注意有坑**：这里我们需要单独设置好在GitHub上使用name和email，否则将会使用global的user.name和user.email，囧~~~）：
+接下来配置GitHub设置，类型设置为git，指定好repo地址，branch必须设置为master，因为GitHub Page只会从mater分支生成。（**注意有坑**：这里我们需要单独设置好在GitHub上使用name和email，否则将会使用global的user.name和user.email，囧~~）：
 ```
 deploy:
   type: git
@@ -49,7 +52,7 @@ deploy:
 
 
 ## 主题配置
-首先当然是下载主题了，题主用得是Hexo上比较热门的[Next](https://github.com/iissnan/hexo-theme-next)主题，简洁大方好看嘿嘿，clone到themes目录中即可：
+首先当然是下载主题了，博主用得是Hexo上比较热门的[Next](https://github.com/iissnan/hexo-theme-next)主题，简洁大方好看嘿嘿，clone到themes目录中即可：
 ``` bash
 $ cd your-hexo-site
 $ git clone https://github.com/iissnan/hexo-theme-next themes/next
@@ -85,4 +88,25 @@ social_icons:
  
  - `hexo clean`: 清除缓存文件 (db.json) 和已生成的静态文件 (public)。在某些情况（尤其是更换主题后），如果发现您对站点的更改无论如何也不生效，您可能需要运行该命令。
 
-最后，打开我们创建好的GitHub Page页面：`username.github.io`，这个时候应该能看到Next主题默认的样式了，此时博客系统已基本搭好了，Have fun~
+最后，打开我们创建好的GitHub Page页面：`username.github.io`，这个时候应该能看到Next主题默认的样式了。
+
+## 关于分支
+前面已经提到了，GitHub Page会根据master分支的内容来生成页面，并且master分支的内容也只包含public文件夹里自动生成的文件。那么我们hexo的配置、主题、Markdown源文件该存储到哪呢？这样以后重装了系统，或者切换了电脑，我们也可以愉快的写博客了。
+
+有两种方式，可以新建一个独立的Repo来管理（感觉有点多余），或者直接新建一条分支。博主采用是新建分支的方式，直接`$ git branch hexo`来新建一条hexo分支，并把相关文件提交上去即可。
+
+那么该提交什么文件呢？其实在最初执行`$ hexo init <folder>`的时候，hexo会自动生成一个`.gitignore`文件（按照hexo的本意，主目录里面的各种源文件也是得托管的），按照里面的指示排除掉相关文件即可。最终提交的应该有以下文件夹：
+```
+├── _config.yml
+├── package.json
+├── .gitignore
+├── scaffolds
+│    ├──draft.md
+│    ├──page.md
+│    └──post.md
+├── source
+│    └── _posts
+└── themes
+```
+
+至此，博客系统已经基本搭好了，跟着hexo官网的[writing](https://hexo.io/zh-cn/docs/writing.html)章节开始愉快的写博客吧。当然，想更加个性化一点的话，可以上万网去买个域名，好吧先写到这，Have fun~
