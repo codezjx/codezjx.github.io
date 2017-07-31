@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Umeng,友盟,SDK,Bug," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。  从上面的文章，了解到">
+<meta name="keywords" content="Umeng,友盟,SDK,Bug">
+<meta property="og:type" content="article">
+<meta property="og:title" content="友盟统计UMID潜在的一个坑">
+<meta property="og:url" content="http://yoursite.com/2016/07/04/umeng-umid-bug/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。  从上面的文章，了解到">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-07-31T16:40:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="友盟统计UMID潜在的一个坑">
+<meta name="twitter:description" content="最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。  从上面的文章，了解到">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/04/umeng-umid-bug/"/>
+
+
+
+
+
+  <title>友盟统计UMID潜在的一个坑 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/04/umeng-umid-bug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">友盟统计UMID潜在的一个坑</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-07-04T21:09:01+08:00">
+                2016-07-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。</p>
+<p>关于活跃用户的定义，可以参考官方这篇文章：<a href="http://bbs.umeng.com/thread-6267-1-1.html" target="_blank" rel="external">你真的了解活跃用户吗？</a>，总结起来其实就是很简单的一句：</p>
+<blockquote>
+<p>活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。</p>
+</blockquote>
+<p>从上面的文章，了解到Umeng里面对用户的定义：友盟将一个独立的设备视为一个用户，然而每个独立的用户是通过UMID来进行唯一标识的。然而UMID又是神马鬼东西？详见这篇文章：<a href="http://bbs.umeng.com/thread-5850-1-1.html" target="_blank" rel="external">友盟UMID方案解析</a>，简单来说就是友盟会在第一次安装的时候生成一个UMID，当ID生成以后友盟会尽量保证这个UMID不会发生变化。</p>
+<p>在应用对应的存储目录下面，我们可以找到这个UMID的身影：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/data/data/com.xxxx.application/files/.imprint</div><div class="line">/data/data/com.xxxx.application/files/.umeng/exchangeIdentity.json</div></pre></td></tr></table></figure></p>
+<p>拿<code>exchangeIdentity.json</code>这个文件来说，cat一下里面的内容，应该可以看到：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;&quot;appkey&quot;:&quot;xxxxxxxxxxxxxxxxxxxxxxxx&quot;,&quot;umid&quot;:&quot;528c8e6cd4a3c6598999a0e9df15ad32&quot;,&quot;signature&quot;:&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;,&quot;checksum&quot;:&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;&#125;</div></pre></td></tr></table></figure></p>
+<p>这里笔者发现公司里多台设备的UMID都居然是一个相同的UMID值，WTF！！！也同样是上面这串神秘的代码：<code>528c8e6cd4a3c6598999a0e9df15ad32</code>。</p>
+<p>这个时候就需要查一下UMID的生成方式了，从上面那篇UMID方案解析的文章中，可以了解到Android系统中与UMID相关的几个ID：imei、mac地址、android_id。有了这些关键点，我们就可以开始去反编译友盟的sdk包并进行下一步的搜索了（这里反编译了友盟最新的jar包：<code>umeng-analytics-v6.0.1.jar</code>）。。。果然，使用上面这几个关键字，很快就搜索到了一些关键的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">I</span><span class="params">(Context paramContext)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">  String str = <span class="string">""</span>;</div><div class="line">  TelephonyManager localTelephonyManager = (TelephonyManager)paramContext.getSystemService(<span class="string">"phone"</span>);</div><div class="line">  <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)</div><div class="line">  &#123;</div><div class="line">      <span class="comment">// 此处省略一部分代码</span></div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span></div><div class="line">  &#123;</div><div class="line">    <span class="keyword">if</span> (localTelephonyManager != <span class="keyword">null</span>) &#123;</div><div class="line">      <span class="keyword">try</span></div><div class="line">      &#123;</div><div class="line">        <span class="keyword">if</span> (a(paramContext, <span class="string">"android.permission.READ_PHONE_STATE"</span>)) &#123;</div><div class="line">          str = localTelephonyManager.getDeviceId();</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">catch</span> (Exception localException2)</div><div class="line">      &#123;</div><div class="line">        bl.d(a, <span class="string">"No IMEI."</span>, localException2);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">    &#123;</div><div class="line">      bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"No IMEI."</span> &#125;);</div><div class="line">      str = u(paramContext);</div><div class="line">      <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">      &#123;</div><div class="line">        bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Failed to take mac as IMEI. Try to use Secure.ANDROID_ID instead."</span> &#125;);</div><div class="line">        str = Settings.Secure.getString(paramContext.getContentResolver(), <span class="string">"android_id"</span>);</div><div class="line">        bl.a(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"getDeviceId: Secure.ANDROID_ID: "</span> + str &#125;);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> str;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这段代码逻辑比较简单（由于笔者所调试系统 &lt; 23，故省略了一部分代码），首先<code>TelephonyManager.getDeviceId()</code>获取imei，若取不到则调用<code>u(context)</code>函数获取下一个字符串，若再取不到，则获取android_id。其实这里可以猜测到，u()中返回的字符串应该就是mac地址，我们来看下函数u()的逻辑代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">u</span><span class="params">(Context paramContext)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">  <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)</div><div class="line">  &#123;</div><div class="line">    String str = d();</div><div class="line">    <span class="keyword">if</span> (str == <span class="keyword">null</span>) &#123;</div><div class="line">      str = H(paramContext);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> str;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> H(paramContext);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">H</span><span class="params">(Context paramContext)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">  <span class="keyword">try</span></div><div class="line">  &#123;</div><div class="line">    WifiManager localWifiManager = (WifiManager)paramContext.getSystemService(<span class="string">"wifi"</span>);</div><div class="line">    <span class="keyword">if</span> (a(paramContext, <span class="string">"android.permission.ACCESS_WIFI_STATE"</span>))</div><div class="line">    &#123;</div><div class="line">      WifiInfo localWifiInfo = localWifiManager.getConnectionInfo();</div><div class="line">      <span class="keyword">return</span> localWifiInfo.getMacAddress();</div><div class="line">    &#125;</div><div class="line">    bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Could not get mac address.[no permission android.permission.ACCESS_WIFI_STATE"</span> &#125;);</div><div class="line">    <span class="keyword">return</span> <span class="string">""</span>;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">catch</span> (Exception localException)</div><div class="line">  &#123;</div><div class="line">    bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Could not get mac address."</span> + localException.toString() &#125;);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> <span class="string">""</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>果然，函数<code>u(context)</code>就是返回wifi的mac地址的。那么，回到刚刚的那个问题，到底那串神秘的UMID是<code>528c8e6cd4a3c6598999a0e9df15ad32</code>根据啥来生成的？看着这格式有点像md5。然后把机器上的imei、mac地址、android_id都打印了出来：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">07-01 18:01:05.586 16217-16217/com.xxxx.application D/xxx: imei: null</div><div class="line">07-01 18:01:05.606 16217-16217/com.xxxx.application D/xxx: macAddr: 00:00:00:00:00:00</div><div class="line">07-01 18:01:05.616 16217-16217/com.xxxx.application D/xxx: Secure.ANDROID_ID: 137xxxxxxxxxx16</div></pre></td></tr></table></figure></p>
+<p>突然发现公司设备上打印出来的mac地址都是00:00:00:00:00:00（因为木有wifi模块，只有ethernet模块，囧！！！），怒将其转为md5，正是上面的串代码。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">字符串: 00:00:00:00:00:00</div><div class="line">16位: d4a3c6598999a0e9</div><div class="line">32位: 528c8e6cd4a3c6598999a0e9df15ad32</div></pre></td></tr></table></figure></p>
+<p>可是，为啥当mac地址是00:00:00:00:00:00的时候，不去选择android_id呢？，再回去仔细看代码，发现友盟用的是坑爹的<code>TextUtils.isEmpty()</code>来判断mac地址的有效性，跪了，上面那串明明就是无效的mac地址好么？只能说代码写得不严谨。。。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">&#123;</div><div class="line">  bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"No IMEI."</span> &#125;);</div><div class="line">  str = u(paramContext);</div><div class="line">  <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">  &#123;</div><div class="line">    bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Failed to take mac as IMEI. Try to use Secure.ANDROID_ID instead."</span> &#125;);</div><div class="line">    str = Settings.Secure.getString(paramContext.getContentResolver(), <span class="string">"android_id"</span>);</div><div class="line">    bl.a(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"getDeviceId: Secure.ANDROID_ID: "</span> + str &#125;);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>至此，代码及原因分析完毕。当一些Android平板设备统一返回相同的mac地址，如00:00:00:00:00:00时（有可能是没有wifi模块；也有可能是山寨机出现这种情况的时候），友盟将会将其数据识别成同一用户，并且将会造成严重的MAC地址漂移。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Umeng/" rel="tag"># Umeng</a>
+          
+            <a href="/tags/友盟/" rel="tag"># 友盟</a>
+          
+            <a href="/tags/SDK/" rel="tag"># SDK</a>
+          
+            <a href="/tags/Bug/" rel="tag"># Bug</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/31/hexo-guide/" rel="prev" title="使用Hexo+GitHub搭建及配置个人博客">
+                使用Hexo+GitHub搭建及配置个人博客 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="codezjx" />
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
