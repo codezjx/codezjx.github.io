@@ -1,6 +1,7 @@
 ---
 title: 使用Hexo+GitHub搭建及配置个人博客
 date: 2017-07-31 01:09:13
+categories: Blog
 tags: [Hexo, GitHub]
 ---
 
