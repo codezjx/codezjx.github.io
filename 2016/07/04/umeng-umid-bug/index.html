@@ -93,18 +93,18 @@
 
 
 
-<meta name="description" content="最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。  从上面的文章，了解到">
+<meta name="description" content="前言最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户与UMID关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况">
 <meta name="keywords" content="Umeng,友盟,SDK,Bug">
 <meta property="og:type" content="article">
 <meta property="og:title" content="友盟统计UMID潜在的一个坑">
 <meta property="og:url" content="http://yoursite.com/2016/07/04/umeng-umid-bug/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。  从上面的文章，了解到">
+<meta property="og:description" content="前言最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户与UMID关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-07-31T16:40:44.000Z">
+<meta property="og:updated_time" content="2017-08-01T16:08:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="友盟统计UMID潜在的一个坑">
-<meta name="twitter:description" content="最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。  从上面的文章，了解到">
+<meta name="twitter:description" content="前言最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。 关于活跃用户与UMID关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：  活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况">
 
 
 
@@ -317,6 +317,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -341,8 +363,8 @@
       
 
       
-        <p>最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。</p>
-<p>关于活跃用户的定义，可以参考官方这篇文章：<a href="http://bbs.umeng.com/thread-6267-1-1.html" target="_blank" rel="external">你真的了解活跃用户吗？</a>，总结起来其实就是很简单的一句：</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。</p>
+<h2 id="关于活跃用户与UMID"><a href="#关于活跃用户与UMID" class="headerlink" title="关于活跃用户与UMID"></a>关于活跃用户与UMID</h2><p>关于活跃用户的定义，可以参考官方这篇文章：<a href="http://bbs.umeng.com/thread-6267-1-1.html" target="_blank" rel="external">你真的了解活跃用户吗？</a>，总结起来其实就是很简单的一句：</p>
 <blockquote>
 <p>活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。</p>
 </blockquote>
@@ -350,12 +372,12 @@
 <p>在应用对应的存储目录下面，我们可以找到这个UMID的身影：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/data/data/com.xxxx.application/files/.imprint</div><div class="line">/data/data/com.xxxx.application/files/.umeng/exchangeIdentity.json</div></pre></td></tr></table></figure></p>
 <p>拿<code>exchangeIdentity.json</code>这个文件来说，cat一下里面的内容，应该可以看到：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;&quot;appkey&quot;:&quot;xxxxxxxxxxxxxxxxxxxxxxxx&quot;,&quot;umid&quot;:&quot;528c8e6cd4a3c6598999a0e9df15ad32&quot;,&quot;signature&quot;:&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;,&quot;checksum&quot;:&quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;&#125;</div></pre></td></tr></table></figure></p>
 <p>这里笔者发现公司里多台设备的UMID都居然是一个相同的UMID值，WTF！！！也同样是上面这串神秘的代码：<code>528c8e6cd4a3c6598999a0e9df15ad32</code>。</p>
-<p>这个时候就需要查一下UMID的生成方式了，从上面那篇UMID方案解析的文章中，可以了解到Android系统中与UMID相关的几个ID：imei、mac地址、android_id。有了这些关键点，我们就可以开始去反编译友盟的sdk包并进行下一步的搜索了（这里反编译了友盟最新的jar包：<code>umeng-analytics-v6.0.1.jar</code>）。。。果然，使用上面这几个关键字，很快就搜索到了一些关键的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">I</span><span class="params">(Context paramContext)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">  String str = <span class="string">""</span>;</div><div class="line">  TelephonyManager localTelephonyManager = (TelephonyManager)paramContext.getSystemService(<span class="string">"phone"</span>);</div><div class="line">  <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)</div><div class="line">  &#123;</div><div class="line">      <span class="comment">// 此处省略一部分代码</span></div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span></div><div class="line">  &#123;</div><div class="line">    <span class="keyword">if</span> (localTelephonyManager != <span class="keyword">null</span>) &#123;</div><div class="line">      <span class="keyword">try</span></div><div class="line">      &#123;</div><div class="line">        <span class="keyword">if</span> (a(paramContext, <span class="string">"android.permission.READ_PHONE_STATE"</span>)) &#123;</div><div class="line">          str = localTelephonyManager.getDeviceId();</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">catch</span> (Exception localException2)</div><div class="line">      &#123;</div><div class="line">        bl.d(a, <span class="string">"No IMEI."</span>, localException2);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">    &#123;</div><div class="line">      bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"No IMEI."</span> &#125;);</div><div class="line">      str = u(paramContext);</div><div class="line">      <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">      &#123;</div><div class="line">        bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Failed to take mac as IMEI. Try to use Secure.ANDROID_ID instead."</span> &#125;);</div><div class="line">        str = Settings.Secure.getString(paramContext.getContentResolver(), <span class="string">"android_id"</span>);</div><div class="line">        bl.a(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"getDeviceId: Secure.ANDROID_ID: "</span> + str &#125;);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> str;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="UMID的生成方式"><a href="#UMID的生成方式" class="headerlink" title="UMID的生成方式"></a>UMID的生成方式</h2><p>这个时候就需要查一下UMID的生成方式了，从上面那篇UMID方案解析的文章中，可以了解到Android系统中与UMID相关的几个ID：imei、mac地址、android_id。有了这些关键点，我们就可以开始去反编译友盟的sdk包并进行下一步的搜索了（这里反编译了友盟最新的jar包：<code>umeng-analytics-v6.0.1.jar</code>）。。。果然，使用上面这几个关键字，很快就搜索到了一些关键的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">I</span><span class="params">(Context paramContext)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">  String str = <span class="string">""</span>;</div><div class="line">  TelephonyManager localTelephonyManager = (TelephonyManager)paramContext.getSystemService(<span class="string">"phone"</span>);</div><div class="line">  <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)</div><div class="line">  &#123;</div><div class="line">      <span class="comment">// 此处省略一部分代码</span></div><div class="line">  &#125;</div><div class="line">  <span class="keyword">else</span></div><div class="line">  &#123;</div><div class="line">    <span class="keyword">if</span> (localTelephonyManager != <span class="keyword">null</span>) &#123;</div><div class="line">      <span class="keyword">try</span></div><div class="line">      &#123;</div><div class="line">        <span class="keyword">if</span> (a(paramContext, <span class="string">"android.permission.READ_PHONE_STATE"</span>)) &#123;</div><div class="line">          str = localTelephonyManager.getDeviceId();</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">catch</span> (Exception localException2)</div><div class="line">      &#123;</div><div class="line">        bl.d(a, <span class="string">"No IMEI."</span>, localException2);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">    &#123;</div><div class="line">      bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"No IMEI."</span> &#125;);</div><div class="line">      str = u(paramContext);</div><div class="line">      <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">      &#123;</div><div class="line">        bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Failed to take mac as IMEI. Try to use Secure.ANDROID_ID instead."</span> &#125;);</div><div class="line">        str = Settings.Secure.getString(paramContext.getContentResolver(), <span class="string">"android_id"</span>);</div><div class="line">        bl.a(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"getDeviceId: Secure.ANDROID_ID: "</span> + str &#125;);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> str;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>这段代码逻辑比较简单（由于笔者所调试系统 &lt; 23，故省略了一部分代码），首先<code>TelephonyManager.getDeviceId()</code>获取imei，若取不到则调用<code>u(context)</code>函数获取下一个字符串，若再取不到，则获取android_id。其实这里可以猜测到，u()中返回的字符串应该就是mac地址，我们来看下函数u()的逻辑代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">u</span><span class="params">(Context paramContext)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">  <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)</div><div class="line">  &#123;</div><div class="line">    String str = d();</div><div class="line">    <span class="keyword">if</span> (str == <span class="keyword">null</span>) &#123;</div><div class="line">      str = H(paramContext);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> str;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> H(paramContext);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">H</span><span class="params">(Context paramContext)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">  <span class="keyword">try</span></div><div class="line">  &#123;</div><div class="line">    WifiManager localWifiManager = (WifiManager)paramContext.getSystemService(<span class="string">"wifi"</span>);</div><div class="line">    <span class="keyword">if</span> (a(paramContext, <span class="string">"android.permission.ACCESS_WIFI_STATE"</span>))</div><div class="line">    &#123;</div><div class="line">      WifiInfo localWifiInfo = localWifiManager.getConnectionInfo();</div><div class="line">      <span class="keyword">return</span> localWifiInfo.getMacAddress();</div><div class="line">    &#125;</div><div class="line">    bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Could not get mac address.[no permission android.permission.ACCESS_WIFI_STATE"</span> &#125;);</div><div class="line">    <span class="keyword">return</span> <span class="string">""</span>;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">catch</span> (Exception localException)</div><div class="line">  &#123;</div><div class="line">    bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Could not get mac address."</span> + localException.toString() &#125;);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> <span class="string">""</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>果然，函数<code>u(context)</code>就是返回wifi的mac地址的。那么，回到刚刚的那个问题，到底那串神秘的UMID是<code>528c8e6cd4a3c6598999a0e9df15ad32</code>根据啥来生成的？看着这格式有点像md5。然后把机器上的imei、mac地址、android_id都打印了出来：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">07-01 18:01:05.586 16217-16217/com.xxxx.application D/xxx: imei: null</div><div class="line">07-01 18:01:05.606 16217-16217/com.xxxx.application D/xxx: macAddr: 00:00:00:00:00:00</div><div class="line">07-01 18:01:05.616 16217-16217/com.xxxx.application D/xxx: Secure.ANDROID_ID: 137xxxxxxxxxx16</div></pre></td></tr></table></figure></p>
+<h2 id="转机"><a href="#转机" class="headerlink" title="转机"></a>转机</h2><p>果然，函数<code>u(context)</code>就是返回wifi的mac地址的。那么，回到刚刚的那个问题，到底那串神秘的UMID是<code>528c8e6cd4a3c6598999a0e9df15ad32</code>根据啥来生成的？看着这格式有点像md5。然后把机器上的imei、mac地址、android_id都打印了出来：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">07-01 18:01:05.586 16217-16217/com.xxxx.application D/xxx: imei: null</div><div class="line">07-01 18:01:05.606 16217-16217/com.xxxx.application D/xxx: macAddr: 00:00:00:00:00:00</div><div class="line">07-01 18:01:05.616 16217-16217/com.xxxx.application D/xxx: Secure.ANDROID_ID: 137xxxxxxxxxx16</div></pre></td></tr></table></figure></p>
 <p>突然发现公司设备上打印出来的mac地址都是00:00:00:00:00:00（因为木有wifi模块，只有ethernet模块，囧！！！），怒将其转为md5，正是上面的串代码。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">字符串: 00:00:00:00:00:00</div><div class="line">16位: d4a3c6598999a0e9</div><div class="line">32位: 528c8e6cd4a3c6598999a0e9df15ad32</div></pre></td></tr></table></figure></p>
 <p>可是，为啥当mac地址是00:00:00:00:00:00的时候，不去选择android_id呢？，再回去仔细看代码，发现友盟用的是坑爹的<code>TextUtils.isEmpty()</code>来判断mac地址的有效性，跪了，上面那串明明就是无效的mac地址好么？只能说代码写得不严谨。。。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">&#123;</div><div class="line">  bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"No IMEI."</span> &#125;);</div><div class="line">  str = u(paramContext);</div><div class="line">  <span class="keyword">if</span> (TextUtils.isEmpty(str))</div><div class="line">  &#123;</div><div class="line">    bl.e(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"Failed to take mac as IMEI. Try to use Secure.ANDROID_ID instead."</span> &#125;);</div><div class="line">    str = Settings.Secure.getString(paramContext.getContentResolver(), <span class="string">"android_id"</span>);</div><div class="line">    bl.a(a, <span class="keyword">new</span> Object[] &#123; <span class="string">"getDeviceId: Secure.ANDROID_ID: "</span> + str &#125;);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>至此，代码及原因分析完毕。当一些Android平板设备统一返回相同的mac地址，如00:00:00:00:00:00时（有可能是没有wifi模块；也有可能是山寨机出现这种情况的时候），友盟将会将其数据识别成同一用户，并且将会造成严重的MAC地址漂移。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>至此，代码及原因分析完毕。当一些Android平板设备统一返回相同的mac地址，如00:00:00:00:00:00时（有可能是没有wifi模块；也有可能是山寨机出现这种情况的时候），友盟将会将其数据识别成同一用户，并且将会造成严重的MAC地址漂移。</p>
 
       
     </div>
@@ -403,6 +425,10 @@
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/04/picasso-circle-transform/" rel="next" title="Android中使用Picasso将图片直接转换为圆形">
+                <i class="fa fa-chevron-left"></i> Android中使用Picasso将图片直接转换为圆形
+              </a>
             
           </div>
 
@@ -460,8 +486,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -476,22 +511,31 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
 
           
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
 
           
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">6</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -552,6 +596,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于活跃用户与UMID"><span class="nav-number">2.</span> <span class="nav-text">关于活跃用户与UMID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UMID的生成方式"><span class="nav-number">3.</span> <span class="nav-text">UMID的生成方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#转机"><span class="nav-number">4.</span> <span class="nav-text">转机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

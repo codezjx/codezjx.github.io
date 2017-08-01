@@ -316,6 +316,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Blog/" itemprop="url" rel="index">
+                    <span itemprop="name">Blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -436,6 +458,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -462,16 +506,157 @@
       
         
           
-          最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。
-关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：
+          前言最近发现友盟的数据统计里面，活跃用户的数量有点不大对劲，跟启动次数相比，严重偏少。sdk的使用方式没啥好说的，就那么简单几步，应该不会是sdk设置的问题。于是就从友盟关于活跃用户的定义开始，着手分析这个问题。
+关于活跃用户与UMID关于活跃用户的定义，可以参考官方这篇文章：你真的了解活跃用户吗？，总结起来其实就是很简单的一句：
 
 活跃用户的定义：打开应用的用户即为活跃用户，不考虑用户的使用情况。
 
-从上面的文章，了解到Umeng里面对用户的定义：友盟将一个独立的设备视为一个用户，然而每个独立的用户是通过UMID来进行
+从上面的文章，了解到Umeng里面对用户的定义：友盟将一个独立的设备视为一个用户，然而每个独立
           ...
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/07/04/umeng-umid-bug/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/04/picasso-circle-transform/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/05/04/picasso-circle-transform/" itemprop="url">Android中使用Picasso将图片直接转换为圆形</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-04T23:46:20+08:00">
+                2016-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          前言圆形头像现在很流行了，Github上也有很多开源的库，最经典的是直接使用一个自定义的圆形ImageViwe，比较有代表性的有这个项目：hdodenhof/CircleImageView。但是，如果你的项目中正好使用Picasso作为图片异步加载的话，可以直接使用Picasso原生的Transformation机制，它允许你在显示图片前做一些转化。
+为了避免重复造轮子，先Google大法一下，会发现2个比较多人start的gist：aprock/RoundedTransformation.ja
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/05/04/picasso-circle-transform/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -554,22 +739,31 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
 
           
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
 
           
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">6</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
