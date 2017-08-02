@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,Lambda,Jack," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
+<meta name="keywords" content="Android,Lambda,Jack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Android上使用官方Lambda支持 - Android N &amp; Jack工具（兼容旧平台）">
+<meta property="og:url" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/20160506000412638.png">
+<meta property="og:updated_time" content="2017-08-02T16:50:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Android上使用官方Lambda支持 - Android N &amp; Jack工具（兼容旧平台）">
+<meta name="twitter:description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
+<meta name="twitter:image" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/20160506000412638.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/"/>
+
+
+
+
+
+  <title>在Android上使用官方Lambda支持 - Android N & Jack工具（兼容旧平台） | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在Android上使用官方Lambda支持 - Android N & Jack工具（兼容旧平台）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-06T00:07:01+08:00">
+                2016-05-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Lambda/" itemprop="url" rel="index">
+                    <span itemprop="name">Lambda</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Android-N-Preview"><a href="#Android-N-Preview" class="headerlink" title="Android N Preview"></a>Android N Preview</h2><p>Google前段时间发布了<code>Android N Preview</code>，对于开发者来说，特别重要的一点是开始支持<code>Java8</code>里面的一些新特性了。<code>N Preview</code>目前支持的特性也非常有限，主要有下列几项，具体参考<a href="http://developer.android.com/intl/zh-cn/preview/j8-jack.html" target="_blank" rel="external">官方介绍</a>和这篇翻译：<a href="http://blog.zhaiyifan.cn/2016/04/20/trans-java-8-in-android-n-preview/" target="_blank" rel="external">在 Android N 预览版中使用 Java 8 的新特性</a>：</p>
+<ul>
+<li>Lambda表达式</li>
+<li>默认和静态接口方法</li>
+<li>Stream</li>
+<li>重复注解</li>
+<li>Method References</li>
+</ul>
+<h2 id="Lambda表达式"><a href="#Lambda表达式" class="headerlink" title="Lambda表达式"></a>Lambda表达式</h2><p>来看看我们比较关注的一点：<code>Lambda</code>表达式，引用官方的一句话：</p>
+<blockquote>
+<p>Android N 的 Lambda 表达式的实现基于匿名类。这种方法使表达式可以向后兼容，并可以在早期版本的 Android 上执行。</p>
+</blockquote>
+<p>看到这里，我相信大家已经兴奋了，这段话啥意思呢？也就是在Android N之前的版本中，我们终于可以不依赖<a href="https://github.com/evant/gradle-retrolambda" target="_blank" rel="external">gradle-retrolambda</a>和<a href="https://github.com/orfjackal/retrolambda" target="_blank" rel="external">retrolambda</a>这两个非官方的兼容库了。终于有了官方的Lambda表达式支持了，此处应有掌声，啪啪啪啪啪啪。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>下面就看看如何实现，步骤也非常简单，主要是更新软件和引入Jack编译工具并修改gradle脚本：</p>
+<ul>
+<li><p>Step1<br>安装<code>jdk8</code>和下载最新的<code>AS2.1</code>稳定版，JDK location选jdk8的路径。</p>
+</li>
+<li><p>Step2<br>更新<code>Build-tools</code>至最新的<code>24.0.0 rc3</code>版本（因为Jack工具需要用到这个最新的rc版）</p>
+</li>
+<li><p>Step3<br>启用Java8特性和Jack工具编译，修改<code>build.gradle</code>脚本</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">  compileSdkVersion <span class="number">23</span></div><div class="line">  buildToolsVersion <span class="string">"24.0.0 rc3"</span></div><div class="line">  ...</div><div class="line">  defaultConfig &#123;</div><div class="line">    minSdkVersion <span class="number">15</span></div><div class="line">    targetSdkVersion <span class="number">23</span></div><div class="line">    versionCode <span class="number">1</span></div><div class="line">    versionName <span class="string">"1.0"</span></div><div class="line">        </div><div class="line">    jackOptions &#123;</div><div class="line">      enabled <span class="keyword">true</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  ...</div><div class="line">  compileOptions &#123;</div><div class="line">    <span class="keyword">sourceCompatibility</span> JavaVersion.VERSION_1_8</div><div class="line">    <span class="keyword">targetCompatibility</span> JavaVersion.VERSION_1_8</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>（注意：若我们只需要使用Lambda特性，<code>compileSdkVersion</code> 和 <code>targetSdkVersion</code> 可以设为 23 或更小的值）</p>
+<ul>
+<li>Step4<br>执行<code>Gradle Sync Project</code>，稍等AS初始化坏境及依赖，就可以开始写Lambda表达式了。Google原生支持的，而且兼容旧版本，各种酸爽有木有？下面是一个Rxjava的例子：</li>
+</ul>
+<p><img src="20160506000412638.png" alt="这里写图片描述"></p>
+<p>可以看到左边的那条bar已经有红色的Lambda标记，证明已经配置成功。终于可以用上Google官方的Lambda表达式兼容支持了，想想内心有点小激动呢，嘿嘿。Have fun~！</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Lambda/" rel="tag"># Lambda</a>
+          
+            <a href="/tags/Jack/" rel="tag"># Jack</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/05/android-retrolambda/" rel="next" title="在Android上使用Lambda表达式 - retrolambda插件">
+                <i class="fa fa-chevron-left"></i> 在Android上使用Lambda表达式 - retrolambda插件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/04/umeng-umid-bug/" rel="prev" title="友盟统计UMID潜在的一个坑">
+                友盟统计UMID潜在的一个坑 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="codezjx" />
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-N-Preview"><span class="nav-number">1.</span> <span class="nav-text">Android N Preview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lambda表达式"><span class="nav-number">2.</span> <span class="nav-text">Lambda表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
