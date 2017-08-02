@@ -1,7 +1,7 @@
 ---
 title: 在Android上使用官方Lambda支持 - Android N & Jack工具（兼容旧平台）
 date: 2016-05-06 00:07:01
-categories: [Android, Lambda]
+categories: Lambda
 tags: [Android, Lambda, Jack]
 ---
 
