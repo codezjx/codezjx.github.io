@@ -1,6 +1,6 @@
 ---
 title: {{ title }}
 date: {{ date }}
-categories: Android
-tags: [Android]
+categories:
+tags:
 ---
