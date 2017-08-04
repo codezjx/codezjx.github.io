@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,Lambda,Jack," />
+  <meta name="keywords" content="Android,Google Analytics," />
 
 
 
@@ -93,20 +93,24 @@
 
 
 
-<meta name="description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
-<meta name="keywords" content="Android,Lambda,Jack">
+<meta name="description" content="前言翻遍官方Android版Guide文档，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做广告系列来源的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现： 一、通过内置广告系列来源实现翻看Me">
+<meta name="keywords" content="Android,Google Analytics">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在Android上使用官方Lambda支持 - Android N &amp; Jack工具（兼容旧平台）">
-<meta property="og:url" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/index.html">
+<meta property="og:title" content="Google Analytics多渠道实现">
+<meta property="og:url" content="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
+<meta property="og:description" content="前言翻遍官方Android版Guide文档，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做广告系列来源的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现： 一、通过内置广告系列来源实现翻看Me">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/20160506000412638.png">
-<meta property="og:updated_time" content="2017-08-02T16:50:56.000Z">
+<meta property="og:image" content="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/20151226153109444.png">
+<meta property="og:image" content="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/20151226153258276.png">
+<meta property="og:image" content="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/20151226153406851.png">
+<meta property="og:image" content="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/20151226153812713.png">
+<meta property="og:image" content="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/20151226154032436.png">
+<meta property="og:updated_time" content="2017-08-04T14:49:20.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在Android上使用官方Lambda支持 - Android N &amp; Jack工具（兼容旧平台）">
-<meta name="twitter:description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
-<meta name="twitter:image" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/20160506000412638.png">
+<meta name="twitter:title" content="Google Analytics多渠道实现">
+<meta name="twitter:description" content="前言翻遍官方Android版Guide文档，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做广告系列来源的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现： 一、通过内置广告系列来源实现翻看Me">
+<meta name="twitter:image" content="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/20151226153109444.png">
 
 
 
@@ -134,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/"/>
+  <link rel="canonical" href="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/"/>
 
 
 
 
 
-  <title>在Android上使用官方Lambda支持 - Android N & Jack工具（兼容旧平台） | codezjx's Home</title>
+  <title>Google Analytics多渠道实现 | codezjx's Home</title>
   
 
 
@@ -279,7 +283,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/12/26/google-analytics-multi-flavor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="codezjx">
@@ -296,7 +300,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">在Android上使用官方Lambda支持 - Android N & Jack工具（兼容旧平台）</h1>
+          <h1 class="post-title" itemprop="name headline">Google Analytics多渠道实现</h1>
         
 
         <div class="post-meta">
@@ -308,8 +312,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-06T00:07:01+08:00">
-                2016-05-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-12-26T15:46:37+08:00">
+                2015-12-26
               </time>
             
 
@@ -331,8 +335,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Lambda/" itemprop="url" rel="index">
-                    <span itemprop="name">Lambda</span>
+                  <a href="/categories/Google-Analytics/" itemprop="url" rel="index">
+                    <span itemprop="name">Google Analytics</span>
                   </a>
                 </span>
 
@@ -365,35 +369,30 @@
       
 
       
-        <h2 id="Android-N-Preview"><a href="#Android-N-Preview" class="headerlink" title="Android N Preview"></a>Android N Preview</h2><p>Google前段时间发布了<code>Android N Preview</code>，对于开发者来说，特别重要的一点是开始支持<code>Java8</code>里面的一些新特性了。<code>N Preview</code>目前支持的特性也非常有限，主要有下列几项，具体参考<a href="http://developer.android.com/intl/zh-cn/preview/j8-jack.html" target="_blank" rel="external">官方介绍</a>和这篇翻译：<a href="http://blog.zhaiyifan.cn/2016/04/20/trans-java-8-in-android-n-preview/" target="_blank" rel="external">在 Android N 预览版中使用 Java 8 的新特性</a>：</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>翻遍官方Android版<a href="https://developers.google.com/analytics/devguides/collection/android/v4/" target="_blank" rel="external">Guide文档</a>，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做<strong>广告系列来源</strong>的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现：</p>
+<h2 id="一、通过内置广告系列来源实现"><a href="#一、通过内置广告系列来源实现" class="headerlink" title="一、通过内置广告系列来源实现"></a>一、通过内置<strong>广告系列来源</strong>实现</h2><p>翻看<a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#cs" target="_blank" rel="external">Measurement Protocol</a>协议文档，你可以找到<strong>广告系列来源</strong>相关的参数支持，可以使用cs这个字段用来标记指定我们的渠道。</p>
+<p>（什么是<code>Measurement Protocol</code>？它可让开发者通过 HTTP 请求直接向 Google Analytics（分析）服务器发送原始用户互动数据。这样，开发者就可以衡量在各种环境中用户与商家互动的情况。）<br><img src="20151226153109444.png" alt="这里写图片描述"></p>
 <ul>
-<li>Lambda表达式</li>
-<li>默认和静态接口方法</li>
-<li>Stream</li>
-<li>重复注解</li>
-<li>Method References</li>
-</ul>
-<h2 id="Lambda表达式"><a href="#Lambda表达式" class="headerlink" title="Lambda表达式"></a>Lambda表达式</h2><p>来看看我们比较关注的一点：<code>Lambda</code>表达式，引用官方的一句话：</p>
-<blockquote>
-<p>Android N 的 Lambda 表达式的实现基于匿名类。这种方法使表达式可以向后兼容，并可以在早期版本的 Android 上执行。</p>
-</blockquote>
-<p>看到这里，我相信大家已经兴奋了，这段话啥意思呢？也就是在Android N之前的版本中，我们终于可以不依赖<a href="https://github.com/evant/gradle-retrolambda" target="_blank" rel="external">gradle-retrolambda</a>和<a href="https://github.com/orfjackal/retrolambda" target="_blank" rel="external">retrolambda</a>这两个非官方的兼容库了。终于有了官方的Lambda表达式支持了，此处应有掌声，啪啪啪啪啪啪。</p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>下面就看看如何实现，步骤也非常简单，主要是更新软件和引入Jack编译工具并修改gradle脚本：</p>
-<ul>
-<li><p>Step1<br>安装<code>jdk8</code>和下载最新的<code>AS2.1</code>稳定版，JDK location选jdk8的路径。</p>
-</li>
-<li><p>Step2<br>更新<code>Build-tools</code>至最新的<code>24.0.0 rc3</code>版本（因为Jack工具需要用到这个最新的rc版）</p>
-</li>
-<li><p>Step3<br>启用Java8特性和Jack工具编译，修改<code>build.gradle</code>脚本</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">  compileSdkVersion <span class="number">23</span></div><div class="line">  buildToolsVersion <span class="string">"24.0.0 rc3"</span></div><div class="line">  ...</div><div class="line">  defaultConfig &#123;</div><div class="line">    minSdkVersion <span class="number">15</span></div><div class="line">    targetSdkVersion <span class="number">23</span></div><div class="line">    versionCode <span class="number">1</span></div><div class="line">    versionName <span class="string">"1.0"</span></div><div class="line">        </div><div class="line">    jackOptions &#123;</div><div class="line">      enabled <span class="keyword">true</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  ...</div><div class="line">  compileOptions &#123;</div><div class="line">    <span class="keyword">sourceCompatibility</span> JavaVersion.VERSION_1_8</div><div class="line">    <span class="keyword">targetCompatibility</span> JavaVersion.VERSION_1_8</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<li>具体到编码上，只需几行代码：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);</div><div class="line">mTracker = analytics.newTracker(R.xml.ga_tracker);</div><div class="line">mTracker.set(&quot;&amp;cs&quot;, &quot;Flavor&quot;);</div></pre></td></tr></table></figure>
 </li>
 </ul>
-<p>（注意：若我们只需要使用Lambda特性，<code>compileSdkVersion</code> 和 <code>targetSdkVersion</code> 可以设为 23 或更小的值）</p>
+<p>后续所有通过此Tracker发送到后台的数据都会带有此来源标识，如上面的Flavor渠道来源</p>
 <ul>
-<li>Step4<br>执行<code>Gradle Sync Project</code>，稍等AS初始化坏境及依赖，就可以开始写Lambda表达式了。Google原生支持的，而且兼容旧版本，各种酸爽有木有？下面是一个Rxjava的例子：</li>
+<li>在GA后台统计中（以<strong>事件</strong>这个数据项为例），我们可以选择一个<strong>次级维度</strong>：次级维度-&gt;数据获取-&gt;来源。此时，数据项会在主要维度的基础下进行二次维度分级（基本所有数据项都支持<strong>次级维度</strong>），如下图：<br><img src="20151226153258276.png" alt="这里写图片描述"></li>
 </ul>
-<p><img src="20160506000412638.png" alt="这里写图片描述"></p>
-<p>可以看到左边的那条bar已经有红色的Lambda标记，证明已经配置成功。终于可以用上Google官方的Lambda表达式兼容支持了，想想内心有点小激动呢，嘿嘿。Have fun~！</p>
+<h2 id="二、通过自定义维度实现"><a href="#二、通过自定义维度实现" class="headerlink" title="二、通过自定义维度实现"></a>二、通过<strong>自定义维度</strong>实现</h2><p>此外，除了使用系统内置的内置维度，我们还可以使用自定义的维度，这样的话会更加灵活。如何创建自定义维度此处不细讲，大家可以参考官方文档：<a href="https://support.google.com/analytics/answer/2709829" target="_blank" rel="external">创建和修改自定义维度和指标</a>和<a href="https://support.google.com/analytics/answer/2709828" target="_blank" rel="external">自定义维度和指标</a>。</p>
+<p>继续翻看<a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#cd_" target="_blank" rel="external">Measurement Protocol</a>协议文档，我们可以找到<strong>自定义维度</strong>相关的参数支持，使用cd这个参数字段。注意，这里每个新建的维度会有一个index，通过cd&lt;index&gt;这样的方式指定维度key。<br><img src="20151226153406851.png" alt="这里写图片描述"></p>
+<ul>
+<li><p>新建完自定义维度后，稍等片刻即可在<strong>次级维度</strong>中看到这个选项（这里我新建的维度名为Flavor），如下图：<br><img src="20151226153812713.png" alt="这里写图片描述"></p>
+</li>
+<li><p>接着把它设置到Tracker上即可，与上面类似（下面的1是index，对应Flavor这个自定义维度）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">String flavorName = &quot;wandoujia&quot;;</div><div class="line">mTracker.set(&quot;&amp;cd1&quot;, flavorName );</div></pre></td></tr></table></figure>
+</li>
+<li><p>在GA后台统计中，同样以<strong>事件</strong>这个数据项为例，次级维度中选择我们自定义的维度，即可查看详细分级结果，如下图：<br><img src="20151226154032436.png" alt="这里写图片描述"></p>
+</li>
+</ul>
+<p>通过系统的自定义维度和指标，可以实现更多的个性化数据统计。例如文档中提到的：针对游戏开发者，“关卡完成度”或“最高得分”等指标就可能比屏幕浏览量等预定义的指标更贴合需求。同时自定义维度可以在自定义报告中显示为主要维度，你也可以在标准报告中将它们用作细分和次级维度。等等等…</p>
+<p>各位不仅要看Android Guide文档，还有GA帮助文档，还有API文档…才能全面、深入的了解GA这个神器…话说知乎网页端也是用GA来做数据统计的。</p>
 
       
     </div>
@@ -425,9 +424,7 @@
           
             <a href="/tags/Android/" rel="tag"># Android</a>
           
-            <a href="/tags/Lambda/" rel="tag"># Lambda</a>
-          
-            <a href="/tags/Jack/" rel="tag"># Jack</a>
+            <a href="/tags/Google-Analytics/" rel="tag"># Google Analytics</a>
           
         </div>
       
@@ -440,8 +437,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/05/05/android-retrolambda/" rel="next" title="在Android上使用Lambda表达式 - retrolambda插件">
-                <i class="fa fa-chevron-left"></i> 在Android上使用Lambda表达式 - retrolambda插件
+              <a href="/2015/12/25/google-analytics-config/" rel="next" title="Google Analytics基本参数配置">
+                <i class="fa fa-chevron-left"></i> Google Analytics基本参数配置
               </a>
             
           </div>
@@ -450,8 +447,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/07/04/umeng-umid-bug/" rel="prev" title="友盟统计UMID潜在的一个坑">
-                友盟统计UMID潜在的一个坑 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/05/04/picasso-circle-transform/" rel="prev" title="Android中使用Picasso将图片直接转换为圆形">
+                Android中使用Picasso将图片直接转换为圆形 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -620,7 +617,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-N-Preview"><span class="nav-number">1.</span> <span class="nav-text">Android N Preview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lambda表达式"><span class="nav-number">2.</span> <span class="nav-text">Lambda表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一、通过内置广告系列来源实现"><span class="nav-number">2.</span> <span class="nav-text">一、通过内置广告系列来源实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、通过自定义维度实现"><span class="nav-number">3.</span> <span class="nav-text">二、通过自定义维度实现</span></a></li></ol></div>
             
 
           </div>
