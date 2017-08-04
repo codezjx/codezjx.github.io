@@ -65,7 +65,7 @@ Tracker tracker = analytics.newTracker(R.xml.ga_tracker);
 ```
 - 注意：若`ga_autoActivityTracking`开启，tracker将实现自动页面跟踪，此时我们可以指定页面与其对应的映射名字，可通过xml配置文件中的`<screenName>`元素来描述其映射关系。
 
-## 参考：
+## 参考
 https://developers.google.com/android/reference/com/google/android/gms/analytics/GoogleAnalytics
 https://developers.google.com/android/reference/com/google/android/gms/analytics/Tracker
 
