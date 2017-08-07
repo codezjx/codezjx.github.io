@@ -93,21 +93,20 @@
 
 
 
-<meta name="description" content="开启Drive API和创建Credential 首先按照官网流程在Google Developers Console创建好Project，并开启Drive API。  然后进入Credentials界面新建一个OAuth 2.0 client凭证。  Application type里面会有以下几种类型：  Web application Android Chrome App iOS PlayS">
+<meta name="description" content="背景由于国内大多数机器都木有安装Google Service框架，也就是说木有办法直接使用Drive SDK进行授权。因此，这一篇文章将介绍如何通过WebView的方式进行Oauth2.0授权码的获取（话说《ES文件浏览器》就是通过这种方式来实现Oauth2.0授权的）。具体的效果是这样的：如果没有登录Google账号，会要求你先登录一次 先来看一下web端account的授权url：123456">
 <meta name="keywords" content="Android,Google Drive">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Google Drive开启API和创建Credential">
-<meta property="og:url" content="http://yoursite.com/2016/03/31/google-drive-create-credential/index.html">
+<meta property="og:title" content="Google Drive WebView授权方式实现">
+<meta property="og:url" content="http://yoursite.com/2016/03/31/google-drive-webview-oauth/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="开启Drive API和创建Credential 首先按照官网流程在Google Developers Console创建好Project，并开启Drive API。  然后进入Credentials界面新建一个OAuth 2.0 client凭证。  Application type里面会有以下几种类型：  Web application Android Chrome App iOS PlayS">
+<meta property="og:description" content="背景由于国内大多数机器都木有安装Google Service框架，也就是说木有办法直接使用Drive SDK进行授权。因此，这一篇文章将介绍如何通过WebView的方式进行Oauth2.0授权码的获取（话说《ES文件浏览器》就是通过这种方式来实现Oauth2.0授权的）。具体的效果是这样的：如果没有登录Google账号，会要求你先登录一次 先来看一下web端account的授权url：123456">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2016/03/31/google-drive-create-credential/20160331130158970.png">
-<meta property="og:image" content="http://yoursite.com/2016/03/31/google-drive-create-credential/20160331130246189.png">
-<meta property="og:updated_time" content="2017-08-07T15:12:38.000Z">
+<meta property="og:image" content="http://yoursite.com/2016/03/31/google-drive-webview-oauth/20160331142025828.png">
+<meta property="og:updated_time" content="2017-08-07T15:21:20.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Google Drive开启API和创建Credential">
-<meta name="twitter:description" content="开启Drive API和创建Credential 首先按照官网流程在Google Developers Console创建好Project，并开启Drive API。  然后进入Credentials界面新建一个OAuth 2.0 client凭证。  Application type里面会有以下几种类型：  Web application Android Chrome App iOS PlayS">
-<meta name="twitter:image" content="http://yoursite.com/2016/03/31/google-drive-create-credential/20160331130158970.png">
+<meta name="twitter:title" content="Google Drive WebView授权方式实现">
+<meta name="twitter:description" content="背景由于国内大多数机器都木有安装Google Service框架，也就是说木有办法直接使用Drive SDK进行授权。因此，这一篇文章将介绍如何通过WebView的方式进行Oauth2.0授权码的获取（话说《ES文件浏览器》就是通过这种方式来实现Oauth2.0授权的）。具体的效果是这样的：如果没有登录Google账号，会要求你先登录一次 先来看一下web端account的授权url：123456">
+<meta name="twitter:image" content="http://yoursite.com/2016/03/31/google-drive-webview-oauth/20160331142025828.png">
 
 
 
@@ -135,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/03/31/google-drive-create-credential/"/>
+  <link rel="canonical" href="http://yoursite.com/2016/03/31/google-drive-webview-oauth/"/>
 
 
 
 
 
-  <title>Google Drive开启API和创建Credential | codezjx's Home</title>
+  <title>Google Drive WebView授权方式实现 | codezjx's Home</title>
   
 
 
@@ -280,7 +279,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/31/google-drive-create-credential/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/31/google-drive-webview-oauth/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="codezjx">
@@ -297,7 +296,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Google Drive开启API和创建Credential</h1>
+          <h1 class="post-title" itemprop="name headline">Google Drive WebView授权方式实现</h1>
         
 
         <div class="post-meta">
@@ -309,7 +308,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-31T13:05:06+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-31T13:36:06+08:00">
                 2016-03-31
               </time>
             
@@ -366,32 +365,20 @@
       
 
       
-        <h2 id="开启Drive-API和创建Credential"><a href="#开启Drive-API和创建Credential" class="headerlink" title="开启Drive API和创建Credential"></a>开启Drive API和创建Credential</h2><ul>
-<li><p>首先按照<a href="https://developers.google.com/drive/v3/web/quickstart/java" target="_blank" rel="external">官网流程</a>在Google Developers Console创建好Project，并开启Drive API。<br><img src="20160331130158970.png" alt="这里写图片描述"></p>
-</li>
-<li><p>然后进入Credentials界面新建一个OAuth 2.0 client凭证。<br><img src="20160331130246189.png" alt="这里写图片描述"></p>
-</li>
-<li><p>Application type里面会有以下几种类型：</p>
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>由于国内大多数机器都木有安装Google Service框架，也就是说木有办法直接使用Drive SDK进行授权。因此，这一篇文章将介绍如何通过WebView的方式进行Oauth2.0授权码的获取（话说《ES文件浏览器》就是通过这种方式来实现Oauth2.0授权的）。具体的效果是这样的：如果没有登录Google账号，会要求你先登录一次<br><img src="20160331142025828.png" alt="这里写图片描述"></p>
+<h2 id="先来看一下web端account的授权url："><a href="#先来看一下web端account的授权url：" class="headerlink" title="先来看一下web端account的授权url："></a>先来看一下web端account的授权url：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">https://accounts.google.com/o/oauth2/auth?</div><div class="line">    redirect_uri=https://localhost/&amp;</div><div class="line">    response_type=code&amp;</div><div class="line">    client_id=xxxxxxxx-xxxxxxx.apps.googleusercontent.com&amp;</div><div class="line">    scope=https://www.googleapis.com/auth/drive+</div><div class="line">             https://www.googleapis.com/auth/userinfo.profile</div></pre></td></tr></table></figure>
+<p>几个关键的字段我来解释一下：</p>
 <ul>
-<li>Web application</li>
-<li>Android</li>
-<li>Chrome App</li>
-<li>iOS</li>
-<li>PlayStation 4</li>
-<li><p>Other</p>
-<p>根据自己的需求，若是在Android App上配合原生Drive SDK使用，可以选择Android（需要fingerprint和packageName）；若是采用Web的接口进行授权及验证：例如java控制台程序，webview的方式等，则可以选择Web application或者Other。因为我后续打算使用Web的接口进行授权，所以此处直接选择Other。新建好以后将拿到Client ID和Client secret，他们主要用于后续的Oauth2.0认证以及API请求。</p>
-</li>
+<li>redirect_uri：定义了授权码code如何发送到你指定的地址中（当用户点击了允许）</li>
+<li>response_type：为固定值code，表示请求授权码</li>
+<li>client_id：在上一篇文章中申请凭证的client id</li>
+<li>scope：申请的权限范围（如上面的scope指定了获取用户drive最高权限以及获取用户信息权限，drive中具体的scope值可以参考<a href="https://developers.google.com/drive/v2/web/scopes" target="_blank" rel="external">官网的说明</a>）</li>
 </ul>
-</li>
-</ul>
-<h2 id="Drive-SDK-for-Android"><a href="#Drive-SDK-for-Android" class="headerlink" title="Drive SDK for Android"></a>Drive SDK for Android</h2><p>Google官方提供了专门针对Android的一套<a href="https://developers.google.com/drive/android/" target="_blank" rel="external">Drive SDK</a>，优缺点如下：</p>
-<ul>
-<li><p>优点<br>1.方便、快捷<br>2.提供完整的API接口，客户端代码量极少<br>3.与Google Account账号体系结合，不需要自己管理账号认证等等</p>
-</li>
-<li><p>缺点<br>没有安装Google Play Service将无法工作</p>
-</li>
-</ul>
-<p>相信大家看到上面这条缺点后就知道在咱们大天朝是不可能用上Drive SDK了，就算解决了肉身翻墙的问题，Google Service全家桶估计没有几个用户的手机是预装的。所以，我们只能采用另外一种方式来进行Google Oauth2.0的登录、认证、授权问题。</p>
+<p>最后直接通过<code>webview.loadUrl(url)</code>方法就可以直接加载上面的页面了。</p>
+<h2 id="为WebView设置自定义WebViewClient"><a href="#为WebView设置自定义WebViewClient" class="headerlink" title="为WebView设置自定义WebViewClient"></a>为WebView设置自定义WebViewClient</h2><p>由于Oauth2.0中，验证的第一步就是需要授权码，也就是上面经过重定向返回的code。因此我们必须监听这个重定向url。在<code>WebView</code>里面，我们可以设置一个<code>WebViewClient</code>，重写里面的<code>onPageFinished()</code>方法，即可对重定向的地址进行用户点击状态的判断（允许或拒绝）以及状态码的截取。关键代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">webview.setWebViewClient(<span class="keyword">new</span> WebViewClient() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPageFinished</span><span class="params">(WebView view, String url)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onPageFinished(view, url);</div><div class="line">        <span class="keyword">if</span> (url.contains(<span class="string">"?code="</span>)) &#123;</div><div class="line">            <span class="comment">// Get code and continue to auth</span></div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (url.contains(<span class="string">"error=access_denied"</span>)) &#123;</div><div class="line">            <span class="comment">// User disallow</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>在取得了授权码code之后，就可以进行后续Oauth2.0中token的请求以及Google API调用了。</p>
+<p>参考：<br><a href="https://developers.google.com/identity/protocols/OAuth2InstalledApp" target="_blank" rel="external">https://developers.google.com/identity/protocols/OAuth2InstalledApp</a><br><a href="https://www.learn2crack.com/2014/01/android-oauth2-webview.html" target="_blank" rel="external">https://www.learn2crack.com/2014/01/android-oauth2-webview.html</a></p>
 
       
     </div>
@@ -436,8 +423,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/01/08/google-analytics-custom-exception/" rel="next" title="Google Analytics自定义异常格式">
-                <i class="fa fa-chevron-left"></i> Google Analytics自定义异常格式
+              <a href="/2016/03/31/google-drive-create-credential/" rel="next" title="Google Drive开启API和创建Credential">
+                <i class="fa fa-chevron-left"></i> Google Drive开启API和创建Credential
               </a>
             
           </div>
@@ -446,8 +433,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/03/31/google-drive-webview-oauth/" rel="prev" title="Google Drive WebView授权方式实现">
-                Google Drive WebView授权方式实现 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/05/04/picasso-circle-transform/" rel="prev" title="Android中使用Picasso将图片直接转换为圆形">
+                Android中使用Picasso将图片直接转换为圆形 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -616,7 +603,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#开启Drive-API和创建Credential"><span class="nav-number">1.</span> <span class="nav-text">开启Drive API和创建Credential</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Drive-SDK-for-Android"><span class="nav-number">2.</span> <span class="nav-text">Drive SDK for Android</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#先来看一下web端account的授权url："><span class="nav-number">2.</span> <span class="nav-text">先来看一下web端account的授权url：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为WebView设置自定义WebViewClient"><span class="nav-number">3.</span> <span class="nav-text">为WebView设置自定义WebViewClient</span></a></li></ol></div>
             
 
           </div>
