@@ -1,7 +1,7 @@
 ---
 title: Google Analytics自定义异常格式
 date: 2016-01-08 21:39:46
-categories: Google Analytics
+categories: Google Analytics Android
 tags: [Android, Google Analytics]
 ---
 

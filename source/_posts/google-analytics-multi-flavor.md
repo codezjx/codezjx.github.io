@@ -1,7 +1,7 @@
 ---
 title: Google Analytics多渠道实现
 date: 2015-12-26 15:46:37
-categories: Google Analytics
+categories: Google Analytics Android
 tags: [Android, Google Analytics]
 ---
 

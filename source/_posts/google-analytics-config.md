@@ -1,7 +1,7 @@
 ---
 title: Google Analytics基本参数配置
 date: 2015-12-25 23:48:23
-categories: Google Analytics
+categories: Google Analytics Android
 tags: [Android, Google Analytics]
 ---
 
