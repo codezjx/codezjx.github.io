@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Android,Google Drive,OAuth," />
 
 
 
@@ -93,13 +93,20 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="codezjx&#39;s Home">
-<meta property="og:url" content="http://yoursite.com/tags/Google-Drive/index.html">
+<meta name="description" content="Oauth2.0认证流程Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：  客户端App发起认证（若用户木有登录，则需要先登录） 弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code） 客户端获取到授权码以后，用授权码向认证服务器请求access token 服务器验证授权码无误后返回access">
+<meta name="keywords" content="Android,Google Drive,OAuth">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Google Drive Oauth2.0认证流程">
+<meta property="og:url" content="http://yoursite.com/2016/03/31/google-drive-oauth20/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="Oauth2.0认证流程Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：  客户端App发起认证（若用户木有登录，则需要先登录） 弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code） 客户端获取到授权码以后，用授权码向认证服务器请求access token 服务器验证授权码无误后返回access">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2016/03/31/google-drive-oauth20/20160331193430106.png">
+<meta property="og:updated_time" content="2017-08-10T14:54:58.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="codezjx&#39;s Home">
+<meta name="twitter:title" content="Google Drive Oauth2.0认证流程">
+<meta name="twitter:description" content="Oauth2.0认证流程Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：  客户端App发起认证（若用户木有登录，则需要先登录） 弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code） 客户端获取到授权码以后，用授权码向认证服务器请求access token 服务器验证授权码无误后返回access">
+<meta name="twitter:image" content="http://yoursite.com/2016/03/31/google-drive-oauth20/20160331193430106.png">
 
 
 
@@ -127,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/Google-Drive/"/>
+  <link rel="canonical" href="http://yoursite.com/2016/03/31/google-drive-oauth20/"/>
 
 
 
 
 
-  <title>标签: Google Drive | codezjx's Home</title>
+  <title>Google Drive Oauth2.0认证流程 | codezjx's Home</title>
   
 
 
@@ -158,7 +165,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -262,100 +269,197 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h1>Google Drive<small>标签</small>
-      </h1>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2016/03/31/google-drive-oauth20/" itemprop="url">
-              
-                <span itemprop="name">Google Drive Oauth2.0认证流程</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-03-31T19:35:06+08:00"
-              content="2016-03-31" >
-          03-31
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2016/03/31/google-drive-webview-oauth/" itemprop="url">
-              
-                <span itemprop="name">Google Drive WebView授权方式实现</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-03-31T13:36:06+08:00"
-              content="2016-03-31" >
-          03-31
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2016/03/31/google-drive-create-credential/" itemprop="url">
-              
-                <span itemprop="name">Google Drive开启API和创建Credential</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-03-31T13:05:06+08:00"
-              content="2016-03-31" >
-          03-31
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/31/google-drive-oauth20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Google Drive Oauth2.0认证流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-31T19:35:06+08:00">
+                2016-03-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Google-Drive-Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Google Drive Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Oauth2-0认证流程"><a href="#Oauth2-0认证流程" class="headerlink" title="Oauth2.0认证流程"></a>Oauth2.0认证流程</h2><p>Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：</p>
+<ol>
+<li>客户端App发起认证（若用户木有登录，则需要先登录）</li>
+<li>弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code）</li>
+<li>客户端获取到授权码以后，用授权码向认证服务器请求access token</li>
+<li>服务器验证授权码无误后返回access token至客户端</li>
+<li>拿到access token以后，就可以访问Google APIs了（其实这里还会返回一个refresh token）</li>
+</ol>
+<p>大家直接看下面的图可能会比较好理解一点：</p>
+<p><img src="20160331193430106.png" alt="这里写图片描述"></p>
+<p>上面的流程只是基于第一次获取access token的情况，因为access token是有期限的，默认是1个小时，access token过期之后，就需要通过refresh token来向Google认证服务器申请一个新的access token，不需要经历上面的1,2,3步。</p>
+<h2 id="Refresh-Token期限"><a href="#Refresh-Token期限" class="headerlink" title="Refresh Token期限"></a>Refresh Token期限</h2><p>Refresh Token并不是一直有效的，在下面的几种情况下将会失效： </p>
+<ul>
+<li>用户回收了授权</li>
+<li>token超过6个月木有被使用</li>
+<li>用户修改了密码并且token授权scope包含了：Gmail, Calendar, Contacts, 或者Hangouts</li>
+<li>超过了一定数量的token数量限制</li>
+</ul>
+<p>目前每个用户账号每个授权凭证有25个refresh token的数量限制，如果超过了这个限制，当你新建一个refresh  token的时候将会使最早创建那个失效。一般来说，我们在经过用户授权，拿到授权码请求到refresh token后，必须把它缓存起来，以便后续更新access token。</p>
+<h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><p><a href="https://developers.google.com/identity/protocols/OAuth2" target="_blank" rel="external">https://developers.google.com/identity/protocols/OAuth2</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Google-Drive/" rel="tag"># Google Drive</a>
+          
+            <a href="/tags/OAuth/" rel="tag"># OAuth</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/31/google-drive-webview-oauth/" rel="next" title="Google Drive WebView授权方式实现">
+                <i class="fa fa-chevron-left"></i> Google Drive WebView授权方式实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/04/picasso-circle-transform/" rel="prev" title="Android中使用Picasso将图片直接转换为圆形">
+                Android中使用Picasso将图片直接转换为圆形 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -363,6 +467,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -383,8 +491,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -484,6 +601,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Oauth2-0认证流程"><span class="nav-number">1.</span> <span class="nav-text">Oauth2.0认证流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Refresh-Token期限"><span class="nav-number">2.</span> <span class="nav-text">Refresh Token期限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考："><span class="nav-number">3.</span> <span class="nav-text">参考：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -604,10 +737,10 @@
 
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
 
-  
+
 
   
 

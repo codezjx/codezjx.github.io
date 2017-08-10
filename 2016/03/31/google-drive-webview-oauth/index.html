@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,Google Drive," />
+  <meta name="keywords" content="Android,Google Drive,OAuth," />
 
 
 
@@ -94,7 +94,7 @@
 
 
 <meta name="description" content="背景由于国内大多数机器都木有安装Google Service框架，也就是说木有办法直接使用Drive SDK进行授权。因此，这一篇文章将介绍如何通过WebView的方式进行Oauth2.0授权码的获取（话说《ES文件浏览器》就是通过这种方式来实现Oauth2.0授权的）。具体的效果是这样的：如果没有登录Google账号，会要求你先登录一次 先来看一下web端account的授权url：123456">
-<meta name="keywords" content="Android,Google Drive">
+<meta name="keywords" content="Android,Google Drive,OAuth">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Google Drive WebView授权方式实现">
 <meta property="og:url" content="http://yoursite.com/2016/03/31/google-drive-webview-oauth/index.html">
@@ -102,7 +102,7 @@
 <meta property="og:description" content="背景由于国内大多数机器都木有安装Google Service框架，也就是说木有办法直接使用Drive SDK进行授权。因此，这一篇文章将介绍如何通过WebView的方式进行Oauth2.0授权码的获取（话说《ES文件浏览器》就是通过这种方式来实现Oauth2.0授权的）。具体的效果是这样的：如果没有登录Google账号，会要求你先登录一次 先来看一下web端account的授权url：123456">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2016/03/31/google-drive-webview-oauth/20160331142025828.png">
-<meta property="og:updated_time" content="2017-08-07T15:21:20.000Z">
+<meta property="og:updated_time" content="2017-08-10T14:49:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Google Drive WebView授权方式实现">
 <meta name="twitter:description" content="背景由于国内大多数机器都木有安装Google Service框架，也就是说木有办法直接使用Drive SDK进行授权。因此，这一篇文章将介绍如何通过WebView的方式进行Oauth2.0授权码的获取（话说《ES文件浏览器》就是通过这种方式来实现Oauth2.0授权的）。具体的效果是这样的：如果没有登录Google账号，会要求你先登录一次 先来看一下web端account的授权url：123456">
@@ -412,6 +412,8 @@
           
             <a href="/tags/Google-Drive/" rel="tag"># Google Drive</a>
           
+            <a href="/tags/OAuth/" rel="tag"># OAuth</a>
+          
         </div>
       
 
@@ -433,8 +435,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/05/04/picasso-circle-transform/" rel="prev" title="Android中使用Picasso将图片直接转换为圆形">
-                Android中使用Picasso将图片直接转换为圆形 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/03/31/google-drive-oauth20/" rel="prev" title="Google Drive Oauth2.0认证流程">
+                Google Drive Oauth2.0认证流程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -508,7 +510,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -530,7 +532,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
