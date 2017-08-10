@@ -2,7 +2,7 @@
 title: Google Drive WebView授权方式实现
 date: 2016-03-31 13:36:06
 categories: Google Drive Android
-tags: [Android, Google Drive]
+tags: [Android, Google Drive, OAuth]
 ---
 
 ## 背景
