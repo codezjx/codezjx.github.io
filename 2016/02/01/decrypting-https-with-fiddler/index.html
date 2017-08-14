@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,Lambda,Jack," />
+  <meta name="keywords" content="Android,Fiddler," />
 
 
 
@@ -93,20 +93,24 @@
 
 
 
-<meta name="description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
-<meta name="keywords" content="Android,Lambda,Jack">
+<meta name="description" content="Fiddler是一个HTTP协议调试代理工具，在开发网络应用的时候经常会用到，其最基本的作用是能抓HTTP的数据包，当然它还有更高级的用法，如添加断点、修改请求与相应的数据等等。。。 基本用法 安装后配置端口：Tools-&amp;gt;Fiddler Options-&amp;gt;Connections-&amp;gt;Fiddler listens on port: 8888（默认值） 勾选Allow remote">
+<meta name="keywords" content="Android,Fiddler">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在Android上使用官方Lambda支持 - Android N &amp; Jack工具（兼容旧平台）">
-<meta property="og:url" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/index.html">
+<meta property="og:title" content="用Fiddler在Android上抓HTTPS包">
+<meta property="og:url" content="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
+<meta property="og:description" content="Fiddler是一个HTTP协议调试代理工具，在开发网络应用的时候经常会用到，其最基本的作用是能抓HTTP的数据包，当然它还有更高级的用法，如添加断点、修改请求与相应的数据等等。。。 基本用法 安装后配置端口：Tools-&amp;gt;Fiddler Options-&amp;gt;Connections-&amp;gt;Fiddler listens on port: 8888（默认值） 勾选Allow remote">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/20160506000412638.png">
-<meta property="og:updated_time" content="2017-08-02T16:50:56.000Z">
+<meta property="og:image" content="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/20160201201120498.png">
+<meta property="og:image" content="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/20160201202303785.png">
+<meta property="og:image" content="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/20160201201210950.png">
+<meta property="og:image" content="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/20160201201238513.png">
+<meta property="og:image" content="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/20160201201314341.png">
+<meta property="og:updated_time" content="2017-08-14T14:50:05.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在Android上使用官方Lambda支持 - Android N &amp; Jack工具（兼容旧平台）">
-<meta name="twitter:description" content="Android N PreviewGoogle前段时间发布了Android N Preview，对于开发者来说，特别重要的一点是开始支持Java8里面的一些新特性了。N Preview目前支持的特性也非常有限，主要有下列几项，具体参考官方介绍和这篇翻译：在 Android N 预览版中使用 Java 8 的新特性：  Lambda表达式 默认和静态接口方法 Stream 重复注解 Method R">
-<meta name="twitter:image" content="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/20160506000412638.png">
+<meta name="twitter:title" content="用Fiddler在Android上抓HTTPS包">
+<meta name="twitter:description" content="Fiddler是一个HTTP协议调试代理工具，在开发网络应用的时候经常会用到，其最基本的作用是能抓HTTP的数据包，当然它还有更高级的用法，如添加断点、修改请求与相应的数据等等。。。 基本用法 安装后配置端口：Tools-&amp;gt;Fiddler Options-&amp;gt;Connections-&amp;gt;Fiddler listens on port: 8888（默认值） 勾选Allow remote">
+<meta name="twitter:image" content="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/20160201201120498.png">
 
 
 
@@ -134,13 +138,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/"/>
+  <link rel="canonical" href="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/"/>
 
 
 
 
 
-  <title>在Android上使用官方Lambda支持 - Android N & Jack工具（兼容旧平台） | codezjx's Home</title>
+  <title>用Fiddler在Android上抓HTTPS包 | codezjx's Home</title>
   
 
 
@@ -279,7 +283,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/05/06/android-n-lambda-with-jack/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/02/01/decrypting-https-with-fiddler/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="codezjx">
@@ -296,7 +300,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">在Android上使用官方Lambda支持 - Android N & Jack工具（兼容旧平台）</h1>
+          <h1 class="post-title" itemprop="name headline">用Fiddler在Android上抓HTTPS包</h1>
         
 
         <div class="post-meta">
@@ -308,8 +312,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-06T00:07:01+08:00">
-                2016-05-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-01T20:17:06+08:00">
+                2016-02-01
               </time>
             
 
@@ -331,8 +335,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Lambda/" itemprop="url" rel="index">
-                    <span itemprop="name">Lambda</span>
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
                   </a>
                 </span>
 
@@ -365,35 +369,21 @@
       
 
       
-        <h2 id="Android-N-Preview"><a href="#Android-N-Preview" class="headerlink" title="Android N Preview"></a>Android N Preview</h2><p>Google前段时间发布了<code>Android N Preview</code>，对于开发者来说，特别重要的一点是开始支持<code>Java8</code>里面的一些新特性了。<code>N Preview</code>目前支持的特性也非常有限，主要有下列几项，具体参考<a href="http://developer.android.com/intl/zh-cn/preview/j8-jack.html" target="_blank" rel="external">官方介绍</a>和这篇翻译：<a href="http://blog.zhaiyifan.cn/2016/04/20/trans-java-8-in-android-n-preview/" target="_blank" rel="external">在 Android N 预览版中使用 Java 8 的新特性</a>：</p>
-<ul>
-<li>Lambda表达式</li>
-<li>默认和静态接口方法</li>
-<li>Stream</li>
-<li>重复注解</li>
-<li>Method References</li>
-</ul>
-<h2 id="Lambda表达式"><a href="#Lambda表达式" class="headerlink" title="Lambda表达式"></a>Lambda表达式</h2><p>来看看我们比较关注的一点：<code>Lambda</code>表达式，引用官方的一句话：</p>
-<blockquote>
-<p>Android N 的 Lambda 表达式的实现基于匿名类。这种方法使表达式可以向后兼容，并可以在早期版本的 Android 上执行。</p>
-</blockquote>
-<p>看到这里，我相信大家已经兴奋了，这段话啥意思呢？也就是在Android N之前的版本中，我们终于可以不依赖<a href="https://github.com/evant/gradle-retrolambda" target="_blank" rel="external">gradle-retrolambda</a>和<a href="https://github.com/orfjackal/retrolambda" target="_blank" rel="external">retrolambda</a>这两个非官方的兼容库了。终于有了官方的Lambda表达式支持了，此处应有掌声，啪啪啪啪啪啪。</p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>下面就看看如何实现，步骤也非常简单，主要是更新软件和引入Jack编译工具并修改gradle脚本：</p>
-<ul>
-<li><p>Step1<br>安装<code>jdk8</code>和下载最新的<code>AS2.1</code>稳定版，JDK location选jdk8的路径。</p>
-</li>
-<li><p>Step2<br>更新<code>Build-tools</code>至最新的<code>24.0.0 rc3</code>版本（因为Jack工具需要用到这个最新的rc版）</p>
-</li>
-<li><p>Step3<br>启用Java8特性和Jack工具编译，修改<code>build.gradle</code>脚本</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">  compileSdkVersion <span class="number">23</span></div><div class="line">  buildToolsVersion <span class="string">"24.0.0 rc3"</span></div><div class="line">  ...</div><div class="line">  defaultConfig &#123;</div><div class="line">    minSdkVersion <span class="number">15</span></div><div class="line">    targetSdkVersion <span class="number">23</span></div><div class="line">    versionCode <span class="number">1</span></div><div class="line">    versionName <span class="string">"1.0"</span></div><div class="line">        </div><div class="line">    jackOptions &#123;</div><div class="line">      enabled <span class="keyword">true</span></div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  ...</div><div class="line">  compileOptions &#123;</div><div class="line">    <span class="keyword">sourceCompatibility</span> JavaVersion.VERSION_1_8</div><div class="line">    <span class="keyword">targetCompatibility</span> JavaVersion.VERSION_1_8</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>（注意：若我们只需要使用Lambda特性，<code>compileSdkVersion</code> 和 <code>targetSdkVersion</code> 可以设为 23 或更小的值）</p>
-<ul>
-<li>Step4<br>执行<code>Gradle Sync Project</code>，稍等AS初始化坏境及依赖，就可以开始写Lambda表达式了。Google原生支持的，而且兼容旧版本，各种酸爽有木有？下面是一个Rxjava的例子：</li>
-</ul>
-<p><img src="20160506000412638.png" alt="这里写图片描述"></p>
-<p>可以看到左边的那条bar已经有红色的Lambda标记，证明已经配置成功。终于可以用上Google官方的Lambda表达式兼容支持了，想想内心有点小激动呢，嘿嘿。Have fun~！</p>
+        <p>Fiddler是一个HTTP协议调试代理工具，在开发网络应用的时候经常会用到，其最基本的作用是能抓HTTP的数据包，当然它还有更高级的用法，如添加断点、修改请求与相应的数据等等。。。</p>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><ol>
+<li>安装后配置端口：Tools-&gt;Fiddler Options-&gt;Connections-&gt;Fiddler listens on port: 8888（默认值）</li>
+<li>勾选Allow remote computers to connect<br><img src="20160201201120498.png" alt="这里写图片描述"></li>
+<li>进入Android设备的WLAN连接，长按进入修改网络-&gt;显示高级选项-&gt;添加代理服务器IP和端口即可（运行Fiddler的那台机器）<br><img src="20160201202303785.png" alt="这里写图片描述"><br>这个时候Android设备上所有的HTTP请求就会通过Fiddler进行代理转发了，当然我们就可以在Fiddler上对数据包进行分析。。。</li>
+</ol>
+<h2 id="抓HTTPS包"><a href="#抓HTTPS包" class="headerlink" title="抓HTTPS包"></a>抓HTTPS包</h2><p>最近项目里需要抓取Google Analytics的数据包进行分析，而GA的数据传输都是基于HTTPS的，用Fiddler进行抓包，命令行一直报Warnning，很明显就是由于证书没添加导致握手过程失败：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">W/GAv4: Network compressed POST connection error: javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.</div></pre></td></tr></table></figure></p>
+<p>我们都知道，HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，HTTPS需要申请CA证书，SSL通过CA证书来进行验证并对数据进行加密。</p>
+<p>要让Fiddler支持HTTPS包的捕获，我们需要到设置里面将其打开，并把CA证书添加到系统中：</p>
+<ol>
+<li>进入Tools-&gt;Fiddler Options-&gt;HTTPS，勾选Decrypt HTTPS traffic<br><img src="20160201201210950.png" alt="这里写图片描述"></li>
+<li>然后通过Actions按钮中的Export Root Certificate to Desktop导出证书文件<code>FiddlerRoot.cer</code>，拷贝至sdcard，然后通过安全-&gt;凭据存储-&gt;从usb存储器安装添加证书。此时会弹出添加证书的Dialog，输入名字点击确定即可。（或者在Android设备通过浏览器进入<a href="http://192.168.xx.xx:8888/，点击最下方的FiddlerRoot" target="_blank" rel="external">http://192.168.xx.xx:8888/，点击最下方的FiddlerRoot</a> certificate，然后会弹出添加证书的Dialog。）<br><img src="20160201201238513.png" alt="这里写图片描述"><br><img src="20160201201314341.png" alt="这里写图片描述"></li>
+<li>设置完后如果没生效把App重启一下再试试，在Fiddler的列表中应该已经出现HTTPS的数据包了。</li>
+</ol>
+<p><strong>注意：</strong><br>若导入证书的时候弹出：“输入凭据存储的密码”，则需要先设置锁定屏幕PIN或密码才能使用凭据存储。</p>
 
       
     </div>
@@ -425,9 +415,7 @@
           
             <a href="/tags/Android/" rel="tag"># Android</a>
           
-            <a href="/tags/Lambda/" rel="tag"># Lambda</a>
-          
-            <a href="/tags/Jack/" rel="tag"># Jack</a>
+            <a href="/tags/Fiddler/" rel="tag"># Fiddler</a>
           
         </div>
       
@@ -440,8 +428,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/05/05/android-retrolambda/" rel="next" title="在Android上使用Lambda表达式 - retrolambda插件">
-                <i class="fa fa-chevron-left"></i> 在Android上使用Lambda表达式 - retrolambda插件
+              <a href="/2016/01/08/google-analytics-custom-exception/" rel="next" title="Google Analytics自定义异常格式">
+                <i class="fa fa-chevron-left"></i> Google Analytics自定义异常格式
               </a>
             
           </div>
@@ -450,8 +438,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/07/04/umeng-umid-bug/" rel="prev" title="友盟统计UMID潜在的一个坑">
-                友盟统计UMID潜在的一个坑 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/03/31/google-drive-create-credential/" rel="prev" title="Google Drive开启API和创建Credential">
+                Google Drive开启API和创建Credential <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -620,7 +608,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-N-Preview"><span class="nav-number">1.</span> <span class="nav-text">Android N Preview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Lambda表达式"><span class="nav-number">2.</span> <span class="nav-text">Lambda表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本用法"><span class="nav-number">1.</span> <span class="nav-text">基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓HTTPS包"><span class="nav-number">2.</span> <span class="nav-text">抓HTTPS包</span></a></li></ol></div>
             
 
           </div>
