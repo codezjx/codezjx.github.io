@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,Google Analytics," />
+  <meta name="keywords" content="Android,Gradle,Flavor," />
 
 
 
@@ -93,20 +93,18 @@
 
 
 
-<meta name="description" content="官方Guide文档中的xml配置项官方Guide文档中Parameters这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。 全局配置项：GoogleAnalytics 配置res/xml/global_tracker.xml123456789&amp;lt;?xml version=&amp;quot;1.0&amp;">
-<meta name="keywords" content="Android,Google Analytics">
+<meta name="description" content="近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的Gradle Plugin User Guide教程学习了下，顺便做下笔记。内容主要分为以下几个模块： Create Product flavors多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等通过以下DSL即可创建渠道flavor1和flavor2：12345678an">
+<meta name="keywords" content="Android,Gradle,Flavor">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Google Analytics基本参数配置">
-<meta property="og:url" content="http://yoursite.com/2015/12/25/google-analytics-config/index.html">
+<meta property="og:title" content="Gradle App项目的多渠道打包实现">
+<meta property="og:url" content="http://yoursite.com/2015/10/30/gradle-app-multi-flavor/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="官方Guide文档中的xml配置项官方Guide文档中Parameters这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。 全局配置项：GoogleAnalytics 配置res/xml/global_tracker.xml123456789&amp;lt;?xml version=&amp;quot;1.0&amp;">
+<meta property="og:description" content="近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的Gradle Plugin User Guide教程学习了下，顺便做下笔记。内容主要分为以下几个模块： Create Product flavors多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等通过以下DSL即可创建渠道flavor1和flavor2：12345678an">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2015/12/25/google-analytics-config/20151225234348789.png">
-<meta property="og:updated_time" content="2017-08-07T15:07:03.000Z">
+<meta property="og:updated_time" content="2017-08-15T14:02:45.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Google Analytics基本参数配置">
-<meta name="twitter:description" content="官方Guide文档中的xml配置项官方Guide文档中Parameters这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。 全局配置项：GoogleAnalytics 配置res/xml/global_tracker.xml123456789&amp;lt;?xml version=&amp;quot;1.0&amp;">
-<meta name="twitter:image" content="http://yoursite.com/2015/12/25/google-analytics-config/20151225234348789.png">
+<meta name="twitter:title" content="Gradle App项目的多渠道打包实现">
+<meta name="twitter:description" content="近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的Gradle Plugin User Guide教程学习了下，顺便做下笔记。内容主要分为以下几个模块： Create Product flavors多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等通过以下DSL即可创建渠道flavor1和flavor2：12345678an">
 
 
 
@@ -134,13 +132,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2015/12/25/google-analytics-config/"/>
+  <link rel="canonical" href="http://yoursite.com/2015/10/30/gradle-app-multi-flavor/"/>
 
 
 
 
 
-  <title>Google Analytics基本参数配置 | codezjx's Home</title>
+  <title>Gradle App项目的多渠道打包实现 | codezjx's Home</title>
   
 
 
@@ -279,7 +277,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/12/25/google-analytics-config/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/10/30/gradle-app-multi-flavor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="codezjx">
@@ -296,7 +294,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Google Analytics基本参数配置</h1>
+          <h1 class="post-title" itemprop="name headline">Gradle App项目的多渠道打包实现</h1>
         
 
         <div class="post-meta">
@@ -308,8 +306,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-12-25T23:48:23+08:00">
-                2015-12-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-30T20:25:20+08:00">
+                2015-10-30
               </time>
             
 
@@ -331,8 +329,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Google-Analytics-Android/" itemprop="url" rel="index">
-                    <span itemprop="name">Google Analytics Android</span>
+                  <a href="/categories/Gradle/" itemprop="url" rel="index">
+                    <span itemprop="name">Gradle</span>
                   </a>
                 </span>
 
@@ -365,34 +363,31 @@
       
 
       
-        <h2 id="官方Guide文档中的xml配置项"><a href="#官方Guide文档中的xml配置项" class="headerlink" title="官方Guide文档中的xml配置项"></a>官方Guide文档中的xml配置项</h2><p>官方Guide文档中<a href="https://developers.google.com/analytics/devguides/collection/android/v4/parameters" target="_blank" rel="external">Parameters</a>这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。<br><img src="20151225234348789.png" alt="xml配置图"></p>
-<h2 id="全局配置项：GoogleAnalytics"><a href="#全局配置项：GoogleAnalytics" class="headerlink" title="全局配置项：GoogleAnalytics"></a>全局配置项：GoogleAnalytics</h2><ul>
-<li>配置<strong>res/xml/global_tracker.xml</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</div><div class="line">&lt;resources&gt;</div><div class="line">    &lt;string name=&quot;ga_appName&quot;&gt;My App&lt;/string&gt;</div><div class="line">    &lt;string name=&quot;ga_appVersion&quot;&gt;1.0&lt;/string&gt;</div><div class="line">    &lt;!-- Default period is 1800 seconds or 30 minutes --&gt;</div><div class="line">    &lt;integer name=&quot;ga_dispatchPeriod&quot;&gt;1800&lt;/integer&gt;</div><div class="line">    &lt;!-- Enable dry run mode. Default is false --&gt;</div><div class="line">    &lt;bool name=&quot;ga_dryRun&quot;&gt;false&lt;/bool&gt;</div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
-</li>
-</ul>
+        <p>近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的<a href="http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Variants" target="_blank" rel="external">Gradle Plugin User Guide</a>教程学习了下，顺便做下笔记。内容主要分为以下几个模块：</p>
+<h2 id="Create-Product-flavors"><a href="#Create-Product-flavors" class="headerlink" title="Create Product flavors"></a>Create Product flavors</h2><p>多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等<br>通过以下DSL即可创建渠道flavor1和flavor2：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    ...</div><div class="line">    productFlavors &#123;</div><div class="line">        flavor1 &#123;&#125;</div><div class="line">        flavor2 &#123;&#125;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="Build-Type-Product-Flavor-Build-Variant"><a href="#Build-Type-Product-Flavor-Build-Variant" class="headerlink" title="Build Type + Product Flavor = Build Variant"></a>Build Type + Product Flavor = Build Variant</h2><p>每一个Variant都是由Build Type和Flavor组合而成，共同生成一个Apk<br>例如默认的Build Type：debug和release，build完后会生成以下4个Variants<br>Flavor1 - debug<br>Flavor1 - release<br>Flavor2 - debug<br>Flavor2 - release</p>
+<h2 id="Product-Flavor-Configuration"><a href="#Product-Flavor-Configuration" class="headerlink" title="Product Flavor Configuration"></a>Product Flavor Configuration</h2><p>我们可以在Flavor对应的闭包内自定义每个渠道相关属性<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    ...</div><div class="line">    defaultConfig &#123;</div><div class="line">        minSdkVersion <span class="number">8</span></div><div class="line">        versionCode <span class="number">10</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    productFlavors &#123;</div><div class="line">        flavor1 &#123;</div><div class="line">            packageName <span class="string">"com.example.flavor1"</span></div><div class="line">            versionCode <span class="number">20</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        flavor2 &#123;</div><div class="line">            packageName <span class="string">"com.example.flavor2"</span></div><div class="line">            minSdkVersion <span class="number">14</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <ul>
-<li><p>在<strong>AndroidManifest.xml</strong>中加入<code>meta-data</code>，并设置为上述xml</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;application&gt;</div><div class="line">    ...</div><div class="line">    &lt;meta-data</div><div class="line">        android:name=&quot;com.google.android.gms.analytics.globalConfigResource&quot;</div><div class="line">        android:resource=&quot;@xml/global_tracker&quot; /&gt;</div><div class="line">    ...</div><div class="line">&lt;/application&gt;</div></pre></td></tr></table></figure>
-</li>
-<li><p>当然我们也可以在编码中动态配置，如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);</div><div class="line">analytics .setLocalDispatchPeriod(1800);</div><div class="line">analytics .setDryRun(false);</div></pre></td></tr></table></figure>
-</li>
-<li><p>注意官方文档中<code>ga_logLevel</code>已经被标记为Deprecated ，使用以下adb指令可打开debug log输出</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell setprop log.tag.GAv4 DEBUG</div></pre></td></tr></table></figure>
-</li>
+<li>flavor对象与defaultConfig的类型是相同的，所以他们的属性也一样</li>
+<li>defaultConfig可以作为每个渠道基础的公共配置，渠道中的属性会覆盖defaultConfig</li>
 </ul>
-<h2 id="跟踪器配置：Tracker"><a href="#跟踪器配置：Tracker" class="headerlink" title="跟踪器配置：Tracker"></a>跟踪器配置：Tracker</h2><ul>
-<li>配置<strong>res/xml/ga_tracker.xml</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</div><div class="line">&lt;resources&gt;</div><div class="line">    &lt;string name=&quot;ga_trackingId&quot;&gt;UA-0000-1&lt;/string&gt;</div><div class="line">    &lt;string name=&quot;ga_sampleFrequency&quot;&gt;100.0&lt;/string&gt;</div><div class="line">    &lt;integer name=&quot;ga_sessionTimeout&quot;&gt;1800&lt;/integer&gt;</div><div class="line">    &lt;bool name=&quot;ga_autoActivityTracking&quot;&gt;true&lt;/bool&gt;</div><div class="line">    &lt;bool name=&quot;ga_anonymizeIp&quot;&gt;false&lt;/bool&gt;</div><div class="line">    &lt;bool name=&quot;ga_reportUncaughtExceptions&quot;&gt;true&lt;/bool&gt;</div><div class="line">    &lt;screenName name=&quot;com.example.MainActivity&quot;&gt;Home Screen&lt;/screenName&gt;</div><div class="line">    &lt;screenName name=&quot;com.example.SecondActivity&quot;&gt;Second Screen&lt;/screenName&gt;</div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
-</li>
-</ul>
+<h2 id="Sourcesets-and-Dependencies"><a href="#Sourcesets-and-Dependencies" class="headerlink" title="Sourcesets and Dependencies"></a>Sourcesets and Dependencies</h2><p>Android Studio默认目录结构下，每个渠道会创建自己的sourceSets，与默认的android.sourceSets.main共同编译生成Apk：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">android.<span class="keyword">sourceSets</span>.main</div><div class="line">- src<span class="regexp">/main/</span></div><div class="line">android.<span class="keyword">sourceSets</span>.flavor1</div><div class="line">- src<span class="regexp">/flavor1/</span></div><div class="line">android.<span class="keyword">sourceSets</span>.flavor2</div><div class="line">- src<span class="regexp">/flavor2/</span></div></pre></td></tr></table></figure></p>
+<p>若是Eclipse的那种目录结构，可选择自己指定sourceSets位置，如：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">sourceSets</span> &#123;</div><div class="line">    main &#123;</div><div class="line">        manifest.srcFile <span class="string">'AndroidManifest.xml'</span></div><div class="line">        java.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        resources.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        aidl.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        renderscript.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        res.srcDirs = [<span class="string">'res'</span>]</div><div class="line">        assets.srcDirs = [<span class="string">'assets'</span>]</div><div class="line">    &#125;</div><div class="line">    flavor1 &#123;</div><div class="line">        java.srcDirs = [<span class="string">'xxx-folder/flavor1/src'</span>]</div><div class="line">        res.srcDirs = [<span class="string">'xxx-folder/flavor1/res'</span>]</div><div class="line">    &#125;</div><div class="line">    flavor2 &#123;</div><div class="line">        java.srcDirs = [<span class="string">'xxx-folder/flavor2/src'</span>]</div><div class="line">        res.srcDirs = [<span class="string">'xxx-folder/flavor2/res'</span>]</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>编译某个渠道包的时候遵循以下4条准则：</p>
 <ul>
-<li><p>调用<code>GoogleAnalytics</code>对象的<code>newTracker</code>方法并传入上述xml，即可完成对单独tracker的初始化</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);</div><div class="line">Tracker tracker = analytics.newTracker(R.xml.ga_tracker);</div></pre></td></tr></table></figure>
-</li>
-<li><p>注意：若<code>ga_autoActivityTracking</code>开启，tracker将实现自动页面跟踪，此时我们可以指定页面与其对应的映射名字，可通过xml配置文件中的<code>&lt;screenName&gt;</code>元素来描述其映射关系。</p>
-</li>
+<li>所有的源码(src/*/java)会用来共同编译生成一个Apk，不允许覆盖，会提示<code>duplicate class found</code></li>
+<li>所有的Manifests都将会合并，这样一来就允许渠道包中可以定义不同的组件与权限，具体可参考官方<a href="http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger" target="_blank" rel="external"><code>Manifest Merger</code></a></li>
+<li>渠道中的资源会以覆盖或增量的形式与main合并，优先级为<code>Build Type &gt; Product Flavor &gt; Main sourceSet</code></li>
+<li>每个Build Variant都会生成自己的R文件</li>
 </ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://developers.google.com/android/reference/com/google/android/gms/analytics/GoogleAnalytics" target="_blank" rel="external">https://developers.google.com/android/reference/com/google/android/gms/analytics/GoogleAnalytics</a><br><a href="https://developers.google.com/android/reference/com/google/android/gms/analytics/Tracker" target="_blank" rel="external">https://developers.google.com/android/reference/com/google/android/gms/analytics/Tracker</a></p>
+<p>渠道可以指定自己特定的dependencies，命名规则为(Flavor Name)Compile<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">dependencies</span> &#123;</div><div class="line">    flavor1Compile <span class="string">"..."</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="Building-and-Tasks"><a href="#Building-and-Tasks" class="headerlink" title="Building and Tasks"></a>Building and Tasks</h2><p>每个Build Variants都会创建相应的assemble task，可以通过以下命名方式调用对应指令来执行编译：</p>
+<ul>
+<li>assemble(Variant Name)   // 编译指定的Variant，如：assembleFlavor1Debug</li>
+<li>assemble(Build Type Name)   // 如：assembleDebug将同时编译Flavor1Debug和Flavor2Debug variants</li>
+<li>assemble(Product Flavor Name)  // 如：assembleFlavor1将同时编译Flavor1Debug和Flavor1Release variants</li>
+</ul>
+<p>执行<code>gradle assemble</code>将会编译所有的variants包，用得比较多的还是编译所有渠道的release包：<code>gradle assembleRelease</code>，然后就去喝杯咖啡慢慢的等待编译完成吧</p>
 
       
     </div>
@@ -424,7 +419,9 @@
           
             <a href="/tags/Android/" rel="tag"># Android</a>
           
-            <a href="/tags/Google-Analytics/" rel="tag"># Google Analytics</a>
+            <a href="/tags/Gradle/" rel="tag"># Gradle</a>
+          
+            <a href="/tags/Flavor/" rel="tag"># Flavor</a>
           
         </div>
       
@@ -437,18 +434,14 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/10/31/reuse-gradle-library-module/" rel="next" title="Gradle Library Module的复用机制">
-                <i class="fa fa-chevron-left"></i> Gradle Library Module的复用机制
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/12/26/google-analytics-multi-flavor/" rel="prev" title="Google Analytics多渠道实现">
-                Google Analytics多渠道实现 <i class="fa fa-chevron-right"></i>
+              <a href="/2015/10/31/reuse-gradle-library-module/" rel="prev" title="Gradle Library Module的复用机制">
+                Gradle Library Module的复用机制 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -617,7 +610,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#官方Guide文档中的xml配置项"><span class="nav-number">1.</span> <span class="nav-text">官方Guide文档中的xml配置项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全局配置项：GoogleAnalytics"><span class="nav-number">2.</span> <span class="nav-text">全局配置项：GoogleAnalytics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跟踪器配置：Tracker"><span class="nav-number">3.</span> <span class="nav-text">跟踪器配置：Tracker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-Product-flavors"><span class="nav-number">1.</span> <span class="nav-text">Create Product flavors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Build-Type-Product-Flavor-Build-Variant"><span class="nav-number">2.</span> <span class="nav-text">Build Type + Product Flavor = Build Variant</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Product-Flavor-Configuration"><span class="nav-number">3.</span> <span class="nav-text">Product Flavor Configuration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sourcesets-and-Dependencies"><span class="nav-number">4.</span> <span class="nav-text">Sourcesets and Dependencies</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Building-and-Tasks"><span class="nav-number">5.</span> <span class="nav-text">Building and Tasks</span></a></li></ol></div>
             
 
           </div>
