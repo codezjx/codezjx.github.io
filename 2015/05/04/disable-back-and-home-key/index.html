@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,Google Analytics," />
+  <meta name="keywords" content="Android,Hack," />
 
 
 
@@ -93,20 +93,18 @@
 
 
 
-<meta name="description" content="官方Guide文档中的xml配置项官方Guide文档中Parameters这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。 全局配置项：GoogleAnalytics 配置res/xml/global_tracker.xml123456789&amp;lt;?xml version=&amp;quot;1.0&amp;">
-<meta name="keywords" content="Android,Google Analytics">
+<meta name="description" content="屏蔽返回键比较简单，重写onBackPressed()即可，不调用超类方法1234@Overridepublic void onBackPressed() &amp;#123;    // super.onBackPressed();&amp;#125; 屏蔽Home键常规方法代码如下，但是在Android4.0以上会失效12345@Overridepublic void onAttachedToWindow()">
+<meta name="keywords" content="Android,Hack">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Google Analytics基本参数配置">
-<meta property="og:url" content="http://yoursite.com/2015/12/25/google-analytics-config/index.html">
+<meta property="og:title" content="Android中Back键和Home键的屏蔽">
+<meta property="og:url" content="http://yoursite.com/2015/05/04/disable-back-and-home-key/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="官方Guide文档中的xml配置项官方Guide文档中Parameters这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。 全局配置项：GoogleAnalytics 配置res/xml/global_tracker.xml123456789&amp;lt;?xml version=&amp;quot;1.0&amp;">
+<meta property="og:description" content="屏蔽返回键比较简单，重写onBackPressed()即可，不调用超类方法1234@Overridepublic void onBackPressed() &amp;#123;    // super.onBackPressed();&amp;#125; 屏蔽Home键常规方法代码如下，但是在Android4.0以上会失效12345@Overridepublic void onAttachedToWindow()">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2015/12/25/google-analytics-config/20151225234348789.png">
-<meta property="og:updated_time" content="2017-08-07T15:07:03.000Z">
+<meta property="og:updated_time" content="2017-08-16T13:42:49.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Google Analytics基本参数配置">
-<meta name="twitter:description" content="官方Guide文档中的xml配置项官方Guide文档中Parameters这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。 全局配置项：GoogleAnalytics 配置res/xml/global_tracker.xml123456789&amp;lt;?xml version=&amp;quot;1.0&amp;">
-<meta name="twitter:image" content="http://yoursite.com/2015/12/25/google-analytics-config/20151225234348789.png">
+<meta name="twitter:title" content="Android中Back键和Home键的屏蔽">
+<meta name="twitter:description" content="屏蔽返回键比较简单，重写onBackPressed()即可，不调用超类方法1234@Overridepublic void onBackPressed() &amp;#123;    // super.onBackPressed();&amp;#125; 屏蔽Home键常规方法代码如下，但是在Android4.0以上会失效12345@Overridepublic void onAttachedToWindow()">
 
 
 
@@ -134,13 +132,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2015/12/25/google-analytics-config/"/>
+  <link rel="canonical" href="http://yoursite.com/2015/05/04/disable-back-and-home-key/"/>
 
 
 
 
 
-  <title>Google Analytics基本参数配置 | codezjx's Home</title>
+  <title>Android中Back键和Home键的屏蔽 | codezjx's Home</title>
   
 
 
@@ -279,7 +277,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/12/25/google-analytics-config/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/05/04/disable-back-and-home-key/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="codezjx">
@@ -296,7 +294,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Google Analytics基本参数配置</h1>
+          <h1 class="post-title" itemprop="name headline">Android中Back键和Home键的屏蔽</h1>
         
 
         <div class="post-meta">
@@ -308,8 +306,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-12-25T23:48:23+08:00">
-                2015-12-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-05-04T21:16:00+08:00">
+                2015-05-04
               </time>
             
 
@@ -331,8 +329,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Google-Analytics-Android/" itemprop="url" rel="index">
-                    <span itemprop="name">Google Analytics Android</span>
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
                   </a>
                 </span>
 
@@ -365,34 +363,19 @@
       
 
       
-        <h2 id="官方Guide文档中的xml配置项"><a href="#官方Guide文档中的xml配置项" class="headerlink" title="官方Guide文档中的xml配置项"></a>官方Guide文档中的xml配置项</h2><p>官方Guide文档中<a href="https://developers.google.com/analytics/devguides/collection/android/v4/parameters" target="_blank" rel="external">Parameters</a>这一节讲述了可以在xml中配置的选项，配置方法与范围稍微有些区别，坑爹的Guide文档中并没有描述它们的区别，具体的配置方法我们可以从API文档中获取。<br><img src="20151225234348789.png" alt="xml配置图"></p>
-<h2 id="全局配置项：GoogleAnalytics"><a href="#全局配置项：GoogleAnalytics" class="headerlink" title="全局配置项：GoogleAnalytics"></a>全局配置项：GoogleAnalytics</h2><ul>
-<li>配置<strong>res/xml/global_tracker.xml</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</div><div class="line">&lt;resources&gt;</div><div class="line">    &lt;string name=&quot;ga_appName&quot;&gt;My App&lt;/string&gt;</div><div class="line">    &lt;string name=&quot;ga_appVersion&quot;&gt;1.0&lt;/string&gt;</div><div class="line">    &lt;!-- Default period is 1800 seconds or 30 minutes --&gt;</div><div class="line">    &lt;integer name=&quot;ga_dispatchPeriod&quot;&gt;1800&lt;/integer&gt;</div><div class="line">    &lt;!-- Enable dry run mode. Default is false --&gt;</div><div class="line">    &lt;bool name=&quot;ga_dryRun&quot;&gt;false&lt;/bool&gt;</div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<ul>
-<li><p>在<strong>AndroidManifest.xml</strong>中加入<code>meta-data</code>，并设置为上述xml</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;application&gt;</div><div class="line">    ...</div><div class="line">    &lt;meta-data</div><div class="line">        android:name=&quot;com.google.android.gms.analytics.globalConfigResource&quot;</div><div class="line">        android:resource=&quot;@xml/global_tracker&quot; /&gt;</div><div class="line">    ...</div><div class="line">&lt;/application&gt;</div></pre></td></tr></table></figure>
-</li>
-<li><p>当然我们也可以在编码中动态配置，如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);</div><div class="line">analytics .setLocalDispatchPeriod(1800);</div><div class="line">analytics .setDryRun(false);</div></pre></td></tr></table></figure>
-</li>
-<li><p>注意官方文档中<code>ga_logLevel</code>已经被标记为Deprecated ，使用以下adb指令可打开debug log输出</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell setprop log.tag.GAv4 DEBUG</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="跟踪器配置：Tracker"><a href="#跟踪器配置：Tracker" class="headerlink" title="跟踪器配置：Tracker"></a>跟踪器配置：Tracker</h2><ul>
-<li>配置<strong>res/xml/ga_tracker.xml</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</div><div class="line">&lt;resources&gt;</div><div class="line">    &lt;string name=&quot;ga_trackingId&quot;&gt;UA-0000-1&lt;/string&gt;</div><div class="line">    &lt;string name=&quot;ga_sampleFrequency&quot;&gt;100.0&lt;/string&gt;</div><div class="line">    &lt;integer name=&quot;ga_sessionTimeout&quot;&gt;1800&lt;/integer&gt;</div><div class="line">    &lt;bool name=&quot;ga_autoActivityTracking&quot;&gt;true&lt;/bool&gt;</div><div class="line">    &lt;bool name=&quot;ga_anonymizeIp&quot;&gt;false&lt;/bool&gt;</div><div class="line">    &lt;bool name=&quot;ga_reportUncaughtExceptions&quot;&gt;true&lt;/bool&gt;</div><div class="line">    &lt;screenName name=&quot;com.example.MainActivity&quot;&gt;Home Screen&lt;/screenName&gt;</div><div class="line">    &lt;screenName name=&quot;com.example.SecondActivity&quot;&gt;Second Screen&lt;/screenName&gt;</div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<ul>
-<li><p>调用<code>GoogleAnalytics</code>对象的<code>newTracker</code>方法并传入上述xml，即可完成对单独tracker的初始化</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);</div><div class="line">Tracker tracker = analytics.newTracker(R.xml.ga_tracker);</div></pre></td></tr></table></figure>
-</li>
-<li><p>注意：若<code>ga_autoActivityTracking</code>开启，tracker将实现自动页面跟踪，此时我们可以指定页面与其对应的映射名字，可通过xml配置文件中的<code>&lt;screenName&gt;</code>元素来描述其映射关系。</p>
-</li>
-</ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://developers.google.com/android/reference/com/google/android/gms/analytics/GoogleAnalytics" target="_blank" rel="external">https://developers.google.com/android/reference/com/google/android/gms/analytics/GoogleAnalytics</a><br><a href="https://developers.google.com/android/reference/com/google/android/gms/analytics/Tracker" target="_blank" rel="external">https://developers.google.com/android/reference/com/google/android/gms/analytics/Tracker</a></p>
+        <h2 id="屏蔽返回键"><a href="#屏蔽返回键" class="headerlink" title="屏蔽返回键"></a>屏蔽返回键</h2><p>比较简单，重写<code>onBackPressed()</code>即可，不调用超类方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onBackPressed</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// super.onBackPressed();</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="屏蔽Home键"><a href="#屏蔽Home键" class="headerlink" title="屏蔽Home键"></a>屏蔽Home键</h2><h3 id="常规方法"><a href="#常规方法" class="headerlink" title="常规方法"></a>常规方法</h3><p>代码如下，但是在Android4.0以上会失效<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onAttachedToWindow</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">this</span>.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);</div><div class="line">    <span class="keyword">super</span>.onAttachedToWindow();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>并加入权限：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">”android.permission.DISABLE_KEYGUARD”</span>&gt;</span><span class="tag">&lt;/<span class="name">uses-permission</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h3 id="Android4-0以上的屏蔽方法"><a href="#Android4-0以上的屏蔽方法" class="headerlink" title="Android4.0以上的屏蔽方法"></a>Android4.0以上的屏蔽方法</h3><p>此法较为猥琐,但在Android4.4以上会失效<br>用<code>WindowManager</code>的<code>addview</code>方法将view加到窗口上，加上的时候将view的<code>layoutparamas</code>的type设为<code>LayoutParams.TYPE_SYSTEM_ERROR</code>。</p>
+<p>并加上权限<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">”android.permission.SYSTEM_ALERT_WINDOW”/</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>原理：使用<code>WindowManager</code>在屏幕最前面加上一层view，并让其type设置为：<code>LayoutParams.TYPE_SYSTEM_ERROR</code>，官方对其解释是：<strong>internal system error windows, appear on top of everything they can</strong>，既显示在任何界面之上。并且设置flags为<code>LayoutParams.FLAG_NOT_TOUCHABLE</code>，这样我们后面一层的View才能监听到触摸事件。然后我们可以设置所add的view是一个空view，就不会感觉前面多了一层东西，从而达到屏蔽Home键的效果。</p>
+<p>参考代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">forbiddenHomeKey</span><span class="params">()</span></span>&#123;</div><div class="line">    mWindowManager = <span class="keyword">this</span>.getWindowManager();</div><div class="line">    mWindowManagerParams = <span class="keyword">new</span> LayoutParams();</div><div class="line">    mWindowManagerParams.width = LayoutParams.WRAP_CONTENT;</div><div class="line">    mWindowManagerParams.height = LayoutParams.WRAP_CONTENT;</div><div class="line">    <span class="comment">// internal system error windows, appear on top of everything they can</span></div><div class="line">    mWindowManagerParams.type = LayoutParams.TYPE_SYSTEM_ERROR;</div><div class="line">     <span class="comment">// indicate this view don’t respond the touch event</span></div><div class="line">    mWindowManagerParams.flags = LayoutParams.FLAG_NOT_TOUCHABLE;</div><div class="line">    <span class="comment">// add an empty view on the top of the window</span></div><div class="line">    mEmptyView = <span class="keyword">new</span> View(<span class="keyword">this</span>);</div><div class="line">    mWindowManager.addView(mEmptyView, mWindowManagerParams);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>为什么设置了这个type后就可以屏蔽Home呢？我们可以看看<code>PhoneWindowManager.java</code>的<code>interceptKeyBeforeDispatching()</code>方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> <span class="keyword">int</span> typeCount = WINDOW_TYPES_WHERE_HOME_DOESNT_WORK.length;</div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;typeCount; i++) &#123;</div><div class="line">    <span class="keyword">if</span> (type == WINDOW_TYPES_WHERE_HOME_DOESNT_WORK[i]) &#123;</div><div class="line">        <span class="comment">// don't do anything, but also don't pass it to the app</span></div><div class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><code>WINDOW_TYPES_WHERE_HOME_DOESNT_WORK</code>常量的值为：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[] WINDOW_TYPES_WHERE_HOME_DOESNT_WORK = &#123;</div><div class="line">    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,</div><div class="line">    WindowManager.LayoutParams.TYPE_SYSTEM_ERROR,</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>所以type设置为上面两个之一就可以了！</p>
+<h3 id="关于Home的屏蔽，还有一种思路"><a href="#关于Home的屏蔽，还有一种思路" class="headerlink" title="关于Home的屏蔽，还有一种思路"></a>关于Home的屏蔽，还有一种思路</h3><p>监听程序是否在前台显示（通过<code>ActivityManager.getRunningAppProcesses()</code>），如果没有，则马上把程序的task移动至前台（通过<code>ActivityManager.moveTaskToFront()</code>）。但是Android早就已经想到这个漏洞，当你点击完home键后，系统的Launcher会有5秒的延迟保护。所有启动Activity、或者移动到前台的方法都会有5秒延迟。具体看stackoverflow上的解答，若需要破解此限制需要加入系统权限<code>android.permission.STOP_APP_SWITCHES</code>：</p>
+<p><a href="http://stackoverflow.com/questions/5600084/starting-an-activity-from-a-service-after-home-button-pressed-without-the-5-seco" target="_blank" rel="external">http://stackoverflow.com/questions/5600084/starting-an-activity-from-a-service-after-home-button-pressed-without-the-5-seco</a></p>
+<p>也就是说，若没有系统权限的话，只能通过自己写第三方的Launcher即可破解，此方法经过撸主本人亲测有效！</p>
 
       
     </div>
@@ -424,7 +407,7 @@
           
             <a href="/tags/Android/" rel="tag"># Android</a>
           
-            <a href="/tags/Google-Analytics/" rel="tag"># Google Analytics</a>
+            <a href="/tags/Hack/" rel="tag"># Hack</a>
           
         </div>
       
@@ -437,18 +420,14 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/10/31/reuse-gradle-library-module/" rel="next" title="Gradle Library Module的复用机制">
-                <i class="fa fa-chevron-left"></i> Gradle Library Module的复用机制
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/12/26/google-analytics-multi-flavor/" rel="prev" title="Google Analytics多渠道实现">
-                Google Analytics多渠道实现 <i class="fa fa-chevron-right"></i>
+              <a href="/2015/05/06/disable-recent-and-statusbar/" rel="prev" title="Recent键及状态栏屏蔽">
+                Recent键及状态栏屏蔽 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -617,7 +596,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#官方Guide文档中的xml配置项"><span class="nav-number">1.</span> <span class="nav-text">官方Guide文档中的xml配置项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全局配置项：GoogleAnalytics"><span class="nav-number">2.</span> <span class="nav-text">全局配置项：GoogleAnalytics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跟踪器配置：Tracker"><span class="nav-number">3.</span> <span class="nav-text">跟踪器配置：Tracker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#屏蔽返回键"><span class="nav-number">1.</span> <span class="nav-text">屏蔽返回键</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#屏蔽Home键"><span class="nav-number">2.</span> <span class="nav-text">屏蔽Home键</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常规方法"><span class="nav-number">2.1.</span> <span class="nav-text">常规方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android4-0以上的屏蔽方法"><span class="nav-number">2.2.</span> <span class="nav-text">Android4.0以上的屏蔽方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于Home的屏蔽，还有一种思路"><span class="nav-number">2.3.</span> <span class="nav-text">关于Home的屏蔽，还有一种思路</span></a></li></ol></li></ol></div>
             
 
           </div>
