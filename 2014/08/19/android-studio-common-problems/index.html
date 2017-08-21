@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,Google Drive,OAuth," />
+  <meta name="keywords" content="Android,Android Studio," />
 
 
 
@@ -93,20 +93,18 @@
 
 
 
-<meta name="description" content="Oauth2.0认证流程Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：  客户端App发起认证（若用户木有登录，则需要先登录） 弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code） 客户端获取到授权码以后，用授权码向认证服务器请求access token 服务器验证授权码无误后返回access">
-<meta name="keywords" content="Android,Google Drive,OAuth">
+<meta name="description" content="整理了一些这段时间遇到的常见问题，希望对各位猿们有帮助。。。如果觉得有用就点个赞哦 问题一123456Error:(26, 9) Attribute application@icon value=(@drawable/logo) from AndroidManifest.xml:26:9Error:(28, 9) Attribute application@theme value=(@style/">
+<meta name="keywords" content="Android,Android Studio">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Google Drive Oauth2.0认证流程">
-<meta property="og:url" content="http://yoursite.com/2016/03/31/google-drive-oauth20/index.html">
+<meta property="og:title" content="Android Studio使用心得 - 常见问题集锦">
+<meta property="og:url" content="http://yoursite.com/2014/08/19/android-studio-common-problems/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="Oauth2.0认证流程Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：  客户端App发起认证（若用户木有登录，则需要先登录） 弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code） 客户端获取到授权码以后，用授权码向认证服务器请求access token 服务器验证授权码无误后返回access">
+<meta property="og:description" content="整理了一些这段时间遇到的常见问题，希望对各位猿们有帮助。。。如果觉得有用就点个赞哦 问题一123456Error:(26, 9) Attribute application@icon value=(@drawable/logo) from AndroidManifest.xml:26:9Error:(28, 9) Attribute application@theme value=(@style/">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/2016/03/31/google-drive-oauth20/20160331193430106.png">
-<meta property="og:updated_time" content="2017-08-10T14:54:58.000Z">
+<meta property="og:updated_time" content="2017-08-21T15:44:46.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Google Drive Oauth2.0认证流程">
-<meta name="twitter:description" content="Oauth2.0认证流程Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：  客户端App发起认证（若用户木有登录，则需要先登录） 弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code） 客户端获取到授权码以后，用授权码向认证服务器请求access token 服务器验证授权码无误后返回access">
-<meta name="twitter:image" content="http://yoursite.com/2016/03/31/google-drive-oauth20/20160331193430106.png">
+<meta name="twitter:title" content="Android Studio使用心得 - 常见问题集锦">
+<meta name="twitter:description" content="整理了一些这段时间遇到的常见问题，希望对各位猿们有帮助。。。如果觉得有用就点个赞哦 问题一123456Error:(26, 9) Attribute application@icon value=(@drawable/logo) from AndroidManifest.xml:26:9Error:(28, 9) Attribute application@theme value=(@style/">
 
 
 
@@ -134,13 +132,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/03/31/google-drive-oauth20/"/>
+  <link rel="canonical" href="http://yoursite.com/2014/08/19/android-studio-common-problems/"/>
 
 
 
 
 
-  <title>Google Drive Oauth2.0认证流程 | codezjx's Home</title>
+  <title>Android Studio使用心得 - 常见问题集锦 | codezjx's Home</title>
   
 
 
@@ -279,7 +277,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/31/google-drive-oauth20/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/08/19/android-studio-common-problems/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="codezjx">
@@ -296,7 +294,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Google Drive Oauth2.0认证流程</h1>
+          <h1 class="post-title" itemprop="name headline">Android Studio使用心得 - 常见问题集锦</h1>
         
 
         <div class="post-meta">
@@ -308,8 +306,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-31T19:35:06+08:00">
-                2016-03-31
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2014-08-19T00:16:16+08:00">
+                2014-08-19
               </time>
             
 
@@ -331,8 +329,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Google-Drive-Android/" itemprop="url" rel="index">
-                    <span itemprop="name">Google Drive Android</span>
+                  <a href="/categories/Android-Studio/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Studio</span>
                   </a>
                 </span>
 
@@ -365,26 +363,22 @@
       
 
       
-        <h2 id="Oauth2-0认证流程"><a href="#Oauth2-0认证流程" class="headerlink" title="Oauth2.0认证流程"></a>Oauth2.0认证流程</h2><p>Google提供的APIs访问是基于Oauth2.0认证的，其流程可以大致分为以下几个步骤：</p>
-<ol>
-<li>客户端App发起认证（若用户木有登录，则需要先登录）</li>
-<li>弹出授权页面，用户点击允许后，Google认证服务器给我们返回一个授权码（Authorization code）</li>
-<li>客户端获取到授权码以后，用授权码向认证服务器请求access token</li>
-<li>服务器验证授权码无误后返回access token至客户端</li>
-<li>拿到access token以后，就可以访问Google APIs了（其实这里还会返回一个refresh token）</li>
-</ol>
-<p>大家直接看下面的图可能会比较好理解一点：</p>
-<p><img src="20160331193430106.png" alt="这里写图片描述"></p>
-<p>上面的流程只是基于第一次获取access token的情况，因为access token是有期限的，默认是1个小时，access token过期之后，就需要通过refresh token来向Google认证服务器申请一个新的access token，不需要经历上面的1,2,3步。</p>
-<h2 id="Refresh-Token期限"><a href="#Refresh-Token期限" class="headerlink" title="Refresh Token期限"></a>Refresh Token期限</h2><p>Refresh Token并不是一直有效的，在下面的几种情况下将会失效： </p>
+        <p>整理了一些这段时间遇到的常见问题，希望对各位猿们有帮助。。。如果觉得有用就点个赞哦</p>
+<h2 id="问题一"><a href="#问题一" class="headerlink" title="问题一"></a>问题一</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Error:(26, 9) Attribute application@icon value=(@drawable/logo) from AndroidManifest.xml:26:9</div><div class="line">Error:(28, 9) Attribute application@theme value=(@style/ThemeActionBar) from AndroidManifest.xml:28:9</div><div class="line">is also present at XXXX-trunk:XXXXLib:unspecified:15:9 value=(@style/AppTheme)</div><div class="line">Suggestion: add &apos;tools:replace=&quot;android:theme&quot;&apos; to &lt;application&gt; element at AndroidManifest.xml:24:5 to override</div><div class="line">Error:Execution failed for task &apos;:XXXX:processDebugManifest&apos;.</div><div class="line">&gt; Manifest merger failed with multiple errors, see logs</div></pre></td></tr></table></figure>
+<p><strong>原因：</strong><br>AS的Gradle插件默认会启用Manifest Merger Tool，若Library项目中也定义了与主项目相同的属性（例如默认生成的<code>android:icon</code>和<code>android:theme</code>），则此时会合并失败，并报上面的错误。</p>
+<p><strong>解决方法有以下2种：</strong></p>
 <ul>
-<li>用户回收了授权</li>
-<li>token超过6个月木有被使用</li>
-<li>用户修改了密码并且token授权scope包含了：Gmail, Calendar, Contacts, 或者Hangouts</li>
-<li>超过了一定数量的token数量限制</li>
+<li>方法1：在Manifest.xml的application标签下添加<code>tools:replace=&quot;android:icon, android:theme&quot;</code>（多个属性用,隔开，并且记住在manifest根标签上加入<code>xmlns:tools=&quot;http://schemas.android.com/tools&quot;</code>，否则会找不到namespace哦）</li>
+<li>方法2：在build.gradle根标签上加上<code>useOldManifestMerger true</code> （懒人方法）</li>
 </ul>
-<p>目前每个用户账号每个授权凭证有25个refresh token的数量限制，如果超过了这个限制，当你新建一个refresh  token的时候将会使最早创建那个失效。一般来说，我们在经过用户授权，拿到授权码请求到refresh token后，必须把它缓存起来，以便后续更新access token。</p>
-<h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><p><a href="https://developers.google.com/identity/protocols/OAuth2" target="_blank" rel="external">https://developers.google.com/identity/protocols/OAuth2</a></p>
+<p><strong>参考官方介绍：</strong><br><a href="http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger" target="_blank" rel="external">http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger</a></p>
+<h2 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a>问题二</h2><p>Library Project里面的<code>BuildConfig.DEBUG</code>永远都是false。这是Android Studio的一个已知问题，某Google的攻城狮说，Library projects目前只会生成release的包。<br>Issue 52962: <a href="https://code.google.com/p/android/issues/detail?id=52962" target="_blank" rel="external">https://code.google.com/p/android/issues/detail?id=52962</a></p>
+<p><strong>解决方法：</strong>（某Google的攻城狮推荐的方法）<br>Workaround: instaed of BuildConfig.DEBUG create another boolean variable at lib-project’s e.g. BuildConfig.RELEASE and link it with application’s buildType.<br><a href="https://gist.github.com/almozavr/d59e770d2a6386061fcb" target="_blank" rel="external">https://gist.github.com/almozavr/d59e770d2a6386061fcb</a></p>
+<p><strong>参考stackoverflow上的这篇帖：</strong><br><a href="http://stackoverflow.com/questions/20176284/buildconfig-debug-always-false-when-building-library-projects-with-gradle" target="_blank" rel="external">http://stackoverflow.com/questions/20176284/buildconfig-debug-always-false-when-building-library-projects-with-gradle</a></p>
+<h2 id="问题三"><a href="#问题三" class="headerlink" title="问题三"></a>问题三</h2><p>每次保存的时候，每行多余的空格和TAB会被自动删除（例如结尾、空行的多余空格或TAB）<br>特别是每次准备提交SVN，Review代码时候你就蛋疼了，显示一堆不相关的更改，看的眼花。</p>
+<p><strong>解决方法：</strong><br>Settings-&gt;IDE Settings-&gt;Editor-&gt;Other-&gt;Strip trailing spaces on Save-&gt;None</p>
+<h2 id="问题四"><a href="#问题四" class="headerlink" title="问题四"></a>问题四</h2><p>编译的时候，报：Failure [INSTALL_FAILED_OLDER_SDK]。一般是系统自动帮你设置了compileSdkVersion </p>
+<p><strong>解决方法：</strong><br>修改<code>build.gradle</code>下的<code>compileSdkVersion &#39;android-L&#39;</code>为<code>compileSdkVersion 19</code>（或者你本机已有的SDK即可）</p>
 
       
     </div>
@@ -416,9 +410,7 @@
           
             <a href="/tags/Android/" rel="tag"># Android</a>
           
-            <a href="/tags/Google-Drive/" rel="tag"># Google Drive</a>
-          
-            <a href="/tags/OAuth/" rel="tag"># OAuth</a>
+            <a href="/tags/Android-Studio/" rel="tag"># Android Studio</a>
           
         </div>
       
@@ -431,8 +423,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/03/31/google-drive-webview-oauth/" rel="next" title="Google Drive WebView授权方式实现">
-                <i class="fa fa-chevron-left"></i> Google Drive WebView授权方式实现
+              <a href="/2014/08/14/android-studio-environment-configuration/" rel="next" title="Android Studio使用心得 - 简介与环境配置">
+                <i class="fa fa-chevron-left"></i> Android Studio使用心得 - 简介与环境配置
               </a>
             
           </div>
@@ -441,8 +433,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/04/23/google-drive-api-with-retrofit2/" rel="prev" title="使用Retrofit2.0实现GoogleDrive相关API">
-                使用Retrofit2.0实现GoogleDrive相关API <i class="fa fa-chevron-right"></i>
+              <a href="/2015/05/04/disable-back-and-home-key/" rel="prev" title="Android中Back键和Home键的屏蔽">
+                Android中Back键和Home键的屏蔽 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -611,7 +603,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Oauth2-0认证流程"><span class="nav-number">1.</span> <span class="nav-text">Oauth2.0认证流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Refresh-Token期限"><span class="nav-number">2.</span> <span class="nav-text">Refresh Token期限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考："><span class="nav-number">3.</span> <span class="nav-text">参考：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题一"><span class="nav-number">1.</span> <span class="nav-text">问题一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题二"><span class="nav-number">2.</span> <span class="nav-text">问题二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题三"><span class="nav-number">3.</span> <span class="nav-text">问题三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题四"><span class="nav-number">4.</span> <span class="nav-text">问题四</span></a></li></ol></div>
             
 
           </div>
