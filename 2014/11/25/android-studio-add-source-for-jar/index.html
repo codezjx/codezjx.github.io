@@ -77,7 +77,7 @@
 <link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android,Gradle,Flavor," />
+  <meta name="keywords" content="Android,Android Studio," />
 
 
 
@@ -93,18 +93,22 @@
 
 
 
-<meta name="description" content="近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的Gradle Plugin User Guide教程学习了下，顺便做下笔记。内容主要分为以下几个模块： Create Product flavors多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等通过以下DSL即可创建渠道flavor1和flavor2：12345678an">
-<meta name="keywords" content="Android,Gradle,Flavor">
+<meta name="description" content="简单步骤下面的步骤将介绍如何在Android Studio中为jar库绑定源码~  在build.gradle中添加jar依赖： 1234dependencies &amp;#123;    compile fileTree(dir: &apos;libs&apos;, include: [&apos;*.jar&apos;])       // 针对libs下的.jar库    compile files(&apos;libs/xxxx.Final.j">
+<meta name="keywords" content="Android,Android Studio">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Gradle App项目的多渠道打包实现">
-<meta property="og:url" content="http://yoursite.com/2015/10/30/gradle-app-multi-flavor/index.html">
+<meta property="og:title" content="在Android Studio中为jar添加source源码">
+<meta property="og:url" content="http://yoursite.com/2014/11/25/android-studio-add-source-for-jar/index.html">
 <meta property="og:site_name" content="codezjx&#39;s Home">
-<meta property="og:description" content="近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的Gradle Plugin User Guide教程学习了下，顺便做下笔记。内容主要分为以下几个模块： Create Product flavors多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等通过以下DSL即可创建渠道flavor1和flavor2：12345678an">
+<meta property="og:description" content="简单步骤下面的步骤将介绍如何在Android Studio中为jar库绑定源码~  在build.gradle中添加jar依赖： 1234dependencies &amp;#123;    compile fileTree(dir: &apos;libs&apos;, include: [&apos;*.jar&apos;])       // 针对libs下的.jar库    compile files(&apos;libs/xxxx.Final.j">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-15T14:02:45.000Z">
+<meta property="og:image" content="http://yoursite.com/2014/11/25/android-studio-add-source-for-jar/20141125131858015.jpg">
+<meta property="og:image" content="http://yoursite.com/2014/11/25/android-studio-add-source-for-jar/20141125131904774.jpg">
+<meta property="og:image" content="http://yoursite.com/2014/11/25/android-studio-add-source-for-jar/20141125132059122.jpg">
+<meta property="og:updated_time" content="2017-08-23T16:12:19.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Gradle App项目的多渠道打包实现">
-<meta name="twitter:description" content="近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的Gradle Plugin User Guide教程学习了下，顺便做下笔记。内容主要分为以下几个模块： Create Product flavors多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等通过以下DSL即可创建渠道flavor1和flavor2：12345678an">
+<meta name="twitter:title" content="在Android Studio中为jar添加source源码">
+<meta name="twitter:description" content="简单步骤下面的步骤将介绍如何在Android Studio中为jar库绑定源码~  在build.gradle中添加jar依赖： 1234dependencies &amp;#123;    compile fileTree(dir: &apos;libs&apos;, include: [&apos;*.jar&apos;])       // 针对libs下的.jar库    compile files(&apos;libs/xxxx.Final.j">
+<meta name="twitter:image" content="http://yoursite.com/2014/11/25/android-studio-add-source-for-jar/20141125131858015.jpg">
 
 
 
@@ -132,13 +136,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2015/10/30/gradle-app-multi-flavor/"/>
+  <link rel="canonical" href="http://yoursite.com/2014/11/25/android-studio-add-source-for-jar/"/>
 
 
 
 
 
-  <title>Gradle App项目的多渠道打包实现 | codezjx's Home</title>
+  <title>在Android Studio中为jar添加source源码 | codezjx's Home</title>
   
 
 
@@ -277,7 +281,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/10/30/gradle-app-multi-flavor/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/25/android-studio-add-source-for-jar/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="codezjx">
@@ -294,7 +298,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Gradle App项目的多渠道打包实现</h1>
+          <h1 class="post-title" itemprop="name headline">在Android Studio中为jar添加source源码</h1>
         
 
         <div class="post-meta">
@@ -306,8 +310,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-30T20:25:20+08:00">
-                2015-10-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2014-11-25T13:36:22+08:00">
+                2014-11-25
               </time>
             
 
@@ -329,8 +333,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Gradle/" itemprop="url" rel="index">
-                    <span itemprop="name">Gradle</span>
+                  <a href="/categories/Android-Studio/" itemprop="url" rel="index">
+                    <span itemprop="name">Android Studio</span>
                   </a>
                 </span>
 
@@ -363,31 +367,29 @@
       
 
       
-        <p>近期项目需要根据客户的要求定制UI，因此需要用到多渠道打包，跟着官方的<a href="http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Variants" target="_blank" rel="external">Gradle Plugin User Guide</a>教程学习了下，顺便做下笔记。内容主要分为以下几个模块：</p>
-<h2 id="Create-Product-flavors"><a href="#Create-Product-flavors" class="headerlink" title="Create Product flavors"></a>Create Product flavors</h2><p>多渠道可以让我们灵活的定制一个应用，如UI、包名、versionName、修改Manifest中的内容等<br>通过以下DSL即可创建渠道flavor1和flavor2：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    ...</div><div class="line">    productFlavors &#123;</div><div class="line">        flavor1 &#123;&#125;</div><div class="line">        flavor2 &#123;&#125;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="Build-Type-Product-Flavor-Build-Variant"><a href="#Build-Type-Product-Flavor-Build-Variant" class="headerlink" title="Build Type + Product Flavor = Build Variant"></a>Build Type + Product Flavor = Build Variant</h2><p>每一个Variant都是由Build Type和Flavor组合而成，共同生成一个Apk<br>例如默认的Build Type：debug和release，build完后会生成以下4个Variants<br>Flavor1 - debug<br>Flavor1 - release<br>Flavor2 - debug<br>Flavor2 - release</p>
-<h2 id="Product-Flavor-Configuration"><a href="#Product-Flavor-Configuration" class="headerlink" title="Product Flavor Configuration"></a>Product Flavor Configuration</h2><p>我们可以在Flavor对应的闭包内自定义每个渠道相关属性<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    ...</div><div class="line">    defaultConfig &#123;</div><div class="line">        minSdkVersion <span class="number">8</span></div><div class="line">        versionCode <span class="number">10</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    productFlavors &#123;</div><div class="line">        flavor1 &#123;</div><div class="line">            packageName <span class="string">"com.example.flavor1"</span></div><div class="line">            versionCode <span class="number">20</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        flavor2 &#123;</div><div class="line">            packageName <span class="string">"com.example.flavor2"</span></div><div class="line">            minSdkVersion <span class="number">14</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+        <h2 id="简单步骤"><a href="#简单步骤" class="headerlink" title="简单步骤"></a>简单步骤</h2><p>下面的步骤将介绍如何在Android Studio中为jar库绑定源码~</p>
+<ol>
+<li><p>在<code>build.gradle</code>中添加jar依赖：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">dependencies</span> &#123;</div><div class="line">    <span class="keyword">compile</span> <span class="keyword">fileTree</span>(dir: <span class="string">'libs'</span>, <span class="keyword">include</span>: [<span class="string">'*.jar'</span>])       <span class="comment">// 针对libs下的.jar库</span></div><div class="line">    <span class="keyword">compile</span> files(<span class="string">'libs/xxxx.Final.jar'</span>)                    <span class="comment">// 针对指定文件</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>Rebuild后点进jar库中的某个<code>*.class</code>文件，然后看右上角（是不是发现了<code>Attach Sources</code>选项）：<br><img src="20141125131858015.jpg" alt="这里写图片描述"><br><img src="20141125131904774.jpg" alt="这里写图片描述"></p>
+</li>
+<li><p>根据2中的步骤选择<code>XX.source.jar</code>即可绑定源码（或者选择source源码存放目录）<br><img src="20141125132059122.jpg" alt="这里写图片描述"></p>
+</li>
+</ol>
+<h2 id="其他方式"><a href="#其他方式" class="headerlink" title="其他方式"></a>其他方式</h2><p>除了上面的方法，还可以使用手动导入的方式：<br>（1）打开<code>项目目录\.idea\libraries</code>文件夹，找到<code>XX_library_name.xml</code>，我这里是<code>android-support-v4.jar</code>库所以对应是<code>android_support_v4.xml</code><br>（2）添加以下片段即可，url指定<code>source.jar</code>地址或者目录地址。</p>
 <ul>
-<li>flavor对象与defaultConfig的类型是相同的，所以他们的属性也一样</li>
-<li>defaultConfig可以作为每个渠道基础的公共配置，渠道中的属性会覆盖defaultConfig</li>
+<li><p>若是*.jar，则按如下方式：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">SOURCES</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">"jar://$PROJECT_DIR$/XXX_Project/sources/XXXX.Final-sources.jar!/"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">SOURCES</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>若是源码目录，则按如下方式：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">SOURCES</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">"file://X:/XXX/android-sdk-windows/extras/android/support/v4/src/java"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">SOURCES</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
 </ul>
-<h2 id="Sourcesets-and-Dependencies"><a href="#Sourcesets-and-Dependencies" class="headerlink" title="Sourcesets and Dependencies"></a>Sourcesets and Dependencies</h2><p>Android Studio默认目录结构下，每个渠道会创建自己的sourceSets，与默认的android.sourceSets.main共同编译生成Apk：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">android.<span class="keyword">sourceSets</span>.main</div><div class="line">- src<span class="regexp">/main/</span></div><div class="line">android.<span class="keyword">sourceSets</span>.flavor1</div><div class="line">- src<span class="regexp">/flavor1/</span></div><div class="line">android.<span class="keyword">sourceSets</span>.flavor2</div><div class="line">- src<span class="regexp">/flavor2/</span></div></pre></td></tr></table></figure></p>
-<p>若是Eclipse的那种目录结构，可选择自己指定sourceSets位置，如：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">sourceSets</span> &#123;</div><div class="line">    main &#123;</div><div class="line">        manifest.srcFile <span class="string">'AndroidManifest.xml'</span></div><div class="line">        java.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        resources.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        aidl.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        renderscript.srcDirs = [<span class="string">'src'</span>]</div><div class="line">        res.srcDirs = [<span class="string">'res'</span>]</div><div class="line">        assets.srcDirs = [<span class="string">'assets'</span>]</div><div class="line">    &#125;</div><div class="line">    flavor1 &#123;</div><div class="line">        java.srcDirs = [<span class="string">'xxx-folder/flavor1/src'</span>]</div><div class="line">        res.srcDirs = [<span class="string">'xxx-folder/flavor1/res'</span>]</div><div class="line">    &#125;</div><div class="line">    flavor2 &#123;</div><div class="line">        java.srcDirs = [<span class="string">'xxx-folder/flavor2/src'</span>]</div><div class="line">        res.srcDirs = [<span class="string">'xxx-folder/flavor2/res'</span>]</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>编译某个渠道包的时候遵循以下4条准则：</p>
-<ul>
-<li>所有的源码(src/*/java)会用来共同编译生成一个Apk，不允许覆盖，会提示<code>duplicate class found</code></li>
-<li>所有的Manifests都将会合并，这样一来就允许渠道包中可以定义不同的组件与权限，具体可参考官方<a href="http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger" target="_blank" rel="external"><code>Manifest Merger</code></a></li>
-<li>渠道中的资源会以覆盖或增量的形式与main合并，优先级为<code>Build Type &gt; Product Flavor &gt; Main sourceSet</code></li>
-<li>每个Build Variant都会生成自己的R文件</li>
-</ul>
-<p>渠道可以指定自己特定的dependencies，命名规则为(Flavor Name)Compile<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">dependencies</span> &#123;</div><div class="line">    flavor1Compile <span class="string">"..."</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="Building-and-Tasks"><a href="#Building-and-Tasks" class="headerlink" title="Building and Tasks"></a>Building and Tasks</h2><p>每个Build Variants都会创建相应的assemble task，可以通过以下命名方式调用对应指令来执行编译：</p>
-<ul>
-<li>assemble(Variant Name)   // 编译指定的Variant，如：assembleFlavor1Debug</li>
-<li>assemble(Build Type Name)   // 如：assembleDebug将同时编译Flavor1Debug和Flavor2Debug variants</li>
-<li>assemble(Product Flavor Name)  // 如：assembleFlavor1将同时编译Flavor1Debug和Flavor1Release variants</li>
-</ul>
-<p>执行<code>gradle assemble</code>将会编译所有的variants包，用得比较多的还是编译所有渠道的release包：<code>gradle assembleRelease</code>，然后就去喝杯咖啡慢慢的等待编译完成吧</p>
+<p>同理，若是添加javadoc，添加<code>&lt;JAVADOC /&gt;</code>标签即可！</p>
+<h2 id="关于android-jar源码绑定"><a href="#关于android-jar源码绑定" class="headerlink" title="关于android.jar源码绑定"></a>关于android.jar源码绑定</h2><p>一般在SDK Manager中勾选了source并下载完成后，会在<code>android-sdk/sources/android-xx</code>目录下生成源码，此时重启Android Studio即可自动完成源码绑定。</p>
+<p>若还是没有生效，可以进入AS的配置目录下<code>~/AndroidStudio2.3/options/</code>修改<code>jdk.table.xml</code>这个文件，手动加上对应的sourcePath，如下所示：然后重启AS再试试。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">sourcePath</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">root</span> <span class="attr">type</span>=<span class="string">"composite"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">type</span>=<span class="string">"simple"</span> <span class="attr">url</span>=<span class="string">"file://$USER_HOME$/Android/android-sdk-macosx/sources/android-17"</span> /&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">root</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">sourcePath</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>同理，若是添加javadoc，添加<code>&lt;javadocPath /&gt;</code>标签即可~</p>
 
       
     </div>
@@ -419,9 +421,7 @@
           
             <a href="/tags/Android/" rel="tag"># Android</a>
           
-            <a href="/tags/Gradle/" rel="tag"># Gradle</a>
-          
-            <a href="/tags/Flavor/" rel="tag"># Flavor</a>
+            <a href="/tags/Android-Studio/" rel="tag"># Android Studio</a>
           
         </div>
       
@@ -434,8 +434,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/05/06/disable-recent-and-statusbar/" rel="next" title="Android中Recent键及状态栏屏蔽">
-                <i class="fa fa-chevron-left"></i> Android中Recent键及状态栏屏蔽
+              <a href="/2014/08/29/android-studio-settings-and-keymaps/" rel="next" title="Android Studio中常用设置与快捷键（私人珍藏，Eclipse转AS必看）">
+                <i class="fa fa-chevron-left"></i> Android Studio中常用设置与快捷键（私人珍藏，Eclipse转AS必看）
               </a>
             
           </div>
@@ -444,8 +444,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/30/gradle-library-multi-flavor/" rel="prev" title="Gradle Library项目的多渠道打包实现">
-                Gradle Library项目的多渠道打包实现 <i class="fa fa-chevron-right"></i>
+              <a href="/2015/05/04/disable-back-and-home-key/" rel="prev" title="Android中Back键和Home键的屏蔽">
+                Android中Back键和Home键的屏蔽 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -614,7 +614,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-Product-flavors"><span class="nav-number">1.</span> <span class="nav-text">Create Product flavors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Build-Type-Product-Flavor-Build-Variant"><span class="nav-number">2.</span> <span class="nav-text">Build Type + Product Flavor = Build Variant</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Product-Flavor-Configuration"><span class="nav-number">3.</span> <span class="nav-text">Product Flavor Configuration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sourcesets-and-Dependencies"><span class="nav-number">4.</span> <span class="nav-text">Sourcesets and Dependencies</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Building-and-Tasks"><span class="nav-number">5.</span> <span class="nav-text">Building and Tasks</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简单步骤"><span class="nav-number">1.</span> <span class="nav-text">简单步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他方式"><span class="nav-number">2.</span> <span class="nav-text">其他方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于android-jar源码绑定"><span class="nav-number">3.</span> <span class="nav-text">关于android.jar源码绑定</span></a></li></ol></div>
             
 
           </div>
