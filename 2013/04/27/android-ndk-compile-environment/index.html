@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,NDK,Cygwin," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Cygwin的下载与安装cygwin是一个在windows平台上运行的unix模拟环境，它对于学习unix/linux操作环境，或者从unix到windows的应用程序移植，或者进行某些特殊的开发工作，尤其是使用gnu工具集在windows上进行嵌入式系统开发，非常有用。简单来说，我们直接用他来编译我们的c/c++代码，而不必放到Linux虚拟机或者Linux系统上去编译我们的代码，方便大家在wi">
+<meta name="keywords" content="Android,NDK,Cygwin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android NDK &amp;&amp; JNI编译环境的搭建">
+<meta property="og:url" content="http://yoursite.com/2013/04/27/android-ndk-compile-environment/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="Cygwin的下载与安装cygwin是一个在windows平台上运行的unix模拟环境，它对于学习unix/linux操作环境，或者从unix到windows的应用程序移植，或者进行某些特殊的开发工作，尤其是使用gnu工具集在windows上进行嵌入式系统开发，非常有用。简单来说，我们直接用他来编译我们的c/c++代码，而不必放到Linux虚拟机或者Linux系统上去编译我们的代码，方便大家在wi">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2013/04/27/android-ndk-compile-environment/20130427150402206.jpg">
+<meta property="og:image" content="http://yoursite.com/2013/04/27/android-ndk-compile-environment/20130427143621925.jpg">
+<meta property="og:image" content="http://yoursite.com/2013/04/27/android-ndk-compile-environment/20130427143630259.jpg">
+<meta property="og:image" content="http://yoursite.com/2013/04/27/android-ndk-compile-environment/20130427143636722.jpg">
+<meta property="og:image" content="http://yoursite.com/2013/04/27/android-ndk-compile-environment/20130427143640368.jpg">
+<meta property="og:updated_time" content="2017-08-25T17:03:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android NDK &amp;&amp; JNI编译环境的搭建">
+<meta name="twitter:description" content="Cygwin的下载与安装cygwin是一个在windows平台上运行的unix模拟环境，它对于学习unix/linux操作环境，或者从unix到windows的应用程序移植，或者进行某些特殊的开发工作，尤其是使用gnu工具集在windows上进行嵌入式系统开发，非常有用。简单来说，我们直接用他来编译我们的c/c++代码，而不必放到Linux虚拟机或者Linux系统上去编译我们的代码，方便大家在wi">
+<meta name="twitter:image" content="http://yoursite.com/2013/04/27/android-ndk-compile-environment/20130427150402206.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/04/27/android-ndk-compile-environment/"/>
+
+
+
+
+
+  <title>Android NDK && JNI编译环境的搭建 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/04/27/android-ndk-compile-environment/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android NDK && JNI编译环境的搭建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2013-04-27T14:41:00+08:00">
+                2013-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android-NDK/" itemprop="url" rel="index">
+                    <span itemprop="name">Android NDK</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Cygwin的下载与安装"><a href="#Cygwin的下载与安装" class="headerlink" title="Cygwin的下载与安装"></a>Cygwin的下载与安装</h2><p>cygwin是一个在windows平台上运行的unix模拟环境，它对于学习unix/linux操作环境，或者从unix到windows的应用程序移植，或者进行某些特殊的开发工作，尤其是使用gnu工具集在windows上进行嵌入式系统开发，非常有用。简单来说，我们直接用他来编译我们的c/c++代码，而不必放到Linux虚拟机或者Linux系统上去编译我们的代码，方便大家在windows上能直接开发并生成我们需要的.so库文件。由于篇幅有限，Cygwin的安装与下载大家可以参考网上的许多帖子。<strong>（建议不熟悉Cygwin的童鞋在下载的时候可以把所有的组件勾上，以免发生缺少依赖的软件包情况而产生不愉快）</strong></p>
+<h2 id="配置NDK环境变量"><a href="#配置NDK环境变量" class="headerlink" title="配置NDK环境变量"></a>配置NDK环境变量</h2><ol>
+<li>首先找到cygwin的安装目录，找到一个<code>home\&lt;你的用户名&gt;\.bash_profile</code>文件，我的是：<code>D:\Android\cygwin\home\bear\.bash_profile</code>。<br><strong>(注意：若home文件夹下面神马都没有或者没有你用户名的文件夹，解决的办法：首先打开环境变量，把里面的用户变量中的HOME变量删掉，在<code>D:\Android\cygwin\home</code>文件夹下建立名为你用户名的文件夹，然后把<code>D:\Android\cygwin\etc\skel\.bash_profile</code>拷贝到该文件夹下；我这边是第一次<code>bash --login -i</code>时他会自动创建用户名文件夹)。</strong></li>
+<li><p>打开<code>bash_profile</code>文件，添加<code>NDK=/cygdrive/&lt;你的盘符&gt;/&lt;android ndk 目录&gt;</code> 如：<strong>（注意：NDK这个名字是随便取的，为了方面以后使用方便，选个简短的名字，然后保存）</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">NDK=/cygdrive/d/Android/android-ndk-r8e</div><div class="line"><span class="built_in">export</span> NDK</div></pre></td></tr></table></figure>
+</li>
+<li><p>打开cygwin，输入<code>cd $NDK</code>，如果输出上面配置的<code>/cygdrive/d/Android/android-ndk-r8e</code>信息，则表明环境变量设置成功了。</p>
+</li>
+</ol>
+<h2 id="用NDK来编译程序（手动编译）"><a href="#用NDK来编译程序（手动编译）" class="headerlink" title="用NDK来编译程序（手动编译）"></a>用NDK来编译程序（手动编译）</h2><ol>
+<li>现在我们用安装好的NDK来编译一个简单的程序吧，我们选择ndk自带的例子hello-jni，我的位于<code>D:\Android\android-ndk-r8e\samples\hello-jni</code>(根据你具体的安装位置而定)</li>
+<li>运行cygwin，输入命令<code>cd /cygdrive/d/Android/android-ndk-r8e/samples/hello-jni</code>，进入到hello-jni目录。</li>
+<li>输入<code>$NDK/ndk-build</code>，执行成功后，它会自动生成一个libs目录，把编译生成的.so文件放在里面。($NDK是调用我们之前配置好的环境变量，ndk-build是调用ndk的编译程序)</li>
+<li>此时去hello-jni的libs目录下看有没有生成的.so文件，如果有，你的ndk就运行正常啦！</li>
+<li>把.so文件拷贝到项目中，并完成JNI调用。</li>
+</ol>
+<h2 id="在eclipse中集成c-c-开发环境（开发C-C-代码）"><a href="#在eclipse中集成c-c-开发环境（开发C-C-代码）" class="headerlink" title="在eclipse中集成c/c++开发环境（开发C/C++代码）"></a>在eclipse中集成c/c++开发环境（开发C/C++代码）</h2><ol>
+<li>装Eclipse的C/C++环境插件：CDT，这里选择在线安装。<br>首先登录：<a href="http://www.eclipse.org/cdt/downloads.php" target="_blank" rel="external">http://www.eclipse.org/cdt/downloads.php</a><br>找到对应你Eclipse版本的CDT插件的在线安装地址。</li>
+<li>然后点Help菜单，找到<code>Install New Software</code>菜单</li>
+<li>点击Add按钮，把取的地址填进去，出来插件列表后，选<code>Select All</code>，然后选择下一步即可完成安装</li>
+<li>安装完成后，在eclispe中右击新建一个项目，如果出现了c/c++项目，则表明你的CDT插件安装成功啦</li>
+<li>或者可以直接在安装ADT的时候勾选<code>Android Native Development Tools</code>，里面集成了c/c++的开发环境</li>
+</ol>
+<h2 id="配置C-C-的编译器（Eclipse自动编译）"><a href="#配置C-C-的编译器（Eclipse自动编译）" class="headerlink" title="配置C/C++的编译器（Eclipse自动编译）"></a>配置C/C++的编译器（Eclipse自动编译）</h2><ol>
+<li><p>打开eclipse，导入ndk自带的hello-jni例子，右键单击项目名称，点击Properties，弹出配置界面，之后再点击Builders，弹出项目的编译工具列表，之后点击New，新添加一个编译器，点击后出现添加界面，选择Program，点击OK。<br><img src="20130427150402206.jpg" alt=""></p>
+</li>
+<li><p>出现了添加界面：<br>（1）首先给编译配置起个名字，如：NDK_Builder<br>（2）设置Location为<code>&lt;你cygwin安装路径&gt;\bin\bash.exe</code>程序，例如：<code>D:\Android\cygwin\bin\bash.exe</code><br>（3）设置Working Directory为<code>&lt;你cygwin安装路径&gt;\bin目录</code>，例如：<code>D:\Android\cygwin\bin</code><br>（4）设置Arguments为：<code>--login -c &quot;cd /cygdrive/c/Users/Administrator/Desktop/AndroidProjects/hello-jni &amp;&amp; $NDK/ndk-build&quot;</code>。上面的配置中的<code>/cygdrive/c/Users/Administrator/Desktop/AndroidProjects/hello-jni</code>是你当前要编译的程序的目录，$NDK是之前配置的ndk的环境变量，这两个根据你具体的安装目录进行配置，其他的不用变，Arguments这串参数实际是给bash.exe命令行程序传参数，进入要编译的程序目录，然后运行ndk-build编译程序，其实就跟手动编译的操作差不多，不过我们把它交给配置好的编译器去做！。<br><img src="20130427143621925.jpg" alt=""></p>
+</li>
+<li><p>接着切换到Refresh选项卡，勾选以下项：<br>Refresh resources upon completion<br>The entire workspace<br>Recursively include sub-folders<br><img src="20130427143630259.jpg" alt=""></p>
+</li>
+<li><p>然后切换到Build Options选项卡，勾选以下项：<br>Allocate Console<br>After a Clean<br>During manual builds<br>During auto builds<br>During a Clean<br><img src="20130427143636722.jpg" alt=""></p>
+</li>
+<li><p>之后点击Specify Resources按钮，选择资源目录，勾选你项目的JNI目录即可<br><img src="20130427143640368.jpg" alt=""></p>
+</li>
+<li><p>最后点击Finish，点击OK一路把刚才的配置都保存下来<br><strong>（注意：如果你配置的编译器在其它编译器下边，记得一定要点Up按钮，把它排到第一位，否则C代码的编译晚于Java代码的编译，会造成你的C代码要编译两次才能看到最新的修改）</strong></p>
+</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/NDK/" rel="tag"># NDK</a>
+          
+            <a href="/tags/Cygwin/" rel="tag"># Cygwin</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/08/14/android-studio-environment-configuration/" rel="prev" title="Android Studio使用心得 - 简介与环境配置">
+                Android Studio使用心得 - 简介与环境配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="codezjx" />
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Cygwin的下载与安装"><span class="nav-number">1.</span> <span class="nav-text">Cygwin的下载与安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置NDK环境变量"><span class="nav-number">2.</span> <span class="nav-text">配置NDK环境变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用NDK来编译程序（手动编译）"><span class="nav-number">3.</span> <span class="nav-text">用NDK来编译程序（手动编译）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在eclipse中集成c-c-开发环境（开发C-C-代码）"><span class="nav-number">4.</span> <span class="nav-text">在eclipse中集成c/c++开发环境（开发C/C++代码）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置C-C-的编译器（Eclipse自动编译）"><span class="nav-number">5.</span> <span class="nav-text">配置C/C++的编译器（Eclipse自动编译）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
