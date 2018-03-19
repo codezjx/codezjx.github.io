@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Open Source,Python,Netease,Cloud Music," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Introduction基于Python3.X编写的网易云音乐命令行下载器，自动下载专辑封面，记录歌手名、音乐标题、专辑名等元数据，并写入ID3 Tags metadata容器。在github上试了几个高星的下载器都没有写入专辑封面，对于强迫症患者简直不能忍，于是一怒之下决定自己写。 项目地址：https://github.com/codezjx/netease-cloud-music-dl Pr">
+<meta name="keywords" content="Open Source,Python,Netease,Cloud Music">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源了一款基于Python3.X编写的网易云音乐下载器（支持嵌入专辑封面等ID3-Tags信息）">
+<meta property="og:url" content="http://yoursite.com/2017/06/30/open-source-project-netease-cloud-music-dl/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="Introduction基于Python3.X编写的网易云音乐命令行下载器，自动下载专辑封面，记录歌手名、音乐标题、专辑名等元数据，并写入ID3 Tags metadata容器。在github上试了几个高星的下载器都没有写入专辑封面，对于强迫症患者简直不能忍，于是一怒之下决定自己写。 项目地址：https://github.com/codezjx/netease-cloud-music-dl Pr">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2017/06/30/open-source-project-netease-cloud-music-dl/preview.gif">
+<meta property="og:updated_time" content="2018-03-19T15:48:16.803Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开源了一款基于Python3.X编写的网易云音乐下载器（支持嵌入专辑封面等ID3-Tags信息）">
+<meta name="twitter:description" content="Introduction基于Python3.X编写的网易云音乐命令行下载器，自动下载专辑封面，记录歌手名、音乐标题、专辑名等元数据，并写入ID3 Tags metadata容器。在github上试了几个高星的下载器都没有写入专辑封面，对于强迫症患者简直不能忍，于是一怒之下决定自己写。 项目地址：https://github.com/codezjx/netease-cloud-music-dl Pr">
+<meta name="twitter:image" content="http://yoursite.com/2017/06/30/open-source-project-netease-cloud-music-dl/preview.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/30/open-source-project-netease-cloud-music-dl/"/>
+
+
+
+
+
+  <title>开源了一款基于Python3.X编写的网易云音乐下载器（支持嵌入专辑封面等ID3-Tags信息） | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/30/open-source-project-netease-cloud-music-dl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开源了一款基于Python3.X编写的网易云音乐下载器（支持嵌入专辑封面等ID3-Tags信息）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-30T23:28:20+08:00">
+                2017-06-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Open-Source/" itemprop="url" rel="index">
+                    <span itemprop="name">Open Source</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>基于Python3.X编写的网易云音乐命令行下载器，自动下载专辑封面，记录歌手名、音乐标题、专辑名等元数据，并写入<a href="https://zh.wikipedia.org/wiki/ID3" target="_blank" rel="external">ID3 Tags</a> metadata容器。在github上试了几个高星的下载器都没有写入专辑封面，对于强迫症患者简直不能忍，于是一怒之下决定自己写。</p>
+<p>项目地址：<a href="https://github.com/codezjx/netease-cloud-music-dl" target="_blank" rel="external">https://github.com/codezjx/netease-cloud-music-dl</a></p>
+<h2 id="Preview"><a href="#Preview" class="headerlink" title="Preview"></a>Preview</h2><p><img src="preview.gif" alt="Preview"></p>
+<h2 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h2><p>若没有安装Python3，请先到官网下载并安装：</p>
+<blockquote>
+<p><a href="https://www.python.org/download/releases/3.0/" target="_blank" rel="external">https://www.python.org/download/releases/3.0/</a></p>
+</blockquote>
+<p>首先下载源码：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ git <span class="built_in">clone</span> https://github.com/codezjx/netease-cloud-music-dl.git</div></pre></td></tr></table></figure></p>
+<p>进入根目录，然后执行：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ python setup.py install</div></pre></td></tr></table></figure></p>
+<p>最终显示以下log，表示顺利安装：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">running install</div><div class="line">running bdist_egg</div><div class="line">running egg_info</div><div class="line">...</div><div class="line">...</div><div class="line">Finished processing dependencies for netease-cloud-music-dl==x.x.x</div></pre></td></tr></table></figure></p>
+<p>后续直接在命令行中通过<code>ncm</code>指令即可快速调用相关功能，<strong>Warning: 目前只支持Python3.x版本</strong></p>
+<h2 id="Feature"><a href="#Feature" class="headerlink" title="Feature"></a>Feature</h2><ul>
+<li>支持下载专辑封面并嵌入MP3文件</li>
+<li>支持写入歌手名、音乐标题、专辑名等信息至<a href="https://zh.wikipedia.org/wiki/ID3" target="_blank" rel="external">ID3 Tags</a></li>
+<li>支持跳过已下载的音频文件</li>
+<li>支持常见设置选项，如：保存路径、音乐命名格式、文件智能分类等</li>
+<li>默认下载比特率为320k的高品质音乐（若木有320k则会自动下载最高比特率）</li>
+<li>支持下载单首/多首歌曲</li>
+<li>支持下载歌手热门单曲（可配置最大下载数）</li>
+<li>支持下载专辑所有歌曲</li>
+<li>支持下载公开歌单所有歌曲</li>
+</ul>
+<p><strong>（注意：已下架的音乐暂时无法下载）</strong></p>
+<p>通过<code>ncm -h</code>即可查看所支持的参数列表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">$ ncm -h</div><div class="line">usage: ncm [-h] [-s song_id] [-ss song_ids [song_ids ...]] [-hot artist_id]</div><div class="line">           [-a album_id] [-p playlist_id]</div><div class="line"></div><div class="line">optional arguments:</div><div class="line">  -h, --help            show this help message and exit</div><div class="line">  -s song_id            Download a song by song_id</div><div class="line">  -ss song_ids [song_ids ...]</div><div class="line">                        Download a song list, song_id split by space</div><div class="line">  -hot artist_id        Download an artist hot 50 songs by artist_id</div><div class="line">  -a album_id           Download an album all songs by album_id</div><div class="line">  -p playlist_id        Download a playlist all songs by playlist_id</div></pre></td></tr></table></figure></p>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><h3 id="下载单曲"><a href="#下载单曲" class="headerlink" title="下载单曲"></a>下载单曲</h3><p>使用参数<code>-s</code>，后加歌曲id或者歌曲完整url，如：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ ncm -s 123123</div><div class="line">or</div><div class="line">$ ncm -s http://music.163.com/<span class="comment">#/song?id=123123</span></div></pre></td></tr></table></figure></p>
+<h3 id="下载多首歌曲"><a href="#下载多首歌曲" class="headerlink" title="下载多首歌曲"></a>下载多首歌曲</h3><p>使用参数<code>-ss</code>，后加歌曲ids或者歌曲完整urls(id或url之间通过空格隔开)，如：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ ncm -ss 123123 456456 789789</div><div class="line">or</div><div class="line">$ ncm -ss url1 url2 url3</div></pre></td></tr></table></figure></p>
+<h3 id="下载某歌手的热门单曲-默认下50首，可配置"><a href="#下载某歌手的热门单曲-默认下50首，可配置" class="headerlink" title="下载某歌手的热门单曲(默认下50首，可配置)"></a>下载某歌手的热门单曲(默认下50首，可配置)</h3><p>使用参数<code>-hot</code>，后加歌手id或者完整url，如：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ ncm -hot 123123</div><div class="line">or</div><div class="line">$ ncm -hot http://music.163.com/<span class="comment">#/artist?id=123123</span></div></pre></td></tr></table></figure></p>
+<h3 id="下载某张专辑的所有歌曲"><a href="#下载某张专辑的所有歌曲" class="headerlink" title="下载某张专辑的所有歌曲"></a>下载某张专辑的所有歌曲</h3><p>使用参数<code>-a</code>，后加专辑id或者完整url，使用方法同上。</p>
+<h3 id="下载某个公开的歌单"><a href="#下载某个公开的歌单" class="headerlink" title="下载某个公开的歌单"></a>下载某个公开的歌单</h3><p>使用参数<code>-p</code>，后加歌单id或者完整url，使用方法同上，必须确认是<strong>公开</strong>的歌单才能下载哦。</p>
+<h2 id="Settings"><a href="#Settings" class="headerlink" title="Settings"></a>Settings</h2><p>配置文件在在用户目录下自动生成，路径如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/Users/yourUserName/.ncm/ncm.ini</div></pre></td></tr></table></figure></p>
+<p>目前支持以下几项设置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">[settings]</div><div class="line"></div><div class="line">#--------------------------------------</div><div class="line"># 热门音乐的最大下载数，默认50</div><div class="line"># Range: 0 &lt; hot_max &lt;= 50</div><div class="line">#--------------------------------------</div><div class="line">download.hot_max = 50</div><div class="line"></div><div class="line">#--------------------------------------</div><div class="line"># 音乐文件的下载路径，默认在用户目录.ncm/download目录下</div><div class="line">#--------------------------------------</div><div class="line">download.dir = /Users/yourUserName/.ncm/download</div><div class="line"></div><div class="line">#--------------------------------------</div><div class="line"># 音乐命名格式，默认1</div><div class="line"># 1: 歌曲名</div><div class="line"># 2: 歌手 - 歌曲名</div><div class="line"># 3: 歌曲名 - 歌手</div><div class="line">#--------------------------------------</div><div class="line">song.name_type = 1</div><div class="line"></div><div class="line">#--------------------------------------</div><div class="line"># 文件智能分类，默认1</div><div class="line"># 1: 不分文件夹</div><div class="line"># 2: 按歌手分文件夹</div><div class="line"># 3: 按歌手/专辑分文件夹</div><div class="line">#--------------------------------------</div><div class="line">song.folder_type = 1</div></pre></td></tr></table></figure></p>
+<p><strong>Warning:</strong> 智能分类设置目前只针对<code>-s</code>和<code>-ss</code>参数有效，<code>-hot/-a/-p</code>分别会存于后缀为：<code>-hot50/-album/-playlist</code>的文件夹中，方便管理本地音乐。</p>
+<h2 id="Feedback"><a href="#Feedback" class="headerlink" title="Feedback"></a>Feedback</h2><p>如果遇到Bugs，欢迎提issue或者PR，谢谢各位支持~</p>
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>MIT License</p>
+<p>Copyright (c) 2017 codezjx <a href="&#109;&#97;&#x69;&#108;&#x74;&#111;&#x3a;&#x63;&#x6f;&#100;&#101;&#46;&#122;&#x6a;&#x78;&#x40;&#103;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#x63;&#x6f;&#100;&#101;&#46;&#122;&#x6a;&#x78;&#x40;&#103;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy<br>of this software and associated documentation files (the “Software”), to deal<br>in the Software without restriction, including without limitation the rights<br>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br>copies of the Software, and to permit persons to whom the Software is<br>furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all<br>copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br>SOFTWARE.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Open-Source/" rel="tag"># Open Source</a>
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/Netease/" rel="tag"># Netease</a>
+          
+            <a href="/tags/Cloud-Music/" rel="tag"># Cloud Music</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/04/umeng-umid-bug/" rel="next" title="友盟统计UMID潜在的一个坑">
+                <i class="fa fa-chevron-left"></i> 友盟统计UMID潜在的一个坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/31/hexo-guide/" rel="prev" title="使用Hexo+GitHub搭建及配置个人博客">
+                使用Hexo+GitHub搭建及配置个人博客 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="codezjx" />
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Preview"><span class="nav-number">2.</span> <span class="nav-text">Preview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Installation"><span class="nav-number">3.</span> <span class="nav-text">Installation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Feature"><span class="nav-number">4.</span> <span class="nav-text">Feature</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Usage"><span class="nav-number">5.</span> <span class="nav-text">Usage</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载单曲"><span class="nav-number">5.1.</span> <span class="nav-text">下载单曲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载多首歌曲"><span class="nav-number">5.2.</span> <span class="nav-text">下载多首歌曲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载某歌手的热门单曲-默认下50首，可配置"><span class="nav-number">5.3.</span> <span class="nav-text">下载某歌手的热门单曲(默认下50首，可配置)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载某张专辑的所有歌曲"><span class="nav-number">5.4.</span> <span class="nav-text">下载某张专辑的所有歌曲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载某个公开的歌单"><span class="nav-number">5.5.</span> <span class="nav-text">下载某个公开的歌单</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Settings"><span class="nav-number">6.</span> <span class="nav-text">Settings</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Feedback"><span class="nav-number">7.</span> <span class="nav-text">Feedback</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#License"><span class="nav-number">8.</span> <span class="nav-text">License</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
