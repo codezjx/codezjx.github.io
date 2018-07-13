@@ -5,7 +5,7 @@ categories: Architecture Components
 tags: [Android, Architecture Components, ViewModel, RTFSC]
 ---
 
-## 简单介绍
+## 简介
 `ViewModel`的作用如它的名字所示，用来存储`View`相关的数据，并且他会自动感知当前界面的生命周期，以便在界面重建的时候能够及时恢复数据（如屏幕旋转、语言等Configuration变化的时候）
 
 ## 一分钟上手
