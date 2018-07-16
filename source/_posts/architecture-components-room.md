@@ -201,4 +201,4 @@ public abstract class MainDatabase extends RoomDatabase {
 }
 ```
 
-> 注意：在DAO中所有的数据库操作都不能在主线程中进行，否则`Room`会直接抛异常。当然，你也可以通过`RoomDatabase.Builder.allowMainThreadQueries(true)`方法来解除这个限制，但建议还是遵循官方的建议，采用异步的方式进行或者通过`LiveData`及`RxJava`等异步框架实现。
+> 注意：在DAO中所有的数据库操作都不能在主线程中进行，否则`Room`会直接抛异常。当然，你也可以通过`RoomDatabase.Builder.allowMainThreadQueries()`方法来解除这个限制，但建议还是遵循官方的建议，采用异步的方式进行或者通过`LiveData`及`RxJava`等异步框架实现。
