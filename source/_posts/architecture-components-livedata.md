@@ -66,9 +66,10 @@ LiveData<String> userName = Transformations.map(userLiveData, new Function<User,
 ```
 
 ### Transformations.switchMap()
-与`map()`操作符类似，在下面的例子中，`userIdLiveData`的每次改变，都会导致`getUser(inputId)`被调用，但与`map()`中例子不一样的是这里的`getUser(inputId)`返回的数据是`LiveData`。因此当每次`getUser(inputId)`返回的`LiveData`数据被修改，`userLiveData`也会被修改。也就是说`userLiveData`的变化同时依赖`userIdLiveData`与`getUser(inputId)`返回`LiveData`的修改。
+与`map()`操作符类似，在下面的例子中，`userIdLiveData`的每次改变，都会导致`getUser(inputId)`被调用，但与`map()`中例子不一样的是这里的`getUser(inputId)`返回的数据是`LiveData`（如：从`Room`数据库中获取数据），因此当每次`getUser(inputId)`返回的`LiveData`数据被修改（如：`Room`中`inputId`对应的`User`被修改），`userLiveData`也会被修改。也就是说`userLiveData`的变化同时依赖`userIdLiveData`与`getUser(inputId)`返回`LiveData`对象的修改。
 ```java
 private LiveData<User> getUser(String id) {
+    // Get user from Room database
     ...;
 }
 LiveData<String> userIdLiveData = ...;

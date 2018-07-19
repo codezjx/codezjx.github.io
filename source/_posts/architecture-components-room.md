@@ -140,7 +140,7 @@ public interface UserDao {
 
 （4）加入可观察的查询
 
-1. 使用`LiveData`可使我们的数据在更新后能及时的通知到UI，只需简单包装下方法的返回值即可。
+- 使用`LiveData`可使我们的数据在更新后能及时的通知到UI，只需简单包装下方法的返回值即可。
 ```java
 @Dao
 public interface UserDao {
@@ -148,7 +148,7 @@ public interface UserDao {
     public LiveData<List<User>> loadUsersFromRegionsSync(List<String> regions);
 }
 ```
-2. 使用`RxJava`进行响应式查询，并且可以结合Rx强大的操作符做完成各种骚操作~
+- 使用`RxJava`进行响应式查询，并且可以结合Rx强大的操作符做完成各种骚操作~
 ```java
 @Dao
 public interface UserDao {
@@ -156,7 +156,9 @@ public interface UserDao {
     public Flowable<User> loadUserById(int id);
 }
 ```
-3. 返回原始的Cursor对象（官方不推荐使用，因为他不保证行是否存在或者行包含了什么数据）
+>注意：在Room中，只支持`Maybe`，`Single`和`Flowable`三种返回类型，`Observable`暂时不支持，会在编译期报错`Error: Not sure how to convert a Cursor to this method's return type`。关于三种返回类型的具体使用场景，可见官方推荐的这篇文章：[Room and RxJava][1]。
+
+- 返回原始的`Cursor`对象（官方不推荐使用，因为他不保证行是否存在或者行包含了什么数据）
 ```java
 @Dao
 public interface UserDao {
@@ -202,3 +204,5 @@ public abstract class MainDatabase extends RoomDatabase {
 ```
 
 > 注意：在DAO中所有的数据库操作都不能在主线程中进行，否则`Room`会直接抛异常。当然，你也可以通过`RoomDatabase.Builder.allowMainThreadQueries()`方法来解除这个限制，但建议还是遵循官方的建议，采用异步的方式进行或者通过`LiveData`及`RxJava`等异步框架实现。
+
+[1]: https://medium.com/google-developers/room-rxjava-acb0cd4f3757
