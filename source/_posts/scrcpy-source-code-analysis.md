@@ -132,6 +132,8 @@ fi
 `scrcpy-server.jar`在adb下通过`app_process`运行起来后，默认就有了shell权限，像一些截屏、录屏、模拟按键点击等功能都可以直接使用，而且完全不需要任何权限的声明。
 
 ## RTFSC
+
+### Server.main()
 了解了编译与启动的方式后，我们终于可以开始分析`scrcpy`的源码了，从发送端的主入口`com.genymobile.scrcpy.Server.main()`方法开始看起。
 ```java
 public static void main(String... args) throws Exception {
@@ -168,7 +170,12 @@ private static void scrcpy(Options options) throws IOException {
     }
 }
 ```
+这里，我们可以看到`scrcpy`总共有3条工作线程，分别为：
+- main线程：将录屏数据编码并把视频流传输到展示端
+- controller线程：接收展示端控制信息并进行响应（如：按键、鼠标等事件的处理）
+- sender线程：发送设备信息到展示端（目前仅用于发送设备剪贴板的内容）
 
+### adb reverse和adb forward
 其中通过`DesktopConnection.open()`方法根据`tunnelForward`进行发送端与接收端的服务连接。如果是`adb forward`设置端口转发的方式，则发送端作为服务器，初始化`LocalServerSocket`进行监听；否则若是`adb reverse`反向代理的方式，则通过`LocalSocket`链接到远程服务器，此时接收端作为服务器。关于`adb forward`和`adb reverse`的使用方式不在这里展开，有兴趣的可以自己搜索相关用法。
 ```java
 public static DesktopConnection open(Device device, boolean tunnelForward) throws IOException {
@@ -218,6 +225,7 @@ enable_tunnel(struct server *server) {
 }
 ```
 
+### 录屏&编码
 当连接建立起来后，就可以通过`ScreenEncoder.streamScreen()`方法开始进行录屏、编码与数据的发送了，以下为精简后的核心逻辑代码与流程解析。
 ```java
 public void streamScreen(Device device, FileDescriptor fd) throws IOException {
@@ -261,6 +269,7 @@ private static void setDisplaySurface(IBinder display, Surface surface, Rect dev
 ```
 >注意：这里的`SurfaceControl`是对系统`android.view.SurfaceControl`的反射包装类。因为这个类属于系统隐藏API，客户端无法直接调用，`wrappers`包下的类基本全都是通过这种方式进行调用的。
 
+### 发送数据
 了解完录屏数据的获取以及如何与编码器绑定后，我们来看下怎么拿到编码后的数据及发送，这个时候来看下`encode()`方法。
 ```java
 private boolean encode(MediaCodec codec, FileDescriptor fd) throws IOException {
@@ -293,8 +302,71 @@ private boolean encode(MediaCodec codec, FileDescriptor fd) throws IOException {
 }
 ```
 
-看到这里，发送端的录屏数据采集、编码及发送就结束了。剩下的流程就是展示端接收并通过FFmpeg解码H.264数据，再通过SDL展示每一帧数据的过程了。未完，待续...
+看到这里，发送端的录屏数据采集、编码及发送就结束了。剩下的流程就是展示端接收并通过FFmpeg解码H.264数据，再通过SDL展示每一帧数据的过程了。
 
+### 按键事件处理
+前面我们有留意到`scrcpy`是通过controller线程来接收展示端控制信息并进行响应，具体是如何进行的呢？关键的代码在`Controller.control()`方法中：
+```java
+public void control() throws IOException {
+    // on start, power on the device
+    // 连接上的时候马上模拟按下power，以唤醒设备（因为有可能是息屏状态）
+    if (!device.isScreenOn()) {
+        injectKeycode(KeyEvent.KEYCODE_POWER);
+        ...
+        SystemClock.sleep(500);
+    }
+    // 死循环，不断获取展示端发送过来的事件
+    while (true) {
+        handleEvent();
+    }
+}
+
+private void handleEvent() throws IOException {
+    ControlMessage msg = connection.receiveControlMessage();
+    // 根据消息类型注入不同的事件，如：按键、文字、鼠标、滚动事件...
+    switch (msg.getType()) {
+        case ControlMessage.TYPE_INJECT_KEYCODE:
+            injectKeycode(msg.getAction(), msg.getKeycode(), msg.getMetaState());
+            break;
+        case ControlMessage.TYPE_INJECT_TEXT:
+            injectText(msg.getText());
+            break;
+        case ControlMessage.TYPE_INJECT_MOUSE_EVENT:
+            injectMouse(msg.getAction(), msg.getButtons(), msg.getPosition());
+            break;
+        case ControlMessage.TYPE_INJECT_SCROLL_EVENT:
+            injectScroll(msg.getPosition(), msg.getHScroll(), msg.getVScroll());
+            break;
+        ...
+        default:
+            // do nothing
+    }
+}
+```
+
+关于事件的注入，在`handleEvent()`方法里面调用了一系列的`injectXXX()`方法，都是先转换为`KeyEvent`和`MotionEvent`，最终调用到`InputManager.injectInputEvent()`方法中。这里跟上面的`SurfaceControl`一样，都是通过反射的方式调用到`injectInputEvent()`方法。
+```java
+public final class InputManager {
+    ...
+    public InputManager(IInterface manager) {
+        this.manager = manager;
+        try {
+            injectInputEventMethod = manager.getClass().getMethod("injectInputEvent", InputEvent.class, int.class);
+        } catch (NoSuchMethodException e) {
+            throw new AssertionError(e);
+        }
+    }
+    public boolean injectInputEvent(InputEvent inputEvent, int mode) {
+        try {
+            return (Boolean) injectInputEventMethod.invoke(manager, inputEvent, mode);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+    }
+}
+```
+
+至此，`scrcpy`的源码分析差不多就结束了。从`scrcpy`的编译，再到执行`scrcpy`命令，通过`app_process`启动`scrcpy-server.jar`，最后到发送端的网络连接、录屏、编码、发送流数据和按键处理。我们把`scrcpy`的整个流程分析了一遍。希望看完这篇文章后，能对大家有所帮助~
 
 [1]: https://github.com/Genymobile/scrcpy
 [2]: https://mesonbuild.com/
