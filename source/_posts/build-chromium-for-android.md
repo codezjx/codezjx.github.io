@@ -56,7 +56,8 @@ gn gen --args='target_os="android" target_cpu="arm"' out/Default
 除了`target_os`和`target_cpu`之外，我们还可以根据编译类型（如debug、release）设置一些其他的参数：
 
 - is_debug: 设置true时编译debug版本，false时编译release版本。
-- is_component_build: 设置true时会把声明为`components`的目标作为共享库动态加载，一般在编译debug版本时，会设置为true，这样每次改动编译链接花费的时间就会减少很多。若为false，则组件将采用静态链接，详细介绍参考官方介绍[component_build.md][3]。
+- is_component_build: 设置true时会把声明为`components`的目标作为共享库动态加载，一般在编译debug版本时，会设置为true，这样每次改动编译链接花费的时间就会减少很多。若为false，则组件将采用静态链接，详细介绍可参考官方文档：[component_build.md][3]。
+- use_jumbo_build: 设置true时会启动jumbo编译模式，该模式下编译与链接速度都会快很多，在调试的时候可以提高效率。但是因为jumbo的原理是合并多文件一起进行编译，因此编译时可能会产生额外的symbols冲突，详细介绍可参考官方文档：[jumbo.md][4]。
 
 ## GN常用指令
 
@@ -83,6 +84,8 @@ gn desc out/Default //net:net > desc.txt
 ```bash
 gn help <command>
 ```
+
+关于GN的更多使用方式可参考官方文档：[Quick Start guide][5]
 
 ## 编译Chromium APK
 通过以下命令我们可以编译Chromium的APK：
@@ -130,3 +133,5 @@ link_directories(${libs_dir})
 [1]: https://ninja-build.org/
 [2]: https://gn.googlesource.com/gn/+/master/docs/quick_start.md
 [3]: https://chromium.googlesource.com/chromium/src/+/master/docs/component_build.md
+[4]: https://chromium.googlesource.com/chromium/src/+/master/docs/jumbo.md
+[5]: https://gn.googlesource.com/gn/+/master/docs/quick_start.md
