@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Retrofit,RxJava,IPC,AIDL,Open Source,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="前言工作中经常会遇到进程间通信的需求，但每次通过AIDL实现又觉得步骤十分的繁琐。因此用业余时间自己设计并开源了这款IPC库。设计思路来源于Retrofit通过动态代理生成实现类的这种方式，把AIDL与Retrofit的特性完美的结合起来。 这是你们没有体验过的全新方式，只需体验三分钟，你就会像我一样，爱上这款开源库~ 项目地址：https://github.com/codezjx/AndLink">
+<meta name="keywords" content="Android,Retrofit,RxJava,IPC,AIDL,Open Source">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava">
+<meta property="og:url" content="http://yoursite.com/posts/open-source-project-andlinker/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="前言工作中经常会遇到进程间通信的需求，但每次通过AIDL实现又觉得步骤十分的繁琐。因此用业余时间自己设计并开源了这款IPC库。设计思路来源于Retrofit通过动态代理生成实现类的这种方式，把AIDL与Retrofit的特性完美的结合起来。 这是你们没有体验过的全新方式，只需体验三分钟，你就会像我一样，爱上这款开源库~ 项目地址：https://github.com/codezjx/AndLink">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-27T15:24:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava">
+<meta name="twitter:description" content="前言工作中经常会遇到进程间通信的需求，但每次通过AIDL实现又觉得步骤十分的繁琐。因此用业余时间自己设计并开源了这款IPC库。设计思路来源于Retrofit通过动态代理生成实现类的这种方式，把AIDL与Retrofit的特性完美的结合起来。 这是你们没有体验过的全新方式，只需体验三分钟，你就会像我一样，爱上这款开源库~ 项目地址：https://github.com/codezjx/AndLink">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/open-source-project-andlinker/">
+
+
+
+
+
+  <title>开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/open-source-project-andlinker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T22:28:20+08:00">
+                2018-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Open-Source/" itemprop="url" rel="index">
+                    <span itemprop="name">Open Source</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>工作中经常会遇到进程间通信的需求，但每次通过AIDL实现又觉得步骤十分的繁琐。因此用业余时间自己设计并开源了这款IPC库。设计思路来源于Retrofit通过动态代理生成实现类的这种方式，把AIDL与Retrofit的特性完美的结合起来。</p>
+<p>这是你们没有体验过的全新方式，只需体验三分钟，你就会像我一样，爱上这款开源库~</p>
+<p>项目地址：<a href="https://github.com/codezjx/AndLinker" target="_blank" rel="noopener">https://github.com/codezjx/AndLinker</a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>AndLinker是一款Android上的IPC (进程间通信) 库，结合了<a href="https://developer.android.com/guide/components/aidl.html" target="_blank" rel="noopener">AIDL</a>和<a href="https://github.com/square/retrofit" target="_blank" rel="noopener">Retrofit</a>的诸多特性，且可以与<a href="https://github.com/ReactiveX/RxJava/tree/1.x" target="_blank" rel="noopener">RxJava</a>和<a href="https://github.com/ReactiveX/RxJava/tree/2.x" target="_blank" rel="noopener">RxJava2</a>的Call Adapters无缝结合使用。项目的设计与部分代码参考了伟大的<a href="https://github.com/square/retrofit" target="_blank" rel="noopener">Retrofit</a>项目。</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>在项目根目录的<code>build.gradle</code>中添加<code>jcenter()</code>仓库</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">allprojects &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        jcenter()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在App的<code>build.gradle</code>中添加如下依赖</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    implementation <span class="string">'com.codezjx.library:andlinker:0.7.1'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="功能特性"><a href="#功能特性" class="headerlink" title="功能特性"></a>功能特性</h2><ul>
+<li>以普通Java接口代替AIDL接口</li>
+<li>像<a href="https://github.com/square/retrofit" target="_blank" rel="noopener">Retrofit</a>一样生成远程服务接口的IPC实现</li>
+<li>支持的Call Adapters：<code>Call</code>，<a href="https://github.com/ReactiveX/RxJava/tree/1.x" target="_blank" rel="noopener">RxJava</a> <code>Observable</code>，<a href="https://github.com/ReactiveX/RxJava/tree/2.x" target="_blank" rel="noopener">RxJava2</a> <code>Observable</code> &amp; <code>Flowable</code></li>
+<li>支持远程服务回调机制</li>
+<li>支持AIDL的所有数据类型</li>
+<li>支持AIDL的所有数据定向tag：<code>in</code>，<code>out</code>，<code>inout</code></li>
+<li>支持AIDL的<code>oneway</code>关键字</li>
+</ul>
+<h2 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h2><p>使用注解<code>@RemoteInterface</code>修饰远程服务接口<code>IRemoteService</code>，并实现它</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RemoteInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IRemoteService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getPid</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">basicTypes</span><span class="params">(<span class="keyword">int</span> anInt, <span class="keyword">long</span> aLong, <span class="keyword">boolean</span> aBoolean, <span class="keyword">float</span> aFloat,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">double</span> aDouble, String aString)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> IRemoteService mRemoteService = <span class="keyword">new</span> IRemoteService() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPid</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> android.os.Process.myPid();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">basicTypes</span><span class="params">(<span class="keyword">int</span> anInt, <span class="keyword">long</span> aLong, <span class="keyword">boolean</span> aBoolean,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">float</span> aFloat, <span class="keyword">double</span> aDouble, String aString)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Does something</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在服务端App中，创建<code>AndLinkerBinder</code>对象，并注册上面的接口实现。然后在<code>onBind()</code>方法中返回，暴露给客户端</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> AndLinkerBinder mLinkerBinder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemoteService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate();</span><br><span class="line">        mLinkerBinder = AndLinkerBinder.Factory.newBinder();</span><br><span class="line">        mLinkerBinder.registerObject(mRemoteService);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mLinkerBinder;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在客户端App中，通过<code>Builder</code>创建<code>AndLinker</code>对象，并通过<code>create()</code>方法生成一个<code>IRemoteService</code>远程接口的IPC实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BindingActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> AndLinker mLinker;</span><br><span class="line">    <span class="keyword">private</span> IRemoteService mRemoteService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        mLinker = <span class="keyword">new</span> AndLinker.Builder(<span class="keyword">this</span>)</span><br><span class="line">                .packageName(<span class="string">"com.example.andlinker"</span>)</span><br><span class="line">                .action(<span class="string">"com.example.andlinker.REMOTE_SERVICE_ACTION"</span>)</span><br><span class="line">                .build();</span><br><span class="line">        mLinker.bind();</span><br><span class="line"></span><br><span class="line">        mRemoteService = mLinker.create(IRemoteService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">        mLinker.unbind();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一切就绪，现在<code>mRemoteService</code>对象中的所有方法都是IPC方法，直接调用即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> pid = mRemoteService.getPid();</span><br><span class="line">mRemoteService.basicTypes(<span class="number">1</span>, <span class="number">2L</span>, <span class="keyword">true</span>, <span class="number">3.0f</span>, <span class="number">4.0</span>d, <span class="string">"str"</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="支持数据类型"><a href="#支持数据类型" class="headerlink" title="支持数据类型"></a>支持数据类型</h2><p>AndLinker支持AIDL所有数据类型：</p>
+<ul>
+<li>Java语言中的所有原始类型 (如：<code>int</code>，<code>long</code>，<code>char</code>，<code>boolean</code>，等等)</li>
+<li><code>String</code></li>
+<li><code>CharSequence</code></li>
+<li><code>Parcelable</code></li>
+<li><code>List</code> (List中的所有元素必须是此列表中支持的数据类型)</li>
+<li><code>Map</code> (Map中的所有元素必须是此列表中支持的数据类型)</li>
+</ul>
+<h2 id="进阶使用"><a href="#进阶使用" class="headerlink" title="进阶使用"></a>进阶使用</h2><h3 id="Call-Adapters"><a href="#Call-Adapters" class="headerlink" title="Call Adapters"></a>Call Adapters</h3><p>在客户端App中，你可以copy并修改远程服务接口，包装方法的返回值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RemoteInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IRemoteService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">Observable&lt;Integer&gt; <span class="title">getPid</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">Call&lt;Void&gt; <span class="title">basicTypes</span><span class="params">(<span class="keyword">int</span> anInt, <span class="keyword">long</span> aLong, <span class="keyword">boolean</span> aBoolean, <span class="keyword">float</span> aFloat, </span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">double</span> aDouble, String aString)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>AndLinker.Builder</code>中注册对应的Call Adapter Factory，剩下的步骤基本和<a href="https://github.com/square/retrofit" target="_blank" rel="noopener">Retrofit</a>一致，不再赘述</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> AndLinker.Builder(<span class="keyword">this</span>)</span><br><span class="line">        ...</span><br><span class="line">        .addCallAdapterFactory(OriginalCallAdapterFactory.create()) <span class="comment">// Basic</span></span><br><span class="line">        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())  <span class="comment">// RxJava2</span></span><br><span class="line">        .build();</span><br></pre></td></tr></table></figure>
+
+<h3 id="处理远程服务接口回调"><a href="#处理远程服务接口回调" class="headerlink" title="处理远程服务接口回调"></a>处理远程服务接口回调</h3><p>使用<code>@RemoteInterface</code>注解修饰远程服务回调接口<code>IRemoteCallback</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RemoteInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IRemoteCallback</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onValueChange</span><span class="params">(<span class="keyword">int</span> value)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在远程方法中使用<code>@Callback</code>注解修饰callback参数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">registerCallback</span><span class="params">(@Callback IRemoteCallback callback)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>在客户端App中，实现上面定义的远程服务回调接口<code>IRemoteCallback</code>，并且注册到<code>AndLinker</code>中，就是这么简单</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> IRemoteCallback mRemoteCallback = <span class="keyword">new</span> IRemoteCallback() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onValueChange</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Invoke when server side callback</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">mLinker.registerObject(mRemoteCallback);</span><br></pre></td></tr></table></figure>
+
+<h3 id="指定数据定向tag"><a href="#指定数据定向tag" class="headerlink" title="指定数据定向tag"></a>指定数据定向tag</h3><p>你可以为远程方法的参数指定<code>@In</code>，<code>@Out</code>，或者<code>@Inout</code>注解，它标记了数据在底层Binder中的流向，跟AIDL中的用法一致</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">directionalParamMethod</span><span class="params">(@In KeyEvent event, @Out <span class="keyword">int</span>[] arr, @Inout Rect rect)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>:</p>
+<ul>
+<li>所有非原始类型必须指定数据定向tag：<code>@In</code>，<code>@Out</code>，或者<code>@Inout</code>，用来标记数据的流向。原始类型默认是<code>@In</code>类型，并且不能指定其他值。</li>
+<li>使用<code>@Out</code>或者<code>@Inout</code>修饰的Parcelable参数必须实现<code>SuperParcelable</code>接口，否则你必须手动添加此方法<code>public void readFromParcel(Parcel in)</code>。</li>
+</ul>
+</blockquote>
+<h3 id="使用-OneWay注解"><a href="#使用-OneWay注解" class="headerlink" title="使用@OneWay注解"></a>使用<code>@OneWay</code>注解</h3><p>你可以在远程方法上使用<code>@OneWay</code>注解，这会修改远程方法调用的行为。当使用它时，远程方法调用不会堵塞，它只是简单的发送数据并立即返回，跟AIDL中的用法一致</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@OneWay</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">onewayMethod</span><span class="params">(String msg)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Proguard配置"><a href="#Proguard配置" class="headerlink" title="Proguard配置"></a>Proguard配置</h2><p>在<code>proguard-rules.pro</code>文件中添加如下混淆规则，将需要序列化/反序列化的model类给keep掉</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-keep class com.example.andlinker.model.** &#123;</span><br><span class="line">    public void readFromParcel(android.os.Parcel);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="反馈"><a href="#反馈" class="headerlink" title="反馈"></a>反馈</h2><p>欢迎各位提issues和PRs！</p>
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><pre><code>Copyright 2018 codezjx &lt;code.zjx@gmail.com&gt;
+
+Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Retrofit/" rel="tag"># Retrofit</a>
+          
+            <a href="/tags/RxJava/" rel="tag"># RxJava</a>
+          
+            <a href="/tags/IPC/" rel="tag"># IPC</a>
+          
+            <a href="/tags/AIDL/" rel="tag"># AIDL</a>
+          
+            <a href="/tags/Open-Source/" rel="tag"># Open Source</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/gradle-plugin-3-0-0-migration/" rel="next" title="Android Studio 3.0及Gradle Plugin 3.0升级注意事项">
+                <i class="fa fa-chevron-left"></i> Android Studio 3.0及Gradle Plugin 3.0升级注意事项
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/content-provider-security-exception-issue/" rel="prev" title="从ContentProvider报SecurityException分析出Android5.0+的一个隐藏大坑">
+                从ContentProvider报SecurityException分析出Android5.0+的一个隐藏大坑 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">3.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#功能特性"><span class="nav-number">4.</span> <span class="nav-text">功能特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速开始"><span class="nav-number">5.</span> <span class="nav-text">快速开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#支持数据类型"><span class="nav-number">6.</span> <span class="nav-text">支持数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进阶使用"><span class="nav-number">7.</span> <span class="nav-text">进阶使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Call-Adapters"><span class="nav-number">7.1.</span> <span class="nav-text">Call Adapters</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理远程服务接口回调"><span class="nav-number">7.2.</span> <span class="nav-text">处理远程服务接口回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定数据定向tag"><span class="nav-number">7.3.</span> <span class="nav-text">指定数据定向tag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-OneWay注解"><span class="nav-number">7.4.</span> <span class="nav-text">使用@OneWay注解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Proguard配置"><span class="nav-number">8.</span> <span class="nav-text">Proguard配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反馈"><span class="nav-number">9.</span> <span class="nav-text">反馈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#License"><span class="nav-number">10.</span> <span class="nav-text">License</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Opus,MediaCodec,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="简介Opus是一个有损声音编码的格式，由Xiph.Org基金会开发，之后由互联网工程任务组进行标准化，目标是希望用单一格式包含声音和语音，取代Speex和Vorbis，且适用于网络上低延迟的即时声音传输，标准格式定义于RFC 6716文件。Opus格式是一个开放格式，使用上没有任何专利或限制。 在官方的examples测试案例中，就算有30%的丢包率，也基本能够听清楚人声，这对于即时的声音传输场景">
+<meta name="keywords" content="Android,Opus,MediaCodec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android上使用MediaCodec对Opus音频解码">
+<meta property="og:url" content="http://yoursite.com/posts/opus-mediacodec-decode/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="简介Opus是一个有损声音编码的格式，由Xiph.Org基金会开发，之后由互联网工程任务组进行标准化，目标是希望用单一格式包含声音和语音，取代Speex和Vorbis，且适用于网络上低延迟的即时声音传输，标准格式定义于RFC 6716文件。Opus格式是一个开放格式，使用上没有任何专利或限制。 在官方的examples测试案例中，就算有30%的丢包率，也基本能够听清楚人声，这对于即时的声音传输场景">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/posts/opus-mediacodec-decode/csd-buffer.jpg">
+<meta property="og:updated_time" content="2019-09-04T13:16:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android上使用MediaCodec对Opus音频解码">
+<meta name="twitter:description" content="简介Opus是一个有损声音编码的格式，由Xiph.Org基金会开发，之后由互联网工程任务组进行标准化，目标是希望用单一格式包含声音和语音，取代Speex和Vorbis，且适用于网络上低延迟的即时声音传输，标准格式定义于RFC 6716文件。Opus格式是一个开放格式，使用上没有任何专利或限制。 在官方的examples测试案例中，就算有30%的丢包率，也基本能够听清楚人声，这对于即时的声音传输场景">
+<meta name="twitter:image" content="http://yoursite.com/posts/opus-mediacodec-decode/csd-buffer.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/opus-mediacodec-decode/">
+
+
+
+
+
+  <title>Android上使用MediaCodec对Opus音频解码 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/opus-mediacodec-decode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android上使用MediaCodec对Opus音频解码</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-04T20:10:34+08:00">
+                2019-09-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Opus/" itemprop="url" rel="index">
+                    <span itemprop="name">Opus</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><code>Opus</code>是一个有损声音编码的格式，由Xiph.Org基金会开发，之后由互联网工程任务组进行标准化，目标是希望用单一格式包含声音和语音，取代Speex和Vorbis，且适用于网络上低延迟的即时声音传输，标准格式定义于RFC 6716文件。<code>Opus</code>格式是一个开放格式，使用上没有任何专利或限制。</p>
+<p>在官方的<a href="https://opus-codec.org/examples/" target="_blank" rel="noopener">examples</a>测试案例中，就算有30%的丢包率，也基本能够听清楚人声，这对于即时的声音传输场景来说非常重要。并且它支持动态、无缝的调节比特率与音频带宽，在网络环境多变的场景下更能保证音频的质量。</p>
+<p>同时它是<code>WebRTC</code>中默认的音频编码格式、也是<code>WebM</code>视频文件中音频的编码格式。由于最近项目中需要对<code>Opus</code>音频流进行解码，遇到了很多问题，网上基本也搜不到相关的资料与demo，因此诞生了这篇文章，希望能够帮助到有需要的同学。</p>
+<h2 id="技术特性"><a href="#技术特性" class="headerlink" title="技术特性"></a>技术特性</h2><p><code>Opus</code>可以处理各种音频应用，包括IP语音、视频会议、游戏内聊天、流音乐、甚至远程现场音乐表演。它可以从低比特率窄带语音扩展到非常高清音质的立体声音乐。支持的功能包括：</p>
+<ul>
+<li>6 kb/秒到510 kb/秒的比特率；单一频道最高256 kb/秒</li>
+<li>采样率从8 kHz（窄带）到48 kHz（全频）</li>
+<li>帧大小从2.5毫秒到60毫秒</li>
+<li>支持恒定比特率（CBR）、受约束比特率（CVBR）和可变比特率（VBR）</li>
+<li>支持语音（SILK层）和音乐（CELT层）的单独或混合模式</li>
+<li>支持单声道和立体声；支持多达255个音轨（多数据流的帧）</li>
+<li>可动态调节比特率，音频带宽和帧大小</li>
+<li>良好的鲁棒性丢失率和数据包丢失隐藏（PLC）</li>
+<li>浮点和定点实现</li>
+</ul>
+<h2 id="MediaCodec解码"><a href="#MediaCodec解码" class="headerlink" title="MediaCodec解码"></a>MediaCodec解码</h2><p>从官方的<a href="https://developer.android.com/guide/topics/media/media-formats" target="_blank" rel="noopener">media-formats</a>文档中我们可以知道，从<code>Android 5.0+</code>开始，官方就已经添加了<code>Opus</code>原生的编解码支持，我们使用<code>MediaCodec</code>就能够对其进行编解码的实现。关于<code>MediaCodec</code>的使用就不在这里做介绍了，大家可以参考下<a href="https://developer.android.com/reference/android/media/MediaCodec" target="_blank" rel="noopener">官方介绍文档</a>，非常的详细。</p>
+<p>于是乎很快就撸起Android Studio开始编写解码相关的代码，最开始初始化代码是这样子的，通过一些基本参数如：<code>sampleRate</code>和<code>channelCount</code>初始化<code>MediaCodec</code>并启动：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> sampleRate = <span class="number">48000</span>;</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> channelCount = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> bitRate = <span class="number">102000</span>;</span><br><span class="line">MediaFormat mediaFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_OPUS, sampleRate, channelCount);</span><br><span class="line">mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);</span><br><span class="line">MediaCodec mediaCodec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_AUDIO_OPUS);</span><br><span class="line">mediaCodec.configure(mediaFormat, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="number">0</span>);</span><br><span class="line">mediaCodec.start();</span><br></pre></td></tr></table></figure>
+
+<p>之后就是通过<code>queueInputBuffer()</code>将音频流数据送进<code>MediaCodec</code>进行解码，然后通过<code>dequeueOutputBuffer</code>从缓冲区拿到解码后的数据，这里代码先忽略，还不是重点。当第一帧数据通过<code>queueInputBuffer()</code>进入<code>MediaCodec</code>的时候，就会报以下的错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2019-09-04 19:48:36.701 17584-17678/com.codezjx.opusdecode E/ACodec: [OMX.google.opus.decoder] ERROR(0x80001001)</span><br><span class="line">2019-09-04 19:48:36.701 17584-17678/com.codezjx.opusdecode E/ACodec: signalError(omxError 0x80001001, internalError -2147483648)</span><br><span class="line">2019-09-04 19:48:36.701 17584-17678/com.codezjx.opusdecode E/MediaCodec: Codec reported err 0x80001001, actionCode 0, while in state 6</span><br></pre></td></tr></table></figure>
+
+<p>紧接着调用<code>dequeueOutputBuffer()</code>取出解码后数据的时候，就会报<code>IllegalStateException</code>，表明现在<code>MediaCodec</code>不在执行状态，也就是说上面解码的过程出错，导致<code>MediaCodec</code>的状态异常了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">    --------- beginning of crash</span><br><span class="line">2019-09-04 19:48:36.702 17584-17677/com.codezjx.opusdecode E/AndroidRuntime: FATAL EXCEPTION: Thread-7</span><br><span class="line">    Process: com.codezjx.opusdecode, PID: 17584</span><br><span class="line">    java.lang.IllegalStateException</span><br><span class="line">        at android.media.MediaCodec.native_dequeueOutputBuffer(Native Method)</span><br><span class="line">        at android.media.MediaCodec.dequeueOutputBuffer(MediaCodec.java:2698)</span><br></pre></td></tr></table></figure>
+
+<p>这个时候就比较纳闷了，设备已经是<code>Android 5.0+</code>，应该是支持<code>Opus</code>解码的。猜测应该是参数设置有问题，因此又回去看<a href="https://developer.android.com/reference/android/media/MediaCodec" target="_blank" rel="noopener">MediaCodec</a>的官方文档，果然发现漏了一些很重要的参数：<a href="https://developer.android.com/reference/android/media/MediaCodec#CSD" target="_blank" rel="noopener">CSD buffer</a>。</p>
+<h2 id="Codec-specific-Data"><a href="#Codec-specific-Data" class="headerlink" title="Codec-specific Data"></a>Codec-specific Data</h2><p>对于某些格式，特别是AAC音频和MPEG4、H.264和H.265视频格式，要求实际数据需要以多个缓冲区为前缀，包含设置数据或编解码器特定数据。下图是官方对于不同格式需要设置的不同<code>CSD buffer</code>数据的对照图，其中<code>Opus</code>音频解码需要在<code>CSD buffer #0/#1/#2</code>三个缓冲区分别设置不同的参数。</p>
+<p><img src="csd-buffer.jpg" alt></p>
+<p>设置参数的方式有两种，第一种比较复杂，需要在<code>MediaCodec.start()</code>之后，且在解码任何数据帧之前，将这些数据提交给<code>MediaCodec</code>，需要通过<code>BUFFER_FLAG_CODEC_CONFIG</code>这个flag进行标记：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mediaCodec.queueInputBuffer(inputIdex, <span class="number">0</span>, bytes.length, <span class="number">0</span>, MediaCodec.BUFFER_FLAG_CODEC_CONFIG);</span><br></pre></td></tr></table></figure>
+
+<p>第二种方式就简单很多，直接通过<code>MediaFormat.setByteBuffer()</code>方法，就可以非常简单的对这些缓冲区进行赋值，推荐第二种方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer csd0 = ByteBuffer.wrap(bytes);</span><br><span class="line">mediaFormat.setByteBuffer(<span class="string">"csd-0"</span>, csd0);</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>Pre-skip</code>和<code>Pre-roll</code>参数目前还没有用到，因此设置默认值0应该就可以了，注意这里格式需要是64位的无符号整数，并且是nativeOrder，Android上一般就是小端模式。但是官方文档中对于<code>csd-0</code>需要设置的参数就没有详细介绍了，只写明了是<code>Identification header</code>，也就是标识头，因此我们需要对这个标识头再进行详细分析。</p>
+<h2 id="Opus-Identification-header"><a href="#Opus-Identification-header" class="headerlink" title="Opus Identification header"></a>Opus Identification header</h2><p>关于Opus的标识头，可以从<a href="https://tools.ietf.org/html/rfc7845#section-5.1" target="_blank" rel="noopener">rfc7845</a>标准文档中找到详细的解答，格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> 0                   1                   2                   3</span><br><span class="line"> 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|      &apos;O&apos;      |      &apos;p&apos;      |      &apos;u&apos;      |      &apos;s&apos;      |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|      &apos;H&apos;      |      &apos;e&apos;      |      &apos;a&apos;      |      &apos;d&apos;      |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|  Version = 1  | Channel Count |           Pre-skip            |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|                     Input Sample Rate (Hz)                    |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|   Output Gain (Q7.8 in dB)    | Mapping Family|               |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               :</span><br><span class="line">|                                                               |</span><br><span class="line">:               Optional Channel Mapping Table...               :</span><br><span class="line">|                                                               |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line"></span><br><span class="line">                   Figure 2: ID Header Packet</span><br></pre></td></tr></table></figure>
+
+<p><code>Identification header</code>主要由8个参数组成，分别为：</p>
+<ul>
+<li>Magic Signature：固定头，占8个字节，为字符串OpusHead</li>
+<li>Version：版本号，占1字节，固定为0x01</li>
+<li>Channel Count：通道数，占1字节，根据音频流通道自行设置，如0x02</li>
+<li>Pre-skip：回放的时候从解码器中丢弃的samples数量，占2字节，为小端模式，默认设置0x00, 0x00就好</li>
+<li>Input Sample Rate (Hz)：音频流的Sample Rate，占4字节，为小端模式，根据实际情况自行设置</li>
+<li>Output Gain：输出增益，占2字节，为小端模式，没有用到默认设置0x00, 0x00就好</li>
+<li>Channel Mapping Family：通道映射系列，占1字节，默认设置0x00就好</li>
+<li>Channel Mapping Table：可选参数，上面的Family默认设置0x00的时候可忽略</li>
+</ul>
+<p>最终<code>MediaCodec</code>的初始化代码如下，增加了对<code>csd-0/1/2</code>3个缓冲区的设置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> sampleRate = <span class="number">48000</span>;</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> channelCount = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> bitRate = <span class="number">102000</span>;</span><br><span class="line">MediaFormat mediaFormat = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_OPUS, sampleRate, channelCount);</span><br><span class="line">mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);</span><br><span class="line"><span class="keyword">byte</span>[] csd0bytes = &#123;</span><br><span class="line">        <span class="comment">// Opus</span></span><br><span class="line">        <span class="number">0x4f</span>, <span class="number">0x70</span>, <span class="number">0x75</span>, <span class="number">0x73</span>,</span><br><span class="line">        <span class="comment">// Head</span></span><br><span class="line">        <span class="number">0x48</span>, <span class="number">0x65</span>, <span class="number">0x61</span>, <span class="number">0x64</span>,</span><br><span class="line">        <span class="comment">// Version</span></span><br><span class="line">        <span class="number">0x01</span>,</span><br><span class="line">        <span class="comment">// Channel Count</span></span><br><span class="line">        <span class="number">0x02</span>,</span><br><span class="line">        <span class="comment">// Pre skip</span></span><br><span class="line">        <span class="number">0x00</span>, <span class="number">0x00</span>,</span><br><span class="line">        <span class="comment">// Input Sample Rate (Hz), eg: 48000</span></span><br><span class="line">        (<span class="keyword">byte</span>) <span class="number">0x80</span>, (<span class="keyword">byte</span>) <span class="number">0xbb</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,</span><br><span class="line">        <span class="comment">// Output Gain (Q7.8 in dB)</span></span><br><span class="line">        <span class="number">0x00</span>, <span class="number">0x00</span>,</span><br><span class="line">        <span class="comment">// Mapping Family</span></span><br><span class="line">        <span class="number">0x00</span>&#125;;</span><br><span class="line"><span class="keyword">byte</span>[] csd1bytes = &#123;<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>&#125;;</span><br><span class="line"><span class="keyword">byte</span>[] csd2bytes = &#123;<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>&#125;;</span><br><span class="line">ByteBuffer csd0 = ByteBuffer.wrap(csd0bytes);</span><br><span class="line">mediaFormat.setByteBuffer(<span class="string">"csd-0"</span>, csd0);</span><br><span class="line">ByteBuffer csd1 = ByteBuffer.wrap(csd1bytes);</span><br><span class="line">mediaFormat.setByteBuffer(<span class="string">"csd-1"</span>, csd1);</span><br><span class="line">ByteBuffer csd2 = ByteBuffer.wrap(csd2bytes);</span><br><span class="line">mediaFormat.setByteBuffer(<span class="string">"csd-2"</span>, csd2);</span><br><span class="line">MediaCodec mediaCodec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_AUDIO_OPUS);</span><br><span class="line">mediaCodec.configure(mediaFormat, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="number">0</span>);</span><br><span class="line">mediaCodec.start();</span><br></pre></td></tr></table></figure>
+
+<p>紧接着通过<code>queueInputBuffer()</code>将音频流数据送进<code>MediaCodec</code>进行解码，然后通过<code>dequeueOutputBuffer</code>从缓冲区拿到解码后的数据，最后将数据写到<code>AudioTrack</code>中进行播放，即可完成<code>Opus</code>解码与声音回放。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">MediaCodec.BufferInfo decodeBufferInfo = <span class="keyword">new</span> MediaCodec.BufferInfo();</span><br><span class="line"><span class="keyword">while</span> (isRunning) &#123;</span><br><span class="line">    <span class="keyword">int</span> inputBufferId = mediaCodec.dequeueInputBuffer(timeoutUs);</span><br><span class="line">    <span class="keyword">if</span> (inputBufferId &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        ByteBuffer inputBuffer = mediaCodec.getInputBuffer(inputBufferId);</span><br><span class="line">        inputBuffer.clear();</span><br><span class="line">        <span class="keyword">byte</span>[] data = mDataQueue.take();</span><br><span class="line">        inputBuffer.put(data, <span class="number">0</span>, data.length);</span><br><span class="line">        mediaCodec.queueInputBuffer(inputBufferId, <span class="number">0</span>, data.length, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> outputBufferId = mediaCodec.dequeueOutputBuffer(decodeBufferInfo, timeoutUs);</span><br><span class="line">    <span class="keyword">if</span> (outputBufferId &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        ByteBuffer outputBuffer = mediaCodec.getOutputBuffer(outputBufferId);</span><br><span class="line">        <span class="keyword">byte</span>[] pcm = <span class="keyword">new</span> <span class="keyword">byte</span>[decodeBufferInfo.size];</span><br><span class="line">        outputBuffer.get(pcm);</span><br><span class="line">        outputBuffer.clear();</span><br><span class="line">        mAudioTrack.write(pcm, <span class="number">0</span>, pcm.length);</span><br><span class="line">        mediaCodec.releaseOutputBuffer(outputBufferId, <span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Opus/" rel="tag"># Opus</a>
+          
+            <a href="/tags/MediaCodec/" rel="tag"># MediaCodec</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/scrcpy-source-code-analysis/" rel="next" title="scrcpy投屏工具源码解析">
+                <i class="fa fa-chevron-left"></i> scrcpy投屏工具源码解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/build-chromium-for-android/" rel="prev" title="编译Chromium源码for Android">
+                编译Chromium源码for Android <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术特性"><span class="nav-number">2.</span> <span class="nav-text">技术特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MediaCodec解码"><span class="nav-number">3.</span> <span class="nav-text">MediaCodec解码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Codec-specific-Data"><span class="nav-number">4.</span> <span class="nav-text">Codec-specific Data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Opus-Identification-header"><span class="nav-number">5.</span> <span class="nav-text">Opus Identification header</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

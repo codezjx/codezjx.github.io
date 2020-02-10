@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,ContentProvider,Bug,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="前言最近在开发A应用的时候对接了合作方的一个B应用，对方很快就把接口文档发了过来，约定好我们之间通过B应用提供的XXXContentProvider来获取相关的数据。一切看起来是如此的普通与简单，但是从刚开始调试的那一刻起，诡异的事情就发送了。九十岁老太为何起死回生？数百头母猪为何半夜惨叫？女生宿舍为何频频失窃？超市方便面为何惨招毒手？在这一切的背后，是人性的扭曲，还是道德的沦丧？事件的最后，让我">
+<meta name="keywords" content="Android,ContentProvider,Bug">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从ContentProvider报SecurityException分析出Android5.0+的一个隐藏大坑">
+<meta property="og:url" content="http://yoursite.com/posts/content-provider-security-exception-issue/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="前言最近在开发A应用的时候对接了合作方的一个B应用，对方很快就把接口文档发了过来，约定好我们之间通过B应用提供的XXXContentProvider来获取相关的数据。一切看起来是如此的普通与简单，但是从刚开始调试的那一刻起，诡异的事情就发送了。九十岁老太为何起死回生？数百头母猪为何半夜惨叫？女生宿舍为何频频失窃？超市方便面为何惨招毒手？在这一切的背后，是人性的扭曲，还是道德的沦丧？事件的最后，让我">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-30T13:47:25.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从ContentProvider报SecurityException分析出Android5.0+的一个隐藏大坑">
+<meta name="twitter:description" content="前言最近在开发A应用的时候对接了合作方的一个B应用，对方很快就把接口文档发了过来，约定好我们之间通过B应用提供的XXXContentProvider来获取相关的数据。一切看起来是如此的普通与简单，但是从刚开始调试的那一刻起，诡异的事情就发送了。九十岁老太为何起死回生？数百头母猪为何半夜惨叫？女生宿舍为何频频失窃？超市方便面为何惨招毒手？在这一切的背后，是人性的扭曲，还是道德的沦丧？事件的最后，让我">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/content-provider-security-exception-issue/">
+
+
+
+
+
+  <title>从ContentProvider报SecurityException分析出Android5.0+的一个隐藏大坑 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/content-provider-security-exception-issue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">从ContentProvider报SecurityException分析出Android5.0+的一个隐藏大坑</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-30T21:26:20+08:00">
+                2018-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在开发A应用的时候对接了合作方的一个B应用，对方很快就把接口文档发了过来，约定好我们之间通过B应用提供的<code>XXXContentProvider</code>来获取相关的数据。一切看起来是如此的普通与简单，但是从刚开始调试的那一刻起，诡异的事情就发送了。九十岁老太为何起死回生？数百头母猪为何半夜惨叫？女生宿舍为何频频失窃？超市方便面为何惨招毒手？在这一切的背后，是人性的扭曲，还是道德的沦丧？事件的最后，让我发现了Android系统的一个大坑！滴滴~ 老司机马上开车，带你一同踏上这段难忘的踩坑经历~</p>
+<h2 id="先简单回顾下Android的permissions机制"><a href="#先简单回顾下Android的permissions机制" class="headerlink" title="先简单回顾下Android的permissions机制"></a>先简单回顾下Android的permissions机制</h2><p>在<code>AndroidManifest.xml</code>里面声明<code>ContentProvider</code>的时候，我们是可以指定对应的<code>readPermission</code>与<code>writePermission</code>的，这样就可以限制第三方应用程序，必须声明指定的读写权限，才能进行下一步的访问，提高安全性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;provider</span><br><span class="line">    android:name=&quot;.provider.XXXContentProvider&quot;</span><br><span class="line">    android:authorities=&quot;com.aaa.bbb.ccc.provider.authorities&quot;</span><br><span class="line">    android:readPermission=&quot;com.aaa.bbb.ccc.provider.permission.READ_PERM&quot;</span><br><span class="line">    android:writePermission=&quot;com.aaa.bbb.ccc.provider.permission.WRITE_PERM&quot;</span><br><span class="line">    android:exported=&quot;true&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<p>但是首先，我们得先通过<code>&lt;permission/&gt;</code>定义好相关应用的权限，且你可以通过<code>android:protectionLevel</code>来定义权限的访问等级。常用的有以下几种，更多参数介绍详见官网<a href="https://developer.android.com/guide/topics/manifest/permission-element.html" target="_blank" rel="noopener">permission-element</a>。</p>
+<ul>
+<li>signature: 调用App必须与声明该<code>permission</code>的App使用同一签名</li>
+<li>system: 系统App才能进行访问</li>
+<li>normal: 默认值，系统在安装调用App的时候自动进行授权<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;permission</span><br><span class="line">    android:name=&quot;com.aaa.bbb.ccc.provider.permission.READ_PERM&quot;</span><br><span class="line">    android:protectionLevel=&quot;normal&quot; /&gt;</span><br><span class="line">&lt;permission</span><br><span class="line">    android:name=&quot;com.aaa.bbb.ccc.provider.permission.WRITE_PERM&quot;</span><br><span class="line">    android:protectionLevel=&quot;normal&quot; /&gt;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="What-the-fuck-SecurityException"><a href="#What-the-fuck-SecurityException" class="headerlink" title="What the fuck? SecurityException?"></a>What the fuck? SecurityException?</h2><p>在调用App中，通过<code>&lt;uses-permission /&gt;</code>声明好调用需要的权限，然后通过<code>getContentResolver().query()</code>方法进行数据查询，就这么简单两步。这个时候，程序居然崩溃了，抛出了<code>SecurityException</code>。这尼玛我不是按照接口文档声明好权限了么？怎么会报安全问题呢？一定是我打开的方式不对。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">03-29 12:08:12.839 4255-4271/com.codezjx.provider E/DatabaseUtils: Writing exception to parcel</span><br><span class="line">    java.lang.SecurityException: Permission Denial: reading com.aaa.bbb.ccc.XXXProvider uri content://com.aaa.bbb.ccc.xxx/getxxx/ from pid=22529, uid=10054 requires null, or grantUriPermission()</span><br><span class="line">        at android.content.ContentProvider.enforceReadPermissionInner(ContentProvider.java:539)</span><br><span class="line">        at android.content.ContentProvider$Transport.enforceReadPermission(ContentProvider.java:452)</span><br><span class="line">        at android.content.ContentProvider$Transport.query(ContentProvider.java:205)</span><br><span class="line">        at android.content.ContentProviderNative.onTransact(ContentProviderNative.java:112)</span><br><span class="line">        at android.os.Binder.execTransact(Binder.java:500)</span><br></pre></td></tr></table></figure>
+
+<p>上面这段Log是在<code>ContentProvider</code>所在的应用发出来的，我们都知道<code>ContentProvider</code>中的各种操作其实底层都是通过<code>Binder</code>进行进程间通信的。如果Server发生异常，会把exception写进reply parcel中回传到Client，然后Client通过<code>android.os.Parcel.readException()</code>读出Server的exception，然后抛出来。没错，就是这么暴力~</p>
+<p>这个时候我开始怀疑接口文档的准确性了，马上撸起我的<a href="https://github.com/skylot/jadx" target="_blank" rel="noopener">jadx</a>对目标apk进行了反编译，查了下对方的<code>AndroidManifest.xml</code>文件。里面声明的<code>permission</code>的确没错，而且<code>ContentProvider</code>的<code>authorities</code>属性也是正确的，<code>exported</code>属性也是true。</p>
+<h2 id="SecurityException再次出现"><a href="#SecurityException再次出现" class="headerlink" title="SecurityException再次出现"></a>SecurityException再次出现</h2><p>当时一下子没细想，为了快点把数据联调好，我们暂时把<code>permission</code>给去掉了。哎呀妈，心想这下子可以安心的联调了。没想到，诡异的事情再次发生了。程序运行，<code>SecurityException</code>又再次出现了，还是跟上面的Log一模一样。这尼玛权限不都去掉了吗？为什么还报这个异常呢？</p>
+<blockquote>
+<p>java.lang.SecurityException: Permission Denial: reading com.aaa.bbb.ccc.XXXProvider uri content://com.aaa.bbb.ccc.xxx/getxxx/ from pid=22529, uid=10054 requires null, or grantUriPermission()</p>
+</blockquote>
+<p>仔细分析了上面这段关键的Log，发现<code>requires null</code>这个关键的字眼。一般在<code>ContentProvider</code>出现权限问题的时候，会通过requires告诉你到底缺了什么<code>permission</code>。然而这里为什么是null呢？想想总感觉不对劲。</p>
+<h2 id="Read-the-Fucking-Source-Code"><a href="#Read-the-Fucking-Source-Code" class="headerlink" title="Read the Fucking Source Code"></a>Read the Fucking Source Code</h2><p>合作方告知，当初一直在4.4的机器上调试的，一直没出现过这个问题。这次在5.1的机器上跑，才发现会奔溃。经过了各种尝试与调试（此处省略一万字），还是没能找到报错的原因，甚至曾一度开始怀疑人生了。这个时候，只能去啃啃源码了，看能不能发现什么端倪。</p>
+<p><code>ContentProvider</code>的源码位于<code>frameworks/base/core/java/android/content/ContentProvider.java</code>，没有系统源码的也可以直接翻SDK的源码文件。直接查看Log中报错的位置<code>enforceReadPermissionInner()</code>方法。</p>
+<p>这段方法比较短，还是比较好理解的，其实就是在类似<code>query()</code>这些操作前会做一个检查，确认调用方是否具有某些<code>permission</code>。如果没授权，就会直接抛出<code>SecurityException</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** &#123;<span class="doctag">@hide</span>&#125; */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">enforceReadPermissionInner</span><span class="params">(Uri uri, IBinder callerToken)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> SecurityException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Context context = getContext();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> pid = Binder.getCallingPid();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> uid = Binder.getCallingUid();</span><br><span class="line">    String missingPerm = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (UserHandle.isSameApp(uid, mMyUid)) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mExported &amp;&amp; checkUser(pid, uid, context)) &#123;</span><br><span class="line">        <span class="keyword">final</span> String componentPerm = getReadPermission();</span><br><span class="line">        <span class="keyword">if</span> (componentPerm != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (context.checkPermission(componentPerm, pid, uid, callerToken)</span><br><span class="line">                    == PERMISSION_GRANTED) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                missingPerm = componentPerm;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// track if unprotected read is allowed; any denied</span></span><br><span class="line">        <span class="comment">// &lt;path-permission&gt; below removes this ability</span></span><br><span class="line">        <span class="keyword">boolean</span> allowDefaultRead = (componentPerm == <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> PathPermission[] pps = getPathPermissions();</span><br><span class="line">        <span class="keyword">if</span> (pps != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">final</span> String path = uri.getPath();</span><br><span class="line">            <span class="keyword">for</span> (PathPermission pp : pps) &#123;</span><br><span class="line">                <span class="keyword">final</span> String pathPerm = pp.getReadPermission();</span><br><span class="line">                <span class="keyword">if</span> (pathPerm != <span class="keyword">null</span> &amp;&amp; pp.match(path)) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (context.checkPermission(pathPerm, pid, uid, callerToken)</span><br><span class="line">                            == PERMISSION_GRANTED) &#123;</span><br><span class="line">                        <span class="keyword">return</span>;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="comment">// any denied &lt;path-permission&gt; means we lose</span></span><br><span class="line">                        <span class="comment">// default &lt;provider&gt; access.</span></span><br><span class="line">                        allowDefaultRead = <span class="keyword">false</span>;</span><br><span class="line">                        missingPerm = pathPerm;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// if we passed &lt;path-permission&gt; checks above, and no default</span></span><br><span class="line">        <span class="comment">// &lt;provider&gt; permission, then allow access.</span></span><br><span class="line">        <span class="keyword">if</span> (allowDefaultRead) <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// last chance, check against any uri grants</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> callingUserId = UserHandle.getUserId(uid);</span><br><span class="line">    <span class="keyword">final</span> Uri userUri = (mSingleUser &amp;&amp; !UserHandle.isSameUser(mMyUid, uid))</span><br><span class="line">            ? maybeAddUserId(uri, callingUserId) : uri;</span><br><span class="line">    <span class="keyword">if</span> (context.checkUriPermission(userUri, pid, uid, Intent.FLAG_GRANT_READ_URI_PERMISSION,</span><br><span class="line">            callerToken) == PERMISSION_GRANTED) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> String failReason = mExported</span><br><span class="line">            ? <span class="string">" requires "</span> + missingPerm + <span class="string">", or grantUriPermission()"</span></span><br><span class="line">            : <span class="string">" requires the provider be exported, or grantUriPermission()"</span>;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> SecurityException(<span class="string">"Permission Denial: reading "</span></span><br><span class="line">            + ContentProvider.<span class="keyword">this</span>.getClass().getName() + <span class="string">" uri "</span> + uri + <span class="string">" from pid="</span> + pid</span><br><span class="line">            + <span class="string">", uid="</span> + uid + failReason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们来关注下为什么会是requires null，其实就是因为<code>missingPerm</code>没有被赋值。再仔细分析，如果下面这大段代码没有被执行的话，那么<code>missingPerm</code>就不会被赋值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (mExported &amp;&amp; checkUser(pid, uid, context)) &#123;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>前面已经确认过<code>mExported</code>肯定是true的，那么没执行的原因就是<code>checkUser()</code>方法返回了false。（之前有提到在Android4.4是不会出现这个<code>SecurityException</code>的，为什么呢？因为在Android5.0+后<code>ContentProvider</code>才增加了这段多用户检查的代码，泪奔~）</p>
+<p>我们来看下<code>checkUser()</code>这个方法，种种迹象表明，就是因为它返回了false，导致<code>missingPerm</code>没赋值，并最终throw了<code>SecurityException</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">checkUser</span><span class="params">(<span class="keyword">int</span> pid, <span class="keyword">int</span> uid, Context context)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> UserHandle.getUserId(uid) == context.getUserId()</span><br><span class="line">            || mSingleUser</span><br><span class="line">            || context.checkPermission(INTERACT_ACROSS_USERS, pid, uid)</span><br><span class="line">            == PERMISSION_GRANTED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过反射与其他方式，我们可以逐个验证<code>checkUser()</code>方法中各个boolean条件的值：</p>
+<ul>
+<li><code>(UserHandle.getUserId(uid) == context.getUserId())</code> -&gt; false</li>
+<li><code>mSingleUser</code> -&gt; false</li>
+<li><code>(context.checkPermission(INTERACT_ACROSS_USERS, pid, uid) == PERMISSION_GRANTED)</code> -&gt; false</li>
+</ul>
+<p>前面在踩坑的时候，自己写了一套测试的demo，在正常情况下<code>UserHandle.getUserId(uid) == context.getUserId()</code>是会返回true的，其中返回的userId都是0（因为我测试机器就一个用户）</p>
+<p>种种迹象表明，合作方提供的问题应用中<code>context.getUserId()</code>返回值并不是0。在强烈的好奇心驱使下，我又撸起了<a href="https://github.com/skylot/jadx" target="_blank" rel="noopener">jadx</a>对目标apk再次进行了反编译，全局搜索了下<code>getUserId()</code>方法，发现还真TM有类似的方法，在<code>BaseApplication</code>中，有这么一个<code>getUserId()</code>方法，用来返回注册用户的id。</p>
+<p>而在<code>ContentProvider</code>中，<code>mContext</code>也就是<code>Application</code>这个<code>Context</code>实例，也就是说<code>getUserId()</code>方法<strong>被无意识的进行了重写</strong>。因此，解决这个<code>SecurityException</code>异常最简单的方法就是把<code>BaseApplication</code>中的<code>getUserId()</code>方法换个名字就好了。至此，整个踩坑经历终于到了尾声。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过这次踩坑，发现了Android系统中一个隐藏的问题。在自定义的<code>Application</code>中，如果你声明了<code>public int getUserId()</code>这个方法，并且返回的不是当前用户的<code>userId</code>，那么你的<code>ContentProvider</code>在Android5.0+的机器都会失效。不信？自己试试~</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** <span class="doctag">@hide</span> */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getUserId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> mBase.getUserId();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为这个是一个<code>@hide</code>方法，所以通常这个重写行为都是无意识的，IDE并不会提示你重写了<code>Application</code>中的这个方法。但如果你比较幸运，刚好用了带<a href="https://github.com/anggrayudi/android-hidden-api" target="_blank" rel="noopener">hidden-api</a>的Android SDK Jar包，那么IDE会给你一个提示，但除了系统应用开发，一般很少人会导入<a href="https://github.com/anggrayudi/android-hidden-api" target="_blank" rel="noopener">hidden-api</a>吧~</p>
+<blockquote>
+<p>Missing `@Override` annotation on `getUserId()` more…</p>
+</blockquote>
+<p>好了，这次的分析先到这里，希望大家以后遇到这个诡异的<code>SecurityException</code>异常的时候，不至于再跳进这个隐藏的大坑里~ Over~</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/ContentProvider/" rel="tag"># ContentProvider</a>
+          
+            <a href="/tags/Bug/" rel="tag"># Bug</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/open-source-project-andlinker/" rel="next" title="开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava">
+                <i class="fa fa-chevron-left"></i> 开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/architecture-components-lifecycle/" rel="prev" title="Architecture Components之Lifecycles初探">
+                Architecture Components之Lifecycles初探 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#先简单回顾下Android的permissions机制"><span class="nav-number">2.</span> <span class="nav-text">先简单回顾下Android的permissions机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#What-the-fuck-SecurityException"><span class="nav-number">3.</span> <span class="nav-text">What the fuck? SecurityException?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SecurityException再次出现"><span class="nav-number">4.</span> <span class="nav-text">SecurityException再次出现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Read-the-Fucking-Source-Code"><span class="nav-number">5.</span> <span class="nav-text">Read the Fucking Source Code</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

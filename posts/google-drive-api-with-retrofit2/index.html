@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Retrofit,Google Drive,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="做移动开发的相信对Retrofit一点也不陌生，它是一套RESTful架构的Android(Java)客户端实现，可以利用接口，方法和注解参数（parameter annotations）来声明式定义一个请求应该如何被创建。它的出现使我们只需关注接口所定义的功能而非拘泥于具体实现中，极大简化和提升了开发效率。 相关API接口及请求参数下面我们来看下最近在项目用到的几个API接口和请求参数，并用Re">
+<meta name="keywords" content="Android,Retrofit,Google Drive">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Retrofit2.0实现GoogleDrive相关API">
+<meta property="og:url" content="http://yoursite.com/posts/google-drive-api-with-retrofit2/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="做移动开发的相信对Retrofit一点也不陌生，它是一套RESTful架构的Android(Java)客户端实现，可以利用接口，方法和注解参数（parameter annotations）来声明式定义一个请求应该如何被创建。它的出现使我们只需关注接口所定义的功能而非拘泥于具体实现中，极大简化和提升了开发效率。 相关API接口及请求参数下面我们来看下最近在项目用到的几个API接口和请求参数，并用Re">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-08-10T15:08:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Retrofit2.0实现GoogleDrive相关API">
+<meta name="twitter:description" content="做移动开发的相信对Retrofit一点也不陌生，它是一套RESTful架构的Android(Java)客户端实现，可以利用接口，方法和注解参数（parameter annotations）来声明式定义一个请求应该如何被创建。它的出现使我们只需关注接口所定义的功能而非拘泥于具体实现中，极大简化和提升了开发效率。 相关API接口及请求参数下面我们来看下最近在项目用到的几个API接口和请求参数，并用Re">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/google-drive-api-with-retrofit2/">
+
+
+
+
+
+  <title>使用Retrofit2.0实现GoogleDrive相关API | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/google-drive-api-with-retrofit2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Retrofit2.0实现GoogleDrive相关API</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-23T18:32:06+08:00">
+                2016-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Google-Drive-Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Google Drive Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>做移动开发的相信对Retrofit一点也不陌生，它是一套RESTful架构的Android(Java)客户端实现，可以利用接口，方法和注解参数（parameter annotations）来声明式定义一个请求应该如何被创建。它的出现使我们只需关注接口所定义的功能而非拘泥于具体实现中，极大简化和提升了开发效率。</p>
+<h2 id="相关API接口及请求参数"><a href="#相关API接口及请求参数" class="headerlink" title="相关API接口及请求参数"></a>相关API接口及请求参数</h2><p>下面我们来看下最近在项目用到的几个API接口和请求参数，并用Retrofit2.0来实现他们：</p>
+<p>1.请求token（其中grant_type字段固定值为authorization_code，表示是用authCode来请求token。authCode就是之前我们通过用户授权获取到的授权码，为以下接口中的code字段。）</p>
+<blockquote>
+<p>POST /oauth2/v4/token HTTP/1.1<br>Host: <a href="http://www.googleapis.com" target="_blank" rel="noopener">www.googleapis.com</a><br>Content-Type: application/x-www-form-urlencoded</p>
+</blockquote>
+<blockquote>
+<p>code=4/v6xr77ewYqhvHSyW6UJ1w7jKwAzu&amp;<br>client_id=8819981768.apps.googleusercontent.com&amp;<br>client_secret=your_client_secret&amp;<br>redirect_uri=<a href="https://oauth2-login-demo.appspot.com/code&amp;" target="_blank" rel="noopener">https://oauth2-login-demo.appspot.com/code&amp;</a><br>grant_type=authorization_code</p>
+</blockquote>
+<p>2.更新token （其中grant_type字段固定值为refresh_token，表示用refresh token请求一个新的token。为啥要更新token？因为access token是有一定期限的，过期了以后需要用refresh token去请求一个新的token，具体可以看我上一篇文章）</p>
+<blockquote>
+<p>POST /oauth2/v4/token HTTP/1.1<br>Host: <a href="http://www.googleapis.com" target="_blank" rel="noopener">www.googleapis.com</a><br>Content-Type: application/x-www-form-urlencoded</p>
+</blockquote>
+<blockquote>
+<p>client_id=8819981768.apps.googleusercontent.com&amp;<br>client_secret=your_client_secret&amp;<br>refresh_token=1/6BMfW9j53gdGImsiyUH5kU5RsR4zwI9lUVX-tqf8JXQ&amp;<br>grant_type=refresh_token</p>
+</blockquote>
+<p>3.获取用户基本信息（直接一个get请求，但注意这里需要在Header中添加Authorization认证信息，也就是我们上面接口返回的access token，目前Google Oauth2.0的token类型都固定为Bearer。token认证的魅力也在于此，无需持有客户的账号与密码即可完成相应请求，当然前提还是需要客户允许才能获取授权码。）</p>
+<blockquote>
+<p>GET /oauth2/v3/userinfo HTTP/1.1<br>Host: <a href="http://www.googleapis.com" target="_blank" rel="noopener">www.googleapis.com</a><br>Authorization: Bearer your_auth_token<br>Content-Type: application/x-www-form-urlencoded</p>
+</blockquote>
+<p>4.Drive文件上传（同样需要在Header中添加Authorization认证信息，注意这里涉及到了Multipart的文件上传，其实也有个uploadType=media的简单上传，但是比较坑爹的是采用这种方式上传，在你的GoogleDrive云盘中会显示一个Untitled.jpg的文件。采用Multipart的话，可以分part上传：Metadata part和Media part。Meta part可以指定文件的一些属性如：文件名、保存位置等，Media part主要就是指定上传文件的具体数据了。啰嗦几句：boundary指定了每一part的分隔边界，服务器会根据这个字段来解析我们的每一part。具体可以参考<a href="http://blog.csdn.net/xiaojianpitt/article/details/6856536" target="_blank" rel="noopener">这篇文章</a>）</p>
+<blockquote>
+<p>POST /upload/drive/v3/files?uploadType=multipart HTTP/1.1<br>Host: <a href="http://www.googleapis.com" target="_blank" rel="noopener">www.googleapis.com</a><br>Authorization: Bearer your_auth_token<br>Content-Type: multipart/related; boundary=foo_bar_baz<br>Content-Length: number_of_bytes_in_entire_request_body</p>
+</blockquote>
+<blockquote>
+<p>–foo_bar_baz<br>Content-Type: application/json; charset=UTF-8<br>{<br>  “name”: “My File”<br>}<br>–foo_bar_baz<br>Content-Type: image/jpeg<br>JPEG data<br>–foo_bar_baz–</p>
+</blockquote>
+<h2 id="Retrofit2-0实现接口定义"><a href="#Retrofit2-0实现接口定义" class="headerlink" title="Retrofit2.0实现接口定义"></a>Retrofit2.0实现接口定义</h2><p>根据上面的接口描述我们可以用Retrofit如下定义出接口：（注意<code>@FormUrlEncoded</code>和<code>@Multipart</code>必不可少否则会抛出异常，<code>@Part</code>可以描述Multipart中的某part数据，<code>@Field</code>描述Post的某字段）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">DriveApi</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@POST</span>(<span class="string">"oauth2/v4/token"</span>)</span><br><span class="line">    <span class="meta">@FormUrlEncoded</span></span><br><span class="line">    <span class="function">Call&lt;Token&gt; <span class="title">requestToken</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @Field(<span class="string">"client_id"</span>)</span> String clientId,</span></span><br><span class="line"><span class="function">            @<span class="title">Field</span><span class="params">(<span class="string">"client_secret"</span>)</span> String clientSecret,</span></span><br><span class="line"><span class="function">            @<span class="title">Field</span><span class="params">(<span class="string">"code"</span>)</span> String code,</span></span><br><span class="line"><span class="function">            @<span class="title">Field</span><span class="params">(<span class="string">"redirect_uri"</span>)</span> String redirectUri,</span></span><br><span class="line"><span class="function">            @<span class="title">Field</span><span class="params">(<span class="string">"grant_type"</span>)</span> String grantType)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@POST</span>(<span class="string">"oauth2/v4/token"</span>)</span><br><span class="line">    <span class="meta">@FormUrlEncoded</span></span><br><span class="line">    <span class="function">Call&lt;Token&gt; <span class="title">requestTokenRefresh</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @Field(<span class="string">"refresh_token"</span>)</span> String refreshToken,</span></span><br><span class="line"><span class="function">            @<span class="title">Field</span><span class="params">(<span class="string">"client_id"</span>)</span> String clientId,</span></span><br><span class="line"><span class="function">            @<span class="title">Field</span><span class="params">(<span class="string">"client_secret"</span>)</span> String clientSecret,</span></span><br><span class="line"><span class="function">            @<span class="title">Field</span><span class="params">(<span class="string">"grant_type"</span>)</span> String grantType)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GET</span>(<span class="string">"oauth2/v3/userinfo"</span>)</span><br><span class="line">    <span class="function">Call&lt;UserInfo&gt; <span class="title">requestUserInfo</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @Header(<span class="string">"Authorization"</span>)</span> String authToken)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@POST</span>(<span class="string">"upload/drive/v3/files?uploadType=multipart"</span>)</span><br><span class="line">    <span class="meta">@Multipart</span></span><br><span class="line">    <span class="function">Call&lt;UploadResult&gt; <span class="title">uploadFileMutil</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @Header(<span class="string">"Authorization"</span>)</span> String authToken,</span></span><br><span class="line"><span class="function">            @Part MultipartBody.Part metaPart,</span></span><br><span class="line"><span class="function">            @Part MultipartBody.Part dataPart)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后通过<code>Retrofit</code>对象的<code>create()</code>方法即可实例化上述接口，完全不需要关注具体的实现，只需关注接口的参数和返回值就OK了，是不是爽到爆？这里用到了<code>GsonConverterFactory</code>，自动将返回的json数据转换为POJO，默认是根据POJO类的字段名实现映射。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Retrofit retrofit = <span class="keyword">new</span> Retrofit.Builder()</span><br><span class="line">    .baseUrl(<span class="string">"https://www.googleapis.com/"</span>)</span><br><span class="line">    .addConverterFactory(GsonConverterFactory.create())</span><br><span class="line">    .build();</span><br><span class="line">DriveApi driveApi = retrofit.create(DriveApi<span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>接下来就是使用DriveApi进行接口的调用了。在Retrofit2.0中，接口的定义统一返回<code>Call</code>对象，与1.x版本相比变化还是挺大的。2.0中如果要调用同步请求，只需调用<code>Call</code>对象的<code>execute()</code>方法，调用<code>enqueue()</code>则可以发起一个异步请求。</p>
+<ul>
+<li><p>同步请求：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Synchronous Call in Retrofit 2.0</span></span><br><span class="line">  </span><br><span class="line">Call&lt;Token&gt; call = driveApi.requestToken();</span><br><span class="line">Token token = call.execute();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>异步请求：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Asynchronous Call in Retrofit 2.0</span></span><br><span class="line">  </span><br><span class="line">Call&lt;Token&gt; call = driveApi.requestToken();</span><br><span class="line">call.enqueue(<span class="keyword">new</span> Callback&lt;Token&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Response&lt;Token&gt; response)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Get result Token from response.body()</span></span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Throwable t)</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>取消请求（直接<code>cacel()</code>即可，2.0统一改成返回call对象可以方便的让我们直接取消正在进行的请求）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">call.cancel();</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>有关Retrofit2.0的一些改进，建议可以看下面这篇：Retrofit 2.0：<a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0915/3460.html" target="_blank" rel="noopener">有史以来最大的改进</a>，总结得挺全面的。</p>
+<p>最后别忘记添加相关依赖：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile fileTree(dir: &apos;libs&apos;, include: [&apos;*.jar&apos;])</span><br><span class="line">    compile &apos;com.squareup.okhttp3:okhttp:3.2.0&apos;</span><br><span class="line">    compile &apos;com.squareup.retrofit2:retrofit:2.0.0&apos;</span><br><span class="line">    compile &apos;com.squareup.retrofit2:converter-gson:2.0.0&apos;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Retrofit/" rel="tag"># Retrofit</a>
+          
+            <a href="/tags/Google-Drive/" rel="tag"># Google Drive</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/google-drive-oauth20/" rel="next" title="Google Drive Oauth2.0认证流程">
+                <i class="fa fa-chevron-left"></i> Google Drive Oauth2.0认证流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/google-drive-file-upload-with-retrofit2/" rel="prev" title="使用Retrofit2.0实现Google Drive文件上传进度显示">
+                使用Retrofit2.0实现Google Drive文件上传进度显示 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#相关API接口及请求参数"><span class="nav-number">1.</span> <span class="nav-text">相关API接口及请求参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Retrofit2-0实现接口定义"><span class="nav-number">2.</span> <span class="nav-text">Retrofit2.0实现接口定义</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

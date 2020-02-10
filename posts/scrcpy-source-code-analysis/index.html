@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,RTFSC,scrcpy,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="说到Android上投屏到PC或Mac端的软件，相信大家对Vysor应该都比较熟悉了，它是Chrome上的一款插件，安装完后就能方便的进行手机的投屏，但这款软件现在Pro版要收费了，免费版还一堆的广告。 今天我们要介绍的的是Genymobile自家开源的scrcpy工具，它也能实现我们想要的投屏功能，而且完全免费，没有任何广告，更重要的是它是一款开源软件！开源软件！开源软件！重要的事情说3遍。 在">
+<meta name="keywords" content="Android,RTFSC,scrcpy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="scrcpy投屏工具源码解析">
+<meta property="og:url" content="http://yoursite.com/posts/scrcpy-source-code-analysis/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="说到Android上投屏到PC或Mac端的软件，相信大家对Vysor应该都比较熟悉了，它是Chrome上的一款插件，安装完后就能方便的进行手机的投屏，但这款软件现在Pro版要收费了，免费版还一堆的广告。 今天我们要介绍的的是Genymobile自家开源的scrcpy工具，它也能实现我们想要的投屏功能，而且完全免费，没有任何广告，更重要的是它是一款开源软件！开源软件！开源软件！重要的事情说3遍。 在">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/posts/scrcpy-source-code-analysis/scrcpy.jpg">
+<meta property="og:updated_time" content="2019-06-25T06:10:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="scrcpy投屏工具源码解析">
+<meta name="twitter:description" content="说到Android上投屏到PC或Mac端的软件，相信大家对Vysor应该都比较熟悉了，它是Chrome上的一款插件，安装完后就能方便的进行手机的投屏，但这款软件现在Pro版要收费了，免费版还一堆的广告。 今天我们要介绍的的是Genymobile自家开源的scrcpy工具，它也能实现我们想要的投屏功能，而且完全免费，没有任何广告，更重要的是它是一款开源软件！开源软件！开源软件！重要的事情说3遍。 在">
+<meta name="twitter:image" content="http://yoursite.com/posts/scrcpy-source-code-analysis/scrcpy.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/scrcpy-source-code-analysis/">
+
+
+
+
+
+  <title>scrcpy投屏工具源码解析 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/scrcpy-source-code-analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">scrcpy投屏工具源码解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-24T21:11:36+08:00">
+                2019-06-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Source-Code-Analysis/" itemprop="url" rel="index">
+                    <span itemprop="name">Source Code Analysis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>说到Android上投屏到PC或Mac端的软件，相信大家对Vysor应该都比较熟悉了，它是Chrome上的一款插件，安装完后就能方便的进行手机的投屏，但这款软件现在Pro版要收费了，免费版还一堆的广告。</p>
+<p>今天我们要介绍的的是Genymobile自家开源的<a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">scrcpy</a>工具，它也能实现我们想要的投屏功能，而且完全免费，没有任何广告，更重要的是它是一款开源软件！开源软件！开源软件！重要的事情说3遍。</p>
+<p>在Mac上，通过Homebrew进行安装，等所有依赖下载完就可以使用了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install scrcpy</span><br></pre></td></tr></table></figure>
+
+<p>通过adb connect或者USB数据线连接上电脑后，就可以进行投屏了，直接命令行运行<code>scrcpy</code>即可，Mac上运行起来的效果如下图。相比与Vysor，scrcpy是不需要安装任何APK的，方便快捷！<br><img src="scrcpy.jpg" alt></p>
+<p>可是，如果手机上不安装个发送端，那么Mac接收端怎么接收录屏数据呢？这个时候，强烈的好奇心驱使我挖掘<code>scrcpy</code>的源码。让我们带着这个疑问，一步步的从源码中寻找答案。</p>
+<h2 id="从编译scrcpy说起"><a href="#从编译scrcpy说起" class="headerlink" title="从编译scrcpy说起"></a>从编译scrcpy说起</h2><p>打开源码下的<code>BUILD.md</code>介绍文件，里面会有各个平台的的详细编译流程。</p>
+<p>这里面分client和server端，其中client端是展示端，接收录屏数据并进行解码显示。源码位于<code>app</code>目录。全是c代码，里面用到了FFmpeg和SDL库，都是跨平台的解决方案。因此通过<a href="https://mesonbuild.com/" target="_blank" rel="noopener">meson</a>进行交叉编译后，就能实现展示端的跨平台，支持Linux/Windows/Mac OS/Docker等平台。</p>
+<blockquote>
+<p>Tips：Meson是用于自动化构建的自由软件，使用Python语言编写，在Apache许可证 2.0版本下发布，主要目标是为了让开发者节约用于配置构建系统的时间。</p>
+</blockquote>
+<p>server端就是发送端了，也就是我们的Android手机端，进行录屏后编码发送给展示端进行展示。源码位于<code>server</code>目录，下文我们的重点也会放在Android端源码的分析上面。奇怪了，不是说手机端上是没有安装任何apk的吗？那么这部分代码是怎么运行在Android平台上的呢？</p>
+<p>继续打开<code>server/meson.build</code>文件查看server的编译流程（跟<code>build.gradle</code>一样，<code>meson.build</code>是<code>meson</code>编译所必须的脚本文件）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># It may be useful to use a prebuilt server, so that no Android SDK is required</span><br><span class="line"># to build. If the &apos;prebuilt_server&apos; option is set, just copy the file as is.</span><br><span class="line">prebuilt_server = get_option(&apos;prebuilt_server&apos;)</span><br><span class="line">if prebuilt_server == &apos;&apos;</span><br><span class="line">    custom_target(&apos;scrcpy-server&apos;,</span><br><span class="line">                  build_always: true,  # gradle is responsible for tracking source changes</span><br><span class="line">                  output: &apos;scrcpy-server.jar&apos;,</span><br><span class="line">                  command: [find_program(&apos;./scripts/build-wrapper.sh&apos;), meson.current_source_dir(), &apos;@OUTPUT@&apos;, get_option(&apos;buildtype&apos;)],</span><br><span class="line">                  install: true,</span><br><span class="line">                  install_dir: &apos;share/scrcpy&apos;)</span><br><span class="line">else</span><br><span class="line">    if not prebuilt_server.startswith(&apos;/&apos;)</span><br><span class="line">        # relative path needs some trick</span><br><span class="line">        prebuilt_server = meson.source_root() + &apos;/&apos; + prebuilt_server</span><br><span class="line">    endif</span><br><span class="line">    custom_target(&apos;scrcpy-server-prebuilt&apos;,</span><br><span class="line">                  input: prebuilt_server,</span><br><span class="line">                  output: &apos;scrcpy-server.jar&apos;,</span><br><span class="line">                  command: [&apos;cp&apos;, &apos;@INPUT@&apos;, &apos;@OUTPUT@&apos;],</span><br><span class="line">                  install: true,</span><br><span class="line">                  install_dir: &apos;share/scrcpy&apos;)</span><br><span class="line">endif</span><br></pre></td></tr></table></figure>
+
+<p>可以看到里面通过运行<code>build-wrapper.sh</code>调用<code>gradle</code>编译了apk，并将apk最终输出名字改成了<code>scrcpy-server.jar</code>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">if [[ "$BUILDTYPE" == debug ]]</span><br><span class="line">then</span><br><span class="line">    "$GRADLE" -p "$PROJECT_ROOT" assembleDebug</span><br><span class="line">    cp "$PROJECT_ROOT/build/outputs/apk/debug/server-debug.apk" "$OUTPUT"</span><br><span class="line">else</span><br><span class="line">    "$GRADLE" -p "$PROJECT_ROOT" assembleRelease</span><br><span class="line">    cp "$PROJECT_ROOT/build/outputs/apk/release/server-release-unsigned.apk" "$OUTPUT"</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<h2 id="执行scrcpy"><a href="#执行scrcpy" class="headerlink" title="执行scrcpy"></a>执行scrcpy</h2><p>上面编译生成的<code>scrcpy-server.jar</code>应该就是server端了，那它又是怎么在Android平台上运行起来的呢？通过跟踪client代码发现（源码在<code>server.c</code>），在scrcpy运行的时候，会执行<code>push_server()</code>函数，将<code>scrcpy-server.jar</code>通过<code>adb push</code>到Android的<code>/data/local/tmp/scrcpy-server.jar</code>目录下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SERVER_FILENAME <span class="meta-string">"scrcpy-server.jar"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DEVICE_SERVER_PATH <span class="meta-string">"/data/local/tmp/"</span> SERVER_FILENAME</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">bool</span></span><br><span class="line">push_server(<span class="keyword">const</span> <span class="keyword">char</span> *serial) &#123;</span><br><span class="line">    <span class="keyword">process_t</span> process = adb_push(serial, get_server_path(), DEVICE_SERVER_PATH);</span><br><span class="line">    <span class="keyword">return</span> process_check_success(process, <span class="string">"adb push"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后通过<code>server.c</code>中的<code>execute_server()</code>方法，执行<code>app_process</code>指令将server端运行起来。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">process_t</span></span><br><span class="line">execute_server(struct server *server, <span class="keyword">const</span> struct server_params *params) &#123;</span><br><span class="line">    <span class="keyword">char</span> max_size_string[<span class="number">6</span>];</span><br><span class="line">    <span class="keyword">char</span> bit_rate_string[<span class="number">11</span>];</span><br><span class="line">    <span class="built_in">sprintf</span>(max_size_string, <span class="string">"%"</span>PRIu16, params-&gt;max_size);</span><br><span class="line">    <span class="built_in">sprintf</span>(bit_rate_string, <span class="string">"%"</span>PRIu32, params-&gt;bit_rate);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *<span class="keyword">const</span> cmd[] = &#123;</span><br><span class="line">        <span class="string">"shell"</span>,</span><br><span class="line">        <span class="string">"CLASSPATH=/data/local/tmp/"</span> SERVER_FILENAME,</span><br><span class="line">        <span class="string">"app_process"</span>,</span><br><span class="line">        <span class="string">"/"</span>, <span class="comment">// unused</span></span><br><span class="line">        <span class="string">"com.genymobile.scrcpy.Server"</span>,</span><br><span class="line">        max_size_string,</span><br><span class="line">        bit_rate_string,</span><br><span class="line">        server-&gt;tunnel_forward ? <span class="string">"true"</span> : <span class="string">"false"</span>,</span><br><span class="line">        params-&gt;crop ? params-&gt;crop : <span class="string">"-"</span>,</span><br><span class="line">        params-&gt;send_frame_meta ? <span class="string">"true"</span> : <span class="string">"false"</span>,</span><br><span class="line">        params-&gt;control ? <span class="string">"true"</span> : <span class="string">"false"</span>,</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> adb_execute(server-&gt;serial, cmd, <span class="keyword">sizeof</span>(cmd) / <span class="keyword">sizeof</span>(cmd[<span class="number">0</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="关于app-process"><a href="#关于app-process" class="headerlink" title="关于app_process"></a>关于app_process</h2><p>上面我们提到<code>scrcpy-server.jar</code>是通过<code>app_process</code>运行起来的，那么<code>app_process</code>又是什么鬼？<code>app_process</code>是启动zygote和其他Java程序的应用程序，它可以让虚拟机从main()方法开始执行一个Java 程序。具体的用法可以参考<a href="https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/cmds/app_process/app_main.cpp" target="_blank" rel="noopener">app_process</a>源码中的注释：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"Usage: app_process [java-options] cmd-dir start-class-name [options]\n"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>与APP进程不同，通过<code>app_process</code>启动的进程可以在root权限和shell权限 (adb默认)下启动，也就分别拥有了调用不同API的能力。通常情况下shell权限启动的<code>app_process</code> 只能够调用一些能够完成adb本身工作的API，root权限启动的<code>app_process</code>进程则拥有更多权限，甚至能够调用系统<code>signature</code>保护级别的API及访问整个文件系统。</p>
+<p>实际上不少adb命令都是对调用<code>app_process</code>进行了一些封装，这里举我们平时常用的<a href="https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/cmds/am/am" target="_blank" rel="noopener">am</a>指令为例，我们在执行<code>adb shell am</code>的时候其实是执行了以下的脚本。通过<code>app_process</code>运行<code>am.jar</code>中<code>com.android.commands.am.Am</code>这个类的<code>main()</code>函数来完成具体操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#!/system/bin/sh</span><br><span class="line">if [ &quot;$1&quot; != &quot;instrument&quot; ] ; then</span><br><span class="line">    cmd activity &quot;$@&quot;</span><br><span class="line">else</span><br><span class="line">    base=/system</span><br><span class="line">    export CLASSPATH=$base/framework/am.jar</span><br><span class="line">    exec app_process $base/bin com.android.commands.am.Am &quot;$@&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意的是<code>app_process</code>只能运行原始dex文件，也可以接收包含<code>classes.dex</code>的jar包，如<code>am.jar</code>。这里<code>scrcpy</code>取巧直接用了编译apk的方式，再直接重命名为jar包，这样也可以被<code>app_process</code>运行。而且可以使用gradle方便的进行编译，直接在Android Studio中开发，调用原生API，像源码中的<code>IRotationWatcher.aidl</code>也可以直接生成相应的IPC Proxy类进行调用，省力又省心。</p>
+<p><code>scrcpy-server.jar</code>在adb下通过<code>app_process</code>运行起来后，默认就有了shell权限，像一些截屏、录屏、模拟按键点击等功能都可以直接使用，而且完全不需要任何权限的声明。</p>
+<h2 id="RTFSC"><a href="#RTFSC" class="headerlink" title="RTFSC"></a>RTFSC</h2><h3 id="Server-main"><a href="#Server-main" class="headerlink" title="Server.main()"></a>Server.main()</h3><p>了解了编译与启动的方式后，我们终于可以开始分析<code>scrcpy</code>的源码了，从发送端的主入口<code>com.genymobile.scrcpy.Server.main()</code>方法开始看起。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String... args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    unlinkSelf();</span><br><span class="line">    <span class="comment">// 对尺寸、码率、裁剪等参数进行解析，初始化Options对象</span></span><br><span class="line">    Options options = createOptions(args);</span><br><span class="line">    scrcpy(options);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">scrcpy</span><span class="params">(Options options)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Device device = <span class="keyword">new</span> Device(options);</span><br><span class="line">    <span class="keyword">boolean</span> tunnelForward = options.isTunnelForward();</span><br><span class="line">    <span class="comment">// 根据tunnelForward的值来创建连接</span></span><br><span class="line">    <span class="keyword">try</span> (DesktopConnection connection = DesktopConnection.open(device, tunnelForward)) &#123;</span><br><span class="line">        ScreenEncoder screenEncoder = <span class="keyword">new</span> ScreenEncoder(options.getSendFrameMeta(), options.getBitRate());</span><br><span class="line">        <span class="comment">// 根据Control参数确认是否能对设备进行操作，如按键、鼠标等事件的响应</span></span><br><span class="line">        <span class="keyword">if</span> (options.getControl()) &#123;</span><br><span class="line">            Controller controller = <span class="keyword">new</span> Controller(device, connection);</span><br><span class="line">            <span class="comment">// asynchronous</span></span><br><span class="line">            <span class="comment">// 开了2条线程，通过异步的方式分别启动controller和sender</span></span><br><span class="line">            startController(controller);</span><br><span class="line">            startDeviceMessageSender(controller.getSender());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// synchronous</span></span><br><span class="line">            <span class="comment">// 同步的方式录屏、编码并发送数据到展示端</span></span><br><span class="line">            screenEncoder.streamScreen(device, connection.getVideoFd());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="comment">// this is expected on close</span></span><br><span class="line">            Ln.d(<span class="string">"Screen streaming stopped"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里，我们可以看到<code>scrcpy</code>总共有3条工作线程，分别为：</p>
+<ul>
+<li>main线程：将录屏数据编码并把视频流传输到展示端</li>
+<li>controller线程：接收展示端控制信息并进行响应（如：按键、鼠标等事件的处理）</li>
+<li>sender线程：发送设备信息到展示端（目前仅用于发送设备剪贴板的内容）</li>
+</ul>
+<h3 id="adb-reverse和adb-forward"><a href="#adb-reverse和adb-forward" class="headerlink" title="adb reverse和adb forward"></a>adb reverse和adb forward</h3><p>其中通过<code>DesktopConnection.open()</code>方法根据<code>tunnelForward</code>进行发送端与接收端的服务连接。如果是<code>adb forward</code>设置端口转发的方式，则发送端作为服务器，初始化<code>LocalServerSocket</code>进行监听；否则若是<code>adb reverse</code>反向代理的方式，则通过<code>LocalSocket</code>链接到远程服务器，此时接收端作为服务器。关于<code>adb forward</code>和<code>adb reverse</code>的使用方式不在这里展开，有兴趣的可以自己搜索相关用法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> DesktopConnection <span class="title">open</span><span class="params">(Device device, <span class="keyword">boolean</span> tunnelForward)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    LocalSocket videoSocket;</span><br><span class="line">    LocalSocket controlSocket;</span><br><span class="line">    <span class="keyword">if</span> (tunnelForward) &#123;</span><br><span class="line">        <span class="comment">// adb forward模式下作为服务器进行监听</span></span><br><span class="line">        LocalServerSocket localServerSocket = <span class="keyword">new</span> LocalServerSocket(SOCKET_NAME);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            videoSocket = localServerSocket.accept();</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                controlSocket = localServerSocket.accept();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException | RuntimeException e) &#123;</span><br><span class="line">                videoSocket.close();</span><br><span class="line">                <span class="keyword">throw</span> e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            localServerSocket.close();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// adb reverse模式下作为客户端链接到服务器</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        videoSocket = connect(SOCKET_NAME);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            controlSocket = connect(SOCKET_NAME);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException | RuntimeException e) &#123;</span><br><span class="line">            videoSocket.close();</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> connection;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关于<code>tunnelForward</code>的值，在展示端源码<code>server.c</code>的<code>enable_tunnel</code>中，会尝试执行<code>adb reverse</code>指令，如果失败了则改为<code>adb forward</code>进行端口转发的方式，从实现上来看主要是发送端作为客户端还是服务端的区别。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">bool</span></span><br><span class="line">enable_tunnel(struct server *server) &#123;</span><br><span class="line">    <span class="keyword">if</span> (enable_tunnel_reverse(server-&gt;serial, server-&gt;local_port)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    LOGW(<span class="string">"'adb reverse' failed, fallback to 'adb forward'"</span>);</span><br><span class="line">    server-&gt;tunnel_forward = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> enable_tunnel_forward(server-&gt;serial, server-&gt;local_port);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="录屏-amp-编码"><a href="#录屏-amp-编码" class="headerlink" title="录屏&amp;编码"></a>录屏&amp;编码</h3><p>当连接建立起来后，就可以通过<code>ScreenEncoder.streamScreen()</code>方法开始进行录屏、编码与数据的发送了，以下为精简后的核心逻辑代码与流程解析。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">streamScreen</span><span class="params">(Device device, FileDescriptor fd)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 首先通过MediaCodec创建了一个H.264类型的编码器</span></span><br><span class="line">        MediaCodec codec = MediaCodec.createEncoderByType(<span class="string">"video/avc"</span>);</span><br><span class="line">        <span class="comment">// 通过反射SurfaceControl创建了一个虚拟显示</span></span><br><span class="line">        IBinder display = SurfaceControl.createDisplay(<span class="string">"scrcpy"</span>, <span class="keyword">true</span>);</span><br><span class="line">        ...</span><br><span class="line">        codec.configure(format, <span class="keyword">null</span>, <span class="keyword">null</span>, MediaCodec.CONFIGURE_FLAG_ENCODE);</span><br><span class="line">        <span class="comment">// 通过createInputSurface()获取编码器的输入Surface</span></span><br><span class="line">        <span class="comment">// 后续将这块Surface的内容作为编码器的输入数据源</span></span><br><span class="line">        Surface surface = codec.createInputSurface();</span><br><span class="line">        <span class="comment">// 将Surface和虚拟显示进行绑定，录屏数据将输出到这块Surface上</span></span><br><span class="line">        setDisplaySurface(display, surface, contentRect, videoRect);</span><br><span class="line">        codec.start();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 进行编码并发送数据</span></span><br><span class="line">            alive = encode(codec, fd);</span><br><span class="line">            <span class="comment">// do not call stop() on exception, it would trigger an IllegalStateException</span></span><br><span class="line">            codec.stop();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">while</span> (alive);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过反射SurfaceControl并调用一系列方法，初始化录屏相关的环境，并与Surface进行绑定</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setDisplaySurface</span><span class="params">(IBinder display, Surface surface, Rect deviceRect, Rect displayRect)</span> </span>&#123;</span><br><span class="line">    SurfaceControl.openTransaction();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        SurfaceControl.setDisplaySurface(display, surface);</span><br><span class="line">        SurfaceControl.setDisplayProjection(display, <span class="number">0</span>, deviceRect, displayRect);</span><br><span class="line">        SurfaceControl.setDisplayLayerStack(display, <span class="number">0</span>);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        SurfaceControl.closeTransaction();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：这里的<code>SurfaceControl</code>是对系统<code>android.view.SurfaceControl</code>的反射包装类。因为这个类属于系统隐藏API，客户端无法直接调用，<code>wrappers</code>包下的类基本全都是通过这种方式进行调用的。</p>
+</blockquote>
+<h3 id="发送数据"><a href="#发送数据" class="headerlink" title="发送数据"></a>发送数据</h3><p>了解完录屏数据的获取以及如何与编码器绑定后，我们来看下怎么拿到编码后的数据及发送，这个时候来看下<code>encode()</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">encode</span><span class="params">(MediaCodec codec, FileDescriptor fd)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">while</span> (!consumeRotationChange() &amp;&amp; !eof) &#123;</span><br><span class="line">        <span class="comment">// 通过dequeueOutputBuffer()从输出缓存队列中取出buffer</span></span><br><span class="line">        <span class="keyword">int</span> outputBufferId = codec.dequeueOutputBuffer(bufferInfo, -<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 若flag为BUFFER_FLAG_END_OF_STREAM代表到了流的结尾处，这个时候该停止编码</span></span><br><span class="line">        <span class="comment">// eof将置为true并停止while循环</span></span><br><span class="line">        eof = (bufferInfo.flags &amp; MediaCodec.BUFFER_FLAG_END_OF_STREAM) != <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">if</span> (outputBufferId &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 根据出队的buffer id去获取指定的ByteBuffer对象</span></span><br><span class="line">                ByteBuffer codecBuffer = codec.getOutputBuffer(outputBufferId);</span><br><span class="line">                <span class="keyword">if</span> (sendFrameMeta) &#123;</span><br><span class="line">                    writeFrameMeta(fd, bufferInfo, codecBuffer.remaining());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 此时buffer中的数据已经是编码后的H.264包数据，发送到展示端即可</span></span><br><span class="line">                IO.writeFully(fd, codecBuffer);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (outputBufferId &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 处理完编码后的数据后需要及时释放buffer</span></span><br><span class="line">                codec.releaseOutputBuffer(outputBufferId, <span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> !eof;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看到这里，发送端的录屏数据采集、编码及发送就结束了。剩下的流程就是展示端接收并通过FFmpeg解码H.264数据，再通过SDL展示每一帧数据的过程了。</p>
+<h3 id="按键事件处理"><a href="#按键事件处理" class="headerlink" title="按键事件处理"></a>按键事件处理</h3><p>前面我们有留意到<code>scrcpy</code>是通过controller线程来接收展示端控制信息并进行响应，具体是如何进行的呢？关键的代码在<code>Controller.control()</code>方法中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">control</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="comment">// on start, power on the device</span></span><br><span class="line">    <span class="comment">// 连接上的时候马上模拟按下power，以唤醒设备（因为有可能是息屏状态）</span></span><br><span class="line">    <span class="keyword">if</span> (!device.isScreenOn()) &#123;</span><br><span class="line">        injectKeycode(KeyEvent.KEYCODE_POWER);</span><br><span class="line">        ...</span><br><span class="line">        SystemClock.sleep(<span class="number">500</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 死循环，不断获取展示端发送过来的事件</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        handleEvent();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleEvent</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    ControlMessage msg = connection.receiveControlMessage();</span><br><span class="line">    <span class="comment">// 根据消息类型注入不同的事件，如：按键、文字、鼠标、滚动事件...</span></span><br><span class="line">    <span class="keyword">switch</span> (msg.getType()) &#123;</span><br><span class="line">        <span class="keyword">case</span> ControlMessage.TYPE_INJECT_KEYCODE:</span><br><span class="line">            injectKeycode(msg.getAction(), msg.getKeycode(), msg.getMetaState());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> ControlMessage.TYPE_INJECT_TEXT:</span><br><span class="line">            injectText(msg.getText());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> ControlMessage.TYPE_INJECT_MOUSE_EVENT:</span><br><span class="line">            injectMouse(msg.getAction(), msg.getButtons(), msg.getPosition());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> ControlMessage.TYPE_INJECT_SCROLL_EVENT:</span><br><span class="line">            injectScroll(msg.getPosition(), msg.getHScroll(), msg.getVScroll());</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// do nothing</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关于事件的注入，在<code>handleEvent()</code>方法里面调用了一系列的<code>injectXXX()</code>方法，都是先转换为<code>KeyEvent</code>和<code>MotionEvent</code>，最终调用到<code>InputManager.injectInputEvent()</code>方法中。这里跟上面的<code>SurfaceControl</code>一样，都是通过反射的方式调用到<code>injectInputEvent()</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">InputManager</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">InputManager</span><span class="params">(IInterface manager)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.manager = manager;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            injectInputEventMethod = manager.getClass().getMethod(<span class="string">"injectInputEvent"</span>, InputEvent<span class="class">.<span class="keyword">class</span>, <span class="title">int</span>.<span class="title">class</span>)</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">injectInputEvent</span><span class="params">(InputEvent inputEvent, <span class="keyword">int</span> mode)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> (Boolean) injectInputEventMethod.invoke(manager, inputEvent, mode);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException | IllegalAccessException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至此，<code>scrcpy</code>的源码分析差不多就结束了。从<code>scrcpy</code>的编译，再到执行<code>scrcpy</code>命令，通过<code>app_process</code>启动<code>scrcpy-server.jar</code>，最后到发送端的网络连接、录屏、编码、发送流数据和按键处理。我们把<code>scrcpy</code>的整个流程分析了一遍。希望看完这篇文章后，能对大家有所帮助~</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/RTFSC/" rel="tag"># RTFSC</a>
+          
+            <a href="/tags/scrcpy/" rel="tag"># scrcpy</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/compile-ffmpeg-android/" rel="next" title="在Mac上编译基于Android平台的FFmpeg源码">
+                <i class="fa fa-chevron-left"></i> 在Mac上编译基于Android平台的FFmpeg源码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/opus-mediacodec-decode/" rel="prev" title="Android上使用MediaCodec对Opus音频解码">
+                Android上使用MediaCodec对Opus音频解码 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#从编译scrcpy说起"><span class="nav-number">1.</span> <span class="nav-text">从编译scrcpy说起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行scrcpy"><span class="nav-number">2.</span> <span class="nav-text">执行scrcpy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于app-process"><span class="nav-number">3.</span> <span class="nav-text">关于app_process</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RTFSC"><span class="nav-number">4.</span> <span class="nav-text">RTFSC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-main"><span class="nav-number">4.1.</span> <span class="nav-text">Server.main()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#adb-reverse和adb-forward"><span class="nav-number">4.2.</span> <span class="nav-text">adb reverse和adb forward</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#录屏-amp-编码"><span class="nav-number">4.3.</span> <span class="nav-text">录屏&amp;编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送数据"><span class="nav-number">4.4.</span> <span class="nav-text">发送数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#按键事件处理"><span class="nav-number">4.5.</span> <span class="nav-text">按键事件处理</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

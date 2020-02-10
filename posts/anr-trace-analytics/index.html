@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,ANR,AMS,Bugly,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="背景最近项目组需要实现捕获ANR并上传到公司服务器相关的功能，因此花了点时间来整理相关的知识，并从AMS源码与腾讯Bugly-SDK中逆向找到相关思路，在此分享给大家。 ANR是什么？Application Not Responding的缩写，即应用程序无响应。简单来说，就是应用跑着跑着，突然duang~，界面卡住了，无法响应用户的操作如触摸事件等。 触发ANR的原因 应用进程自身引起  例如：">
+<meta name="keywords" content="Android,ANR,AMS,Bugly">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于ANR异常捕获与分析，你所需要知道的一切">
+<meta property="og:url" content="http://yoursite.com/posts/anr-trace-analytics/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="背景最近项目组需要实现捕获ANR并上传到公司服务器相关的功能，因此花了点时间来整理相关的知识，并从AMS源码与腾讯Bugly-SDK中逆向找到相关思路，在此分享给大家。 ANR是什么？Application Not Responding的缩写，即应用程序无响应。简单来说，就是应用跑着跑着，突然duang~，界面卡住了，无法响应用户的操作如触摸事件等。 触发ANR的原因 应用进程自身引起  例如：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/posts/anr-trace-analytics/thread_state.png">
+<meta property="og:updated_time" content="2017-08-06T14:22:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于ANR异常捕获与分析，你所需要知道的一切">
+<meta name="twitter:description" content="背景最近项目组需要实现捕获ANR并上传到公司服务器相关的功能，因此花了点时间来整理相关的知识，并从AMS源码与腾讯Bugly-SDK中逆向找到相关思路，在此分享给大家。 ANR是什么？Application Not Responding的缩写，即应用程序无响应。简单来说，就是应用跑着跑着，突然duang~，界面卡住了，无法响应用户的操作如触摸事件等。 触发ANR的原因 应用进程自身引起  例如：">
+<meta name="twitter:image" content="http://yoursite.com/posts/anr-trace-analytics/thread_state.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/anr-trace-analytics/">
+
+
+
+
+
+  <title>关于ANR异常捕获与分析，你所需要知道的一切 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/anr-trace-analytics/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于ANR异常捕获与分析，你所需要知道的一切</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-06T22:01:00+08:00">
+                2017-08-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近项目组需要实现捕获ANR并上传到公司服务器相关的功能，因此花了点时间来整理相关的知识，并从AMS源码与腾讯Bugly-SDK中逆向找到相关思路，在此分享给大家。</p>
+<h2 id="ANR是什么？"><a href="#ANR是什么？" class="headerlink" title="ANR是什么？"></a>ANR是什么？</h2><p><strong>Application Not Responding</strong>的缩写，即应用程序无响应。简单来说，就是应用跑着跑着，突然duang~，界面卡住了，无法响应用户的操作如触摸事件等。</p>
+<h2 id="触发ANR的原因"><a href="#触发ANR的原因" class="headerlink" title="触发ANR的原因"></a>触发ANR的原因</h2><ul>
+<li><p>应用进程自身引起<br>  例如：<br>  1.主线程阻塞、挂起、死循环<br>  2.应用进程的其他线程的CPU占用率高，使得主线程无法抢占到CPU时间片</p>
+</li>
+<li><p>其他进程间接引起<strong>（误伤）</strong><br>  例如：<br>  1.当前应用进程进行进程间通信请求其他进程，其他进程的操作长时间没有反馈<br>  2.其他进程的CPU占用率极高，使得当前应用进程无法抢占到CPU时间片</p>
+</li>
+</ul>
+<h2 id="ANR的分类："><a href="#ANR的分类：" class="headerlink" title="ANR的分类："></a>ANR的分类：</h2><ol>
+<li>应用在5秒内未响应用户的输入事件，如按键或触摸事件</li>
+<li>BroadcastReceiver未在10秒内完成相关的处理</li>
+<li>Service的各个生命周期函数时20秒内没有执行完毕</li>
+</ol>
+<p>主要还是以上3种情况，其根本原因都是<strong>主线程被阻塞</strong>导致的。</p>
+<blockquote>
+<p><strong>Tips:</strong><br>其中2,3属于Background ANR，实际上已经发生了ANR，但不会进行对话框弹出。可以在Android开发者选项—&gt;高级—&gt;显示所有”应用程序无响应“，勾选后即可对后台ANR也进行弹框显示。</p>
+</blockquote>
+<h2 id="问题分解"><a href="#问题分解" class="headerlink" title="问题分解"></a>问题分解</h2><p>要实现捕获ANR功能，简单来说，需要解决以下问题：</p>
+<ol>
+<li>获取什么信息？</li>
+<li>去哪里获取？</li>
+<li>什么时候去获取？</li>
+</ol>
+<p>对于上述问题，我们一步一步来，逐个解决。</p>
+<h3 id="一、获取什么信息？"><a href="#一、获取什么信息？" class="headerlink" title="一、获取什么信息？"></a>一、获取什么信息？</h3><p><strong>1. Cause reason:</strong><br>当ANR产生的时候，logcat会打印出一段log，会输出类似下面的信息。</p>
+<p>1) 首先可以得到ANR所在进程的进程名、进程号、及出错的组件；<br>2) 其中<code>Reason</code>主要描述了ANR产生的具体原因/分类；<br>3) <code>CPU usage...ago</code>则主要记录了ANR发生前CPU的使用状况；<br>4) <code>CPU usage...later</code>则记录了ANR发生之后CPU的使用状况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">E/ActivityManager: ANR in com.example.testapp (com.example.testapp/.CrashTestActivity)</span><br><span class="line">     PID: 2480</span><br><span class="line">     Reason: Input dispatching timed out (Waiting because the touched window has not finished processing the input events that were previously delivered to it.)</span><br><span class="line">     Load: 0.06 / 0.08 / 0.05</span><br><span class="line">     CPU usage from 9865ms to 0ms ago:</span><br><span class="line">       0.7% 1558/system_server: 0% user + 0.7% kernel / faults: 39 minor</span><br><span class="line">       0.4% 1143/adbd: 0% user + 0.4% kernel / faults: 117 minor</span><br><span class="line">       0.4% 1796/com.estrongs.android.pop: 0.2% user + 0.2% kernel / faults: 95 minor</span><br><span class="line">       0.2% 1132/surfaceflinger: 0% user + 0.2% kernel</span><br><span class="line">       0.1% 1114/kworker/0:1H: 0% user + 0.1% kernel</span><br><span class="line">       0.1% 1131/rild: 0% user + 0.1% kernel</span><br><span class="line">       0.1% 1682/com.android.phone: 0% user + 0.1% kernel</span><br><span class="line">      +0% 2510/logcat: 0% user + 0% kernel</span><br><span class="line">     0.8% TOTAL: 0.1% user + 0.7% kernel + 0% iowait</span><br><span class="line">     CPU usage from 1098ms to 1603ms later:</span><br><span class="line">       2% 1558/system_server: 2% user + 0% kernel</span><br><span class="line">         2% 1573/ActivityManager: 2% user + 0% kernel</span><br><span class="line">     0% TOTAL: 0% user + 0% kernel</span><br></pre></td></tr></table></figure>
+
+<p>结合此部分信息进行分析可以初步得出产生ANR的基本原因，以及排除是否属于误伤。什么意思呢？也就是说如果发现ANR前后有某个进程在占用大量CPU，那么ANR的产生很可能是误伤-_-|||，具体可以回看上面关于ANR触发原因一节。</p>
+<p><strong>2. ANR traces</strong><br>在知道了Cause reason之后，需要进一步的信息来确定ANR在代码中的位置，这个时候就要去查看traces文件了。每次产生ANR之后，系统都会向<code>/data/anr/traces.txt</code>中写入新的数据。内容大概如下：<br>1）介于<code>----- pid 0000 xxx -----</code>与<code>----- end 0000 -----</code>之间的为进程0000的所有线程堆栈信息。一般来说，发生ANR的进程信息会在文件头部，下面AMS源码分析的时候会说明为什么。<br>2) <code>&quot;main&quot; prio=5 tid=1 TIMED_WAIT</code>分为为线程名、线程优先级（默认值5）、线程ID、线程状态；主线程之后会接着打印进程中其他线程的信息，此处不再贴出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">----- pid 2480 at 2017-04-06 08:48:58 -----</span><br><span class="line">Cmd line: com.example.testapp</span><br><span class="line"></span><br><span class="line">JNI: CheckJNI is on; workarounds are off; pins=0; globals=263</span><br><span class="line"></span><br><span class="line">DALVIK THREADS:</span><br><span class="line">(mutexes: tll=0 tsl=0 tscl=0 ghl=0)</span><br><span class="line"></span><br><span class="line">&quot;main&quot; prio=5 tid=1 TIMED_WAIT</span><br><span class="line">  | group=&quot;main&quot; sCount=1 dsCount=0 obj=0xaccdcbd8 self=0xb80204a0</span><br><span class="line">  | sysTid=2480 nice=0 sched=0/0 cgrp=[fopen-error:2] handle=-1217093536</span><br><span class="line">  | state=S schedstat=( 0 0 0 ) utm=2 stm=1 core=1</span><br><span class="line">  at java.lang.VMThread.sleep(Native Method)</span><br><span class="line">  at java.lang.Thread.sleep(Thread.java:1013)</span><br><span class="line">  at java.lang.Thread.sleep(Thread.java:995)</span><br><span class="line">  at com.tencent.bugly.proguard.ag.a(BUGLY:897)</span><br><span class="line">  at com.tencent.bugly.crashreport.crash.anr.BuglyTestANR_Reciver.onReceive(BUGLY:30)</span><br><span class="line">  at android.app.LoadedApk$ReceiverDispatcher$Args.run(LoadedApk.java:768)</span><br><span class="line">  at android.os.Handler.handleCallback(Handler.java:733)</span><br><span class="line">  at android.os.Handler.dispatchMessage(Handler.java:95)</span><br><span class="line">  at android.os.Looper.loop(Looper.java:136)</span><br><span class="line">  at android.app.ActivityThread.main(ActivityThread.java:5017)</span><br><span class="line">  at java.lang.reflect.Method.invokeNative(Native Method)</span><br><span class="line">  at java.lang.reflect.Method.invoke(Method.java:515)</span><br><span class="line">  at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:779)</span><br><span class="line">  at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:595)</span><br><span class="line">  at dalvik.system.NativeStart.main(Native Method)</span><br><span class="line"></span><br><span class="line">&quot;AnotherThread1&quot; xxx</span><br><span class="line">xxx</span><br><span class="line">xxx</span><br><span class="line">xxx</span><br><span class="line"></span><br><span class="line">&quot;AnotherThread2&quot; xxx</span><br><span class="line">xxx</span><br><span class="line">xxx</span><br><span class="line">xxx</span><br><span class="line"></span><br><span class="line">----- end 2480 -----</span><br><span class="line"></span><br><span class="line">----- pid 1558 at 2017-04-06 08:48:58 -----</span><br><span class="line">Cmd line: another_process_name</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">----- end 2480 -----</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">...</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>Tips:</strong><br>关于ANR traces的保存时长：<br><strong>traces.txt</strong>：只保留最近一次发生ANR时的信息，位置：/data/anr/traces.txt<br><strong>DropBox</strong>： Android 2.2 开始增加, 会保留历史上发生的所有ANR的logs，位置：/data/system/dropbox，保存时长3天。详见：ActivityManagerService.addErrorToDropBox()</p>
+<p><strong>相关源码：</strong><br>ActivityManagerService.java<br>DropBoxManagerService.java<br>SystemServer.java</p>
+</blockquote>
+<p><strong>3. 关于线程状态</strong><br>了解线程的状态对分析traces文件至关重要，下表列出了各线程的状态及含义：<br><img src="thread_state.png" alt="ThreadState"></p>
+<h3 id="Read-The-Fucking-Source-Code"><a href="#Read-The-Fucking-Source-Code" class="headerlink" title="Read The Fucking Source Code"></a>Read The Fucking Source Code</h3><p>在解释后面的两个问题：2.去哪里获取？3.什么时候去获取？之前，我们需要简单的阅读下<code>ActivityManagerService</code>的源码了。</p>
+<p>1) 在产生ANR的时候，会回调到AMS的<code>appNotResponding()</code>方法，以下为关键代码，中文注释为相关代码的解读：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">appNotResponding</span><span class="params">(ProcessRecord app, ActivityRecord activity,</span></span></span><br><span class="line"><span class="function"><span class="params">        ActivityRecord parent, <span class="keyword">boolean</span> aboveSystem, <span class="keyword">final</span> String annotation)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// firstPids与lastPids将记录将要dump线程堆栈信息的进程号，其中firstPids会优先输出，详见后面的dumpStackTraces()方法</span></span><br><span class="line">    ArrayList&lt;Integer&gt; firstPids = <span class="keyword">new</span> ArrayList&lt;Integer&gt;(<span class="number">5</span>);</span><br><span class="line">    SparseArray&lt;Boolean&gt; lastPids = <span class="keyword">new</span> SparseArray&lt;Boolean&gt;(<span class="number">20</span>);</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="comment">// 判断重启、已处于ANR或Crash状态直接返回不处理</span></span><br><span class="line">        <span class="comment">// PowerManager.reboot() can block for a long time, so ignore ANRs while shutting down.</span></span><br><span class="line">        <span class="keyword">if</span> (mShuttingDown) &#123;</span><br><span class="line">            Slog.i(TAG, <span class="string">"During shutdown skipping ANR: "</span> + app + <span class="string">" "</span> + annotation);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (app.notResponding) &#123;</span><br><span class="line">            Slog.i(TAG, <span class="string">"Skipping duplicate ANR: "</span> + app + <span class="string">" "</span> + annotation);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (app.crashing) &#123;</span><br><span class="line">            Slog.i(TAG, <span class="string">"Crashing app skipping ANR: "</span> + app + <span class="string">" "</span> + annotation);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置notResponding标志位</span></span><br><span class="line">        <span class="comment">// In case we come through here for the same app before completing</span></span><br><span class="line">        <span class="comment">// this one, mark as anring now so we will bail out.</span></span><br><span class="line">        app.notResponding = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 这里将把当前进程的id最先加到列表中，因此能保证产生ANR的进程能在traces.txt的头部。</span></span><br><span class="line">        <span class="comment">// Dump thread traces as quickly as we can, starting with "interesting" processes.</span></span><br><span class="line">        firstPids.add(app.pid);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> parentPid = app.pid;</span><br><span class="line">        <span class="keyword">if</span> (parent != <span class="keyword">null</span> &amp;&amp; parent.app != <span class="keyword">null</span> &amp;&amp; parent.app.pid &gt; <span class="number">0</span>) parentPid = parent.app.pid;</span><br><span class="line">        <span class="keyword">if</span> (parentPid != app.pid) firstPids.add(parentPid);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (MY_PID != app.pid &amp;&amp; MY_PID != parentPid) firstPids.add(MY_PID);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将设有persistent属性的进程加入firstPids队列，其他则加入lastPids队列</span></span><br><span class="line">        <span class="comment">// 其中mLruProcesses根据LRU算法存储了最近使用的进程信息</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = mLruProcesses.size() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            ProcessRecord r = mLruProcesses.get(i);</span><br><span class="line">            <span class="keyword">if</span> (r != <span class="keyword">null</span> &amp;&amp; r.thread != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> pid = r.pid;</span><br><span class="line">                <span class="keyword">if</span> (pid &gt; <span class="number">0</span> &amp;&amp; pid != app.pid &amp;&amp; pid != parentPid &amp;&amp; pid != MY_PID) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (r.persistent) &#123;</span><br><span class="line">                        firstPids.add(pid);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        lastPids.put(pid, Boolean.TRUE);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 准备在logcat中打印出Cause Reason信息</span></span><br><span class="line">    <span class="comment">// Log the ANR to the main log.</span></span><br><span class="line">    StringBuilder info = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    info.setLength(<span class="number">0</span>);</span><br><span class="line">    info.append(<span class="string">"ANR in "</span>).append(app.processName);</span><br><span class="line">    <span class="keyword">if</span> (activity != <span class="keyword">null</span> &amp;&amp; activity.shortComponentName != <span class="keyword">null</span>) &#123;</span><br><span class="line">        info.append(<span class="string">" ("</span>).append(activity.shortComponentName).append(<span class="string">")"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    info.append(<span class="string">"\n"</span>);</span><br><span class="line">    info.append(<span class="string">"PID: "</span>).append(app.pid).append(<span class="string">"\n"</span>);</span><br><span class="line">    <span class="keyword">if</span> (annotation != <span class="keyword">null</span>) &#123;</span><br><span class="line">        info.append(<span class="string">"Reason: "</span>).append(annotation).append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (parent != <span class="keyword">null</span> &amp;&amp; parent != activity) &#123;</span><br><span class="line">        info.append(<span class="string">"Parent: "</span>).append(parent.shortComponentName).append(<span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> ProcessCpuTracker processCpuTracker = <span class="keyword">new</span> ProcessCpuTracker(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行此函数将dump相关进程中的线程堆栈信息到traces.txt文件中</span></span><br><span class="line">    File tracesFile = dumpStackTraces(<span class="keyword">true</span>, firstPids, processCpuTracker, lastPids,</span><br><span class="line">            NATIVE_STACKS_OF_INTEREST);</span><br><span class="line"></span><br><span class="line">    String cpuInfo = <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">// 打印CPU usage相关信息</span></span><br><span class="line">    <span class="keyword">if</span> (MONITOR_CPU_USAGE) &#123;</span><br><span class="line">        updateCpuStatsNow();</span><br><span class="line">        <span class="keyword">synchronized</span> (mProcessCpuTracker) &#123;</span><br><span class="line">            cpuInfo = mProcessCpuTracker.printCurrentState(anrTime);</span><br><span class="line">        &#125;</span><br><span class="line">        info.append(processCpuTracker.printCurrentLoad());</span><br><span class="line">        info.append(cpuInfo);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    info.append(processCpuTracker.printCurrentState(anrTime));</span><br><span class="line"></span><br><span class="line">    Slog.e(TAG, info.toString());</span><br><span class="line">    <span class="keyword">if</span> (tracesFile == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// There is no trace file, so dump (only) the alleged culprit's threads to the log</span></span><br><span class="line">        Process.sendSignal(app.pid, Process.SIGNAL_QUIT);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 添加ANR信息至DropBox，默认有效期为3天</span></span><br><span class="line">    addErrorToDropBox(<span class="string">"anr"</span>, app, app.processName, activity, parent, annotation,</span><br><span class="line">            cpuInfo, tracesFile, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 此处获取开发者选项—&gt;高级—&gt;显示所有"应用程序无响应"中的值，若勾选了显示Background ANR，则会显示Broadcast等后台组件所产生的ANR Dialog</span></span><br><span class="line">    <span class="comment">// Unless configured otherwise, swallow ANRs in background processes &amp; kill the process.</span></span><br><span class="line">    <span class="keyword">boolean</span> showBackground = Settings.Secure.getInt(mContext.getContentResolver(),</span><br><span class="line">            Settings.Secure.ANR_SHOW_BACKGROUND, <span class="number">0</span>) != <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">        mBatteryStatsService.noteProcessAnr(app.processName, app.uid);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!showBackground &amp;&amp; !app.isInterestingToUserLocked() &amp;&amp; app.pid != MY_PID) &#123;</span><br><span class="line">            app.kill(<span class="string">"bg anr"</span>, <span class="keyword">true</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Set the app's notResponding state, and look up the errorReportReceiver</span></span><br><span class="line">        makeAppNotRespondingLocked(app,</span><br><span class="line">                activity != <span class="keyword">null</span> ? activity.shortComponentName : <span class="keyword">null</span>,</span><br><span class="line">                annotation != <span class="keyword">null</span> ? <span class="string">"ANR "</span> + annotation : <span class="string">"ANR"</span>,</span><br><span class="line">                info.toString());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 通过hander发送消息，通知显示ANR Dialog</span></span><br><span class="line">        <span class="comment">// Bring up the infamous App Not Responding dialog</span></span><br><span class="line">        Message msg = Message.obtain();</span><br><span class="line">        HashMap&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">        msg.what = SHOW_NOT_RESPONDING_MSG;</span><br><span class="line">        msg.obj = map;</span><br><span class="line">        msg.arg1 = aboveSystem ? <span class="number">1</span> : <span class="number">0</span>;</span><br><span class="line">        map.put(<span class="string">"app"</span>, app);</span><br><span class="line">        <span class="keyword">if</span> (activity != <span class="keyword">null</span>) &#123;</span><br><span class="line">            map.put(<span class="string">"activity"</span>, activity);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mHandler.sendMessage(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2) 我们来详细看下<code>dumpStackTraces()</code>这个方法，此处将dump出<code>firstPids</code>与<code>lastPids</code>进程的相关线程堆栈信息至<code>traces.txt</code>，中文注释为相关代码的解读。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> File <span class="title">dumpStackTraces</span><span class="params">(<span class="keyword">boolean</span> clearTraces, ArrayList&lt;Integer&gt; firstPids,</span></span></span><br><span class="line"><span class="function"><span class="params">        ProcessCpuTracker processCpuTracker, SparseArray&lt;Boolean&gt; lastPids, String[] nativeProcs)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 根据此环境变量获取traces.txt生成路径，默认值为/data/anr/traces.txt</span></span><br><span class="line">    String tracesPath = SystemProperties.get(<span class="string">"dalvik.vm.stack-trace-file"</span>, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">if</span> (tracesPath == <span class="keyword">null</span> || tracesPath.length() == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    File tracesFile = <span class="keyword">new</span> File(tracesPath);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        File tracesDir = tracesFile.getParentFile();</span><br><span class="line">        <span class="keyword">if</span> (!tracesDir.exists()) &#123;</span><br><span class="line">            tracesDir.mkdirs();</span><br><span class="line">            <span class="keyword">if</span> (!SELinux.restorecon(tracesDir)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 删除旧的traces.txt文件，并创建新文件</span></span><br><span class="line">        FileUtils.setPermissions(tracesDir.getPath(), <span class="number">0775</span>, -<span class="number">1</span>, -<span class="number">1</span>);  <span class="comment">// drwxrwxr-x</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (clearTraces &amp;&amp; tracesFile.exists()) tracesFile.delete();</span><br><span class="line">        tracesFile.createNewFile();</span><br><span class="line">        FileUtils.setPermissions(tracesFile.getPath(), <span class="number">0666</span>, -<span class="number">1</span>, -<span class="number">1</span>); <span class="comment">// -rw-rw-rw-</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        Slog.w(TAG, <span class="string">"Unable to prepare ANR traces file: "</span> + tracesPath, e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    dumpStackTraces(tracesPath, firstPids, processCpuTracker, lastPids, nativeProcs);</span><br><span class="line">    <span class="keyword">return</span> tracesFile;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">dumpStackTraces</span><span class="params">(String tracesPath, ArrayList&lt;Integer&gt; firstPids,</span></span></span><br><span class="line"><span class="function"><span class="params">        ProcessCpuTracker processCpuTracker, SparseArray&lt;Boolean&gt; lastPids, String[] nativeProcs)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Use a FileObserver to detect when traces finish writing.</span></span><br><span class="line">    <span class="comment">// The order of traces is considered important to maintain for legibility.</span></span><br><span class="line">    <span class="comment">// 每个进程是按照先后顺序dump信息至traces.txt文件中的</span></span><br><span class="line">    <span class="comment">// 通过FileObserver监听完成写入的操作，并通过wait()/notify()机制等待/唤醒，并继续发送Signal给下一个进程，见下面的for循环</span></span><br><span class="line">    FileObserver observer = <span class="keyword">new</span> FileObserver(tracesPath, FileObserver.CLOSE_WRITE) &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(<span class="keyword">int</span> event, String path)</span> </span>&#123; notify(); &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        observer.startWatching();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// First collect all of the stacks of the most important pids.</span></span><br><span class="line">        <span class="keyword">if</span> (firstPids != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">int</span> num = firstPids.size();</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num; i++) &#123;</span><br><span class="line">                    <span class="keyword">synchronized</span> (observer) &#123;</span><br><span class="line">                        <span class="comment">// 目标进程的虚拟机实例接收到SIGNAL_QUIT信号后会由"Signal Catcher"线程将进程中各个线程的函数堆栈信息输出到traces.txt文件中.</span></span><br><span class="line">                        <span class="comment">// 优先输出firstPids中的进程堆栈信息</span></span><br><span class="line">                        Process.sendSignal(firstPids.get(i), Process.SIGNAL_QUIT);</span><br><span class="line">                        observer.wait(<span class="number">200</span>);  <span class="comment">// Wait for write-close, give up after 200msec</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                Slog.wtf(TAG, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Next collect the stacks of the native pids</span></span><br><span class="line">        <span class="keyword">if</span> (nativeProcs != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span>[] pids = Process.getPidsForCommands(nativeProcs);</span><br><span class="line">            <span class="keyword">if</span> (pids != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> pid : pids) &#123;</span><br><span class="line">                    Debug.dumpNativeBacktraceToFile(pid, tracesPath);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Lastly, measure CPU usage.</span></span><br><span class="line">        <span class="keyword">if</span> (processCpuTracker != <span class="keyword">null</span>) &#123;</span><br><span class="line">            processCpuTracker.init();</span><br><span class="line">            System.gc();</span><br><span class="line">            processCpuTracker.update();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">synchronized</span> (processCpuTracker) &#123;</span><br><span class="line">                    processCpuTracker.wait(<span class="number">500</span>); <span class="comment">// measure over 1/2 second.</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">            processCpuTracker.update();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 获取最近频繁使用CPU的进程</span></span><br><span class="line">            <span class="comment">// We'll take the stack crawls of just the top apps using CPU.</span></span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> N = processCpuTracker.countWorkingStats();</span><br><span class="line">            <span class="keyword">int</span> numProcs = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;N &amp;&amp; numProcs&lt;<span class="number">5</span>; i++) &#123;</span><br><span class="line">                ProcessCpuTracker.Stats stats = processCpuTracker.getWorkingStats(i);</span><br><span class="line">                <span class="comment">// 根据频繁使用CPU的进程与lastPids输出相关进程堆栈信息</span></span><br><span class="line">                <span class="keyword">if</span> (lastPids.indexOfKey(stats.pid) &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                    numProcs++;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">synchronized</span> (observer) &#123;</span><br><span class="line">                            Process.sendSignal(stats.pid, Process.SIGNAL_QUIT);</span><br><span class="line">                            observer.wait(<span class="number">200</span>);  <span class="comment">// Wait for write-close, give up after 200msec</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        Slog.wtf(TAG, e);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        observer.stopWatching();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、去哪里获取？"><a href="#二、去哪里获取？" class="headerlink" title="二、去哪里获取？"></a>二、去哪里获取？</h3><p><strong>1. Cause reason:</strong></p>
+<ul>
+<li>关于reason信息的获取，到目前为止，我们只知道能在logcat中能检索到相关信息，难道要开个线程不断循环去检测logs？这想法看来还是Too Young Too Simple。</li>
+<li>这里先说下结论，可通过<code>ActivityManagerService.getProcessesInErrorState()</code>方法获取进程的ANR信息，此方法是通过逆向Bugly时发现的，后面会讲到。</li>
+<li>此方法会遍历mLruProcesses，并根据进程目前的异常状态如crash或者anr类型，返回具体的ProcessErrorStateInfo，具体看代码，比较简单：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> List&lt;ActivityManager.ProcessErrorStateInfo&gt; getProcessesInErrorState() &#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// iterate across all processes</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=mLruProcesses.size()-<span class="number">1</span>; i&gt;=<span class="number">0</span>; i--) &#123;</span><br><span class="line">            ProcessRecord app = mLruProcesses.get(i);</span><br><span class="line">            <span class="keyword">if</span> (!allUsers &amp;&amp; app.userId != userId) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> ((app.thread != <span class="keyword">null</span>) &amp;&amp; (app.crashing || app.notResponding)) &#123;</span><br><span class="line">                <span class="comment">// This one's in trouble, so we'll generate a report for it</span></span><br><span class="line">                <span class="comment">// crashes are higher priority (in case there's a crash *and* an anr)</span></span><br><span class="line">                ActivityManager.ProcessErrorStateInfo report = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">if</span> (app.crashing) &#123;</span><br><span class="line">                    report = app.crashingReport;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (app.notResponding) &#123;</span><br><span class="line">                    report = app.notRespondingReport;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (report != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (errList == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        errList = <span class="keyword">new</span> ArrayList&lt;ActivityManager.ProcessErrorStateInfo&gt;(<span class="number">1</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    errList.add(report);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    Slog.w(TAG, <span class="string">"Missing app error report, app = "</span> + app.processName +</span><br><span class="line">                            <span class="string">" crashing = "</span> + app.crashing +</span><br><span class="line">                            <span class="string">" notResponding = "</span> + app.notResponding);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> errList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>注意<code>app.notRespondingReport</code>非空的时候才会返回，那它是什么时候初始化的呢？是在<code>makeAppNotRespondingLocked()</code>方法中。其中此方法又是在<code>appNotResponding()</code>中被调用的（在所有进程写完traces.txt之后，可回看上面AMS相关代码）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">makeAppNotRespondingLocked</span><span class="params">(ProcessRecord app,</span></span></span><br><span class="line"><span class="function"><span class="params">        String activity, String shortMsg, String longMsg)</span> </span>&#123;</span><br><span class="line">    app.notResponding = <span class="keyword">true</span>;</span><br><span class="line">    app.notRespondingReport = generateProcessError(app,</span><br><span class="line">            ActivityManager.ProcessErrorStateInfo.NOT_RESPONDING,</span><br><span class="line">            activity, shortMsg, longMsg, <span class="keyword">null</span>);</span><br><span class="line">    startAppProblemLocked(app);</span><br><span class="line">    app.stopFreezingAllLocked();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2. ANR traces</strong><br>这部分内容获取比较简单，直接读取/data/anr/traces.txt里面第一个进程的信息即可，能保证首个进程即是当前ANR的进程，至于为什么上面分析AMS源码中已经说明了，当前进的pid会首先被add进<code>firstPids</code>中被优先输出。此处的难点是如何从traces中过滤出相关的信息，如进程名，进程pid，生成时间，各线程名、tid、优先级、状态、堆栈信息等。这里就要用到强大的正则表达式来进行过滤了，此处忽略一万字…（大家可以反编译Bugly的SDK，参考里面的正则表达式）</p>
+<h3 id="三、什么时候去获取？"><a href="#三、什么时候去获取？" class="headerlink" title="三、什么时候去获取？"></a>三、什么时候去获取？</h3><p>在上面AMS的源码分析中，我们可以关注到<code>dumpStackTraces()</code>方法中的<code>FileObserver</code>，系统通过该类监听文件<code>/data/anr/traces.txt</code>来达到顺序依次写入各个进程的traces信息。按照这个思路，当ANR发生的时候，我们也可以通过监听该文件的写入情况来判断是否发生了ANR，看起来这是一个不错的时机。需要注意的一点是，所有应用发生ANR的时候都会进行回调，因此需要做一些过滤与判断，如包名、进程号等。</p>
+<p>在实现前，我们先来看看Bugly中是如何实现的。这里笔者反编译的是Bugly-v1.2.8版本，搜索关键字<code>FileObserver</code>，果不其然很快发现了一些相关代码，位于<code>com.tencent.bugly.crashreport.crash.anr</code>包下的<code>b.class</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">b</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">this</span>.d()) &#123;</span><br><span class="line">        z.d(<span class="string">"start when started!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.o = <span class="keyword">new</span> FileObserver(<span class="string">"/data/anr/"</span>, <span class="number">8</span>) &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(<span class="keyword">int</span> event, String path)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(path != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    String var3 = <span class="string">"/data/anr/"</span> + path;</span><br><span class="line">                    <span class="keyword">if</span>(!var3.contains(<span class="string">"trace"</span>)) &#123;</span><br><span class="line">                        z.d(<span class="string">"not anr file %s"</span>, <span class="keyword">new</span> Object[]&#123;var3&#125;);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        b.<span class="keyword">this</span>.a(var3);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.o.startWatching();</span><br><span class="line">            z.a(<span class="string">"start anr monitor!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">            ...</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable var2) &#123;</span><br><span class="line">            <span class="keyword">this</span>.o = <span class="keyword">null</span>;</span><br><span class="line">            z.d(<span class="string">"start anr monitor failed!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码比较简单，就是一个启动monitor的方法，监听<code>/data/anr/</code>这个目录，并过滤包含<code>trace</code>的文件名。在<code>FileObserver</code>创建的时候可以传入一个<code>mask</code>参数，8正是代表着<code>CLOSE_WRITE</code>这个常量，当有写入并且close的时候将会回调，跟AMS中的使用基本吻合。</p>
+<p>继续翻看<code>b.class</code>的代码，当过滤出trace文件的时候，会执行<code>b.this.a(var3)</code>这个方法。从代码逻辑上可以看出，这是一个对trace文件有效性判断的方法，精简过后的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">a</span><span class="params">(String var1)</span> </span>&#123;</span><br><span class="line">    ....</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        z.c(<span class="string">"read trace first dump for create time!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">long</span> var2 = -<span class="number">1L</span>;</span><br><span class="line">        com.tencent.bugly.crashreport.crash.anr.c.a var4 = com.tencent.bugly.crashreport.crash.anr.c.a(var1, <span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">if</span>(var4 != <span class="keyword">null</span>) &#123;</span><br><span class="line">            var2 = var4.c;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(var2 == -<span class="number">1L</span>) &#123;</span><br><span class="line">            z.d(<span class="string">"trace dump fail could not get time!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">            var2 = (<span class="keyword">new</span> Date()).getTime();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(Math.abs(var2 - <span class="keyword">this</span>.f) &lt; <span class="number">10000L</span>) &#123;</span><br><span class="line">            z.d(<span class="string">"should not process ANR too Fre in %d"</span>, <span class="keyword">new</span> Object[]&#123;Integer.valueOf(<span class="number">10000</span>)&#125;);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">if</span>(var5 != <span class="keyword">null</span> &amp;&amp; var5.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                ProcessErrorStateInfo var6 = <span class="keyword">this</span>.a(<span class="keyword">this</span>.g, <span class="number">10000L</span>);</span><br><span class="line">                <span class="keyword">if</span>(var6 == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    z.c(<span class="string">"proc state is unvisiable!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span>(var6.pid != Process.myPid()) &#123;</span><br><span class="line">                    z.c(<span class="string">"not mind proc!"</span>, <span class="keyword">new</span> Object[]&#123;var6.processName&#125;);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    z.a(<span class="string">"found visiable anr , start to process!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">                    <span class="keyword">this</span>.a(<span class="keyword">this</span>.g, var1, var6, var2, var5);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                z.d(<span class="string">"can\'t get all thread skip this anr"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable var13) &#123;</span><br><span class="line">        ...</span><br><span class="line">        z.e(<span class="string">"handle anr error %s"</span>, <span class="keyword">new</span> Object[]&#123;var13.getClass().toString()&#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码的意思也比较好理解，先解析出时间，对一些重复的回调或太频繁的ANR进行过滤（为什么会重复回调，因为上面阅读AMS源码的时候也说明了，<code>firstPids</code>中各个进程的信息会依次写入trace文件中）。然后对进程异常状态和进程号进行判断，过滤掉无效或其他应用的回调，最后对有效的trace进行处理。</p>
+<p>这个时候<code>ProcessErrorStateInfo</code>这个类引起了我的注意，我们继续翻代码看他到底获取的是什么信息，进入<code>this.a(this.g, 10000L)</code>这个方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> ProcessErrorStateInfo <span class="title">a</span><span class="params">(Context var1, <span class="keyword">long</span> var2)</span> </span>&#123;</span><br><span class="line">    var2 = var2 &lt; <span class="number">0L</span>?<span class="number">0L</span>:var2;</span><br><span class="line">    z.c(<span class="string">"to find!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">    ActivityManager var4 = (ActivityManager)var1.getSystemService(<span class="string">"activity"</span>);</span><br><span class="line">    <span class="keyword">long</span> var5 = var2 / <span class="number">500L</span>;</span><br><span class="line">    <span class="keyword">int</span> var7 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        z.c(<span class="string">"waiting!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">        List var8 = var4.getProcessesInErrorState();</span><br><span class="line">        <span class="keyword">if</span>(var8 != <span class="keyword">null</span>) &#123;</span><br><span class="line">            Iterator var9 = var8.iterator();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span>(var9.hasNext()) &#123;</span><br><span class="line">                ProcessErrorStateInfo var10 = (ProcessErrorStateInfo)var9.next();</span><br><span class="line">                <span class="keyword">if</span>(var10.condition == <span class="number">2</span>) &#123;</span><br><span class="line">                    z.c(<span class="string">"found!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">                    <span class="keyword">return</span> var10;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ag.a(<span class="number">500L</span>);</span><br><span class="line">    &#125; <span class="keyword">while</span>((<span class="keyword">long</span>)(var7++) &lt; var5);</span><br><span class="line">    z.c(<span class="string">"end!"</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以把这段代码copy到自己的项目中跑一下，首先通过<code>ActivityManager.getProcessesInErrorState()</code>来获取系统中有所有异常进程的信息，通过<code>condition</code>来过滤出目标进程，而2正是代表着<code>NOT_RESPONDING</code>这个常量，即ANR异常。而<code>ProcessErrorStateInfo</code>中的<code>shortMsg</code>和<code>longMsg</code>变量正是我们之前在logcat中看到的Cause reason！</p>
+<p>可以看到，其实Bugly对于ANR的触发时机监听也正是使用<code>FileObserver</code>来实现的。而且之前一直在思考logcat中的Cause reason是从哪里获取的现在也有了答案，反编译有些时候还真是个好法宝，嘿嘿嘿~</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>至此，通过AMS源码分析和Bugly-SDK的逆向，我们终于解决了捕获ANR异常最重要的3个问题：1.获取什么信息？2.去哪里获取？3.什么时候去获取？希望这篇文章能给正在开发相关功能的同学们一些指导，顺便分享下自己的思路与经验~</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://developer.android.com/training/articles/perf-anr.html#anr" target="_blank" rel="noopener">https://developer.android.com/training/articles/perf-anr.html#anr</a><br><a href="http://gityuan.com/2016/07/02/android-anr/" target="_blank" rel="noopener">http://gityuan.com/2016/07/02/android-anr/</a><br><a href="http://blog.csdn.net/tencent_bugly/article/details/46650675" target="_blank" rel="noopener">http://blog.csdn.net/tencent_bugly/article/details/46650675</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/ANR/" rel="tag"># ANR</a>
+          
+            <a href="/tags/AMS/" rel="tag"># AMS</a>
+          
+            <a href="/tags/Bugly/" rel="tag"># Bugly</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/hexo-guide/" rel="next" title="使用Hexo+GitHub搭建及配置个人博客">
+                <i class="fa fa-chevron-left"></i> 使用Hexo+GitHub搭建及配置个人博客
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/gradle-plugin-3-0-0-migration/" rel="prev" title="Android Studio 3.0及Gradle Plugin 3.0升级注意事项">
+                Android Studio 3.0及Gradle Plugin 3.0升级注意事项 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ANR是什么？"><span class="nav-number">2.</span> <span class="nav-text">ANR是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#触发ANR的原因"><span class="nav-number">3.</span> <span class="nav-text">触发ANR的原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ANR的分类："><span class="nav-number">4.</span> <span class="nav-text">ANR的分类：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题分解"><span class="nav-number">5.</span> <span class="nav-text">问题分解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、获取什么信息？"><span class="nav-number">5.1.</span> <span class="nav-text">一、获取什么信息？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Read-The-Fucking-Source-Code"><span class="nav-number">5.2.</span> <span class="nav-text">Read The Fucking Source Code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、去哪里获取？"><span class="nav-number">5.3.</span> <span class="nav-text">二、去哪里获取？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、什么时候去获取？"><span class="nav-number">5.4.</span> <span class="nav-text">三、什么时候去获取？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

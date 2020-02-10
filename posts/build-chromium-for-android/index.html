@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Chromium,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="编译环境在Windows或者Mac下编译Android客户端是不支持的，官方推荐的是使用Ubuntu来进行编译，因此我们的编译采用的是Ubuntu服务器，版本为14.04.2 LTS (GNU/Linux 3.16.0-30-generic x86_64)。需提前安装Git（拉代码）和Python（GN中的所有外部脚本都在Python中执行） 安装depot_toolsChromium使用depo">
+<meta name="keywords" content="Android,Chromium">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译Chromium源码for Android">
+<meta property="og:url" content="http://yoursite.com/posts/build-chromium-for-android/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="编译环境在Windows或者Mac下编译Android客户端是不支持的，官方推荐的是使用Ubuntu来进行编译，因此我们的编译采用的是Ubuntu服务器，版本为14.04.2 LTS (GNU/Linux 3.16.0-30-generic x86_64)。需提前安装Git（拉代码）和Python（GN中的所有外部脚本都在Python中执行） 安装depot_toolsChromium使用depo">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-12T09:30:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编译Chromium源码for Android">
+<meta name="twitter:description" content="编译环境在Windows或者Mac下编译Android客户端是不支持的，官方推荐的是使用Ubuntu来进行编译，因此我们的编译采用的是Ubuntu服务器，版本为14.04.2 LTS (GNU/Linux 3.16.0-30-generic x86_64)。需提前安装Git（拉代码）和Python（GN中的所有外部脚本都在Python中执行） 安装depot_toolsChromium使用depo">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/build-chromium-for-android/">
+
+
+
+
+
+  <title>编译Chromium源码for Android | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/build-chromium-for-android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">编译Chromium源码for Android</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-29T19:20:47+08:00">
+                2019-09-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Chromium/" itemprop="url" rel="index">
+                    <span itemprop="name">Chromium</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="编译环境"><a href="#编译环境" class="headerlink" title="编译环境"></a>编译环境</h2><p>在Windows或者Mac下编译Android客户端是不支持的，官方推荐的是使用Ubuntu来进行编译，因此我们的编译采用的是Ubuntu服务器，版本为<code>14.04.2 LTS (GNU/Linux 3.16.0-30-generic x86_64)</code>。需提前安装Git（拉代码）和Python（GN中的所有外部脚本都在Python中执行）</p>
+<h2 id="安装depot-tools"><a href="#安装depot-tools" class="headerlink" title="安装depot_tools"></a>安装depot_tools</h2><p>Chromium使用<code>depot_tools</code>的脚本包来管理checkout和审查代码，因此拉代码前需要安装好此工具。首先拉取代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://chromium.googlesource.com/chromium/tools/depot_tools.git</span><br></pre></td></tr></table></figure>
+
+<p>添加路径到PATH环境变量中，或者直接添加到配置文件：<code>~/.bashrc</code> 或 <code>~/.zshrc</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PATH</span>:/path/to/depot_tools"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="拉取Chromium源码"><a href="#拉取Chromium源码" class="headerlink" title="拉取Chromium源码"></a>拉取Chromium源码</h2><p>新建目录然后拉取代码，这里过程非常长，看大家网速了。如果想快点拉完，可以在fetch的时候添加<code>--no-history</code>指令不拉取历史记录，这样会快很多。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/chromium &amp;&amp; <span class="built_in">cd</span> ~/chromium</span><br><span class="line">fetch --nohooks android</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>PS：通过<code>fetch android</code>指令拉取代码，会自动帮我们在<code>.gclient</code>文件下配置好<code>target_os = [ &#39;android&#39; ]</code>属性，并自动执行<code>gclient sync</code>指令去拉取Android相关的依赖。</p>
+</blockquote>
+<h2 id="下载Android依赖"><a href="#下载Android依赖" class="headerlink" title="下载Android依赖"></a>下载Android依赖</h2><p>拉完源码后，执行以下指令安装编译Android APK所需的依赖及下载其他所需的二进制文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">build/install-build-deps-android.sh</span><br><span class="line">gclient runhooks</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置GN编译脚本"><a href="#配置GN编译脚本" class="headerlink" title="配置GN编译脚本"></a>配置GN编译脚本</h2><p>Chromium使用<a href="https://ninja-build.org/" target="_blank" rel="noopener">Ninja</a>作为主要的构建工具，并通过<a href="https://gn.googlesource.com/gn/+/master/docs/quick_start.md" target="_blank" rel="noopener">GN</a>来生成<code>.ninja</code>配置文件。对于Chromium这种航母级的源码编译，使用Ninja能大大的加快编译速度。通过<code>gn args out/Default</code>指令，会启动系统的默认编辑器进入配置文件编辑模式，并在<code>out/Default</code>目录下初始化此版本的编译，生成<code>args.gn</code>文件（可以同时配置多个构建版本，生成的产物互不影响）。这个时候输入以下的配置参数并保存，GN会帮我们初始化好所有的<code>.ninja</code>配置文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">target_os = <span class="string">"android"</span></span><br><span class="line">target_cpu = <span class="string">"arm"</span></span><br></pre></td></tr></table></figure>
+
+<p>当然你也可以使用以下指令快速完成配置文件的初始化：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gn gen --args=<span class="string">'target_os="android" target_cpu="arm"'</span> out/Default</span><br></pre></td></tr></table></figure>
+
+<p>关于<code>target_cpu</code>与本机代码指令集的对应关系，可以参照下列表格：</p>
+<table>
+<thead>
+<tr>
+<th align="center">abi</th>
+<th align="center">target_cpu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">arm64-v8a</td>
+<td align="center">arm64</td>
+</tr>
+<tr>
+<td align="center">armeabi-v7a</td>
+<td align="center">arm</td>
+</tr>
+<tr>
+<td align="center">x86</td>
+<td align="center">x86</td>
+</tr>
+<tr>
+<td align="center">x86_64</td>
+<td align="center">x64</td>
+</tr>
+</tbody></table>
+<p>除了<code>target_os</code>和<code>target_cpu</code>之外，我们还可以根据编译类型（如debug、release）设置一些其他的参数：</p>
+<ul>
+<li>is_debug: 设置true时编译debug版本，false时编译release版本。</li>
+<li>is_component_build: 设置true时会把声明为<code>components</code>的目标作为共享库动态加载，一般在编译debug版本时，会设置为true，这样每次改动编译链接花费的时间就会减少很多。若为false，则组件将采用静态链接，详细介绍可参考官方文档：<a href="https://chromium.googlesource.com/chromium/src/+/master/docs/component_build.md" target="_blank" rel="noopener">component_build.md</a>。</li>
+<li>use_jumbo_build: 设置true时会启动jumbo编译模式，该模式下编译与链接速度都会快很多，在调试的时候可以提高效率。但是因为jumbo的原理是合并多文件一起进行编译，因此编译时可能会产生额外的symbols冲突，详细介绍可参考官方文档：<a href="https://chromium.googlesource.com/chromium/src/+/master/docs/jumbo.md" target="_blank" rel="noopener">jumbo.md</a>。</li>
+</ul>
+<h2 id="GN常用指令"><a href="#GN常用指令" class="headerlink" title="GN常用指令"></a>GN常用指令</h2><h3 id="查看构建环境的默认参数"><a href="#查看构建环境的默认参数" class="headerlink" title="查看构建环境的默认参数"></a>查看构建环境的默认参数</h3><p>通过<code>args --list</code>命令还可以查看当前构建环境的所有配置参数与详细说明，并且可以看到当前的默认值是多少，通过以下指令我们可以把参数输出到文件中进行查看。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gn args --list out/Default &gt; env.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="对历史构建进行清理"><a href="#对历史构建进行清理" class="headerlink" title="对历史构建进行清理"></a>对历史构建进行清理</h3><p>通过<code>clean</code>指令可以对编译环境进行清理，会删除所有编译的中间产物，仅保留<code>args.gn</code>、<code>build.ninja</code>等基础的配置文件，以便我们进行一次完整的重编译。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gn clean out/Default</span><br></pre></td></tr></table></figure>
+
+<h3 id="查看给定target或config的详细信息"><a href="#查看给定target或config的详细信息" class="headerlink" title="查看给定target或config的详细信息"></a>查看给定target或config的详细信息</h3><p>通过<code>desc</code>指令可以查看某个target的所有详细信息，包括所有包含的<code>sources</code>源码、<code>cflags</code>参数、依赖的<code>libs</code>等等…通过以下指令我们可以把结果输出到文件中进行查看。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gn desc out/Default //net:net &gt; desc.txt</span><br></pre></td></tr></table></figure>
+
+<h3 id="查看指令帮助信息"><a href="#查看指令帮助信息" class="headerlink" title="查看指令帮助信息"></a>查看指令帮助信息</h3><p>通过<code>help</code>指令可快速查看某个<code>command</code>的详细使用文档，包括支持参数、输出结果、Examples等：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gn <span class="built_in">help</span> &lt;<span class="built_in">command</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>关于GN的更多使用方式可参考官方文档：<a href="https://gn.googlesource.com/gn/+/master/docs/quick_start.md" target="_blank" rel="noopener">Quick Start guide</a></p>
+<h2 id="编译Chromium-APK"><a href="#编译Chromium-APK" class="headerlink" title="编译Chromium APK"></a>编译Chromium APK</h2><p>通过以下命令我们可以编译Chromium的APK：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">autoninja -C out/Default chrome_public_apk</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>autoninja</code>为<code>ninja</code>的包装器，会自动提供最佳的参数给到<code>ninja</code>；<code>out/Default</code>为我们生成配置文件的目录；最后的<code>chrome_public_apk</code>为<code>ninja</code>已经配置好的编译target，其中还包含了<code>chrome_modern_public_apk</code>、<code>monochrome_public_apk</code>等特性target。</p>
+<p>经过漫长的等待后，看到下面的log，并且没有任何报错，就证明已经编译完成了，APK产物<code>ChromePublic.apk</code>在<code>out/Default/apks</code>目录下面：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ninja: Entering directory `out/Default<span class="string">'</span></span><br><span class="line"><span class="string">[40164/40164] STAMP obj/chrome/android/chrome_public_apk.stamp</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="单独编译模块与使用"><a href="#单独编译模块与使用" class="headerlink" title="单独编译模块与使用"></a>单独编译模块与使用</h2><p>除了编译完整的APK，其实在<code>Chromium</code>中还有很多实用的模块与so库我们可以抽出来在项目中进行使用。单独编译模块的方式也很简单，假设我们需要编译net模块到项目中使用，可通过如下的命令进行编译：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">autoninja -C out/Default net</span><br></pre></td></tr></table></figure>
+
+<p>此命令会编译net模块以及所依赖的其他模块，如：<code>base</code>、<code>boringssl</code>、<code>crcrypto</code>等模块。顺利编译完成后，在<code>out/Default/</code>目录下即可找到我们所需的so库文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ls -l | grep so$</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx  1871676 Sep 30 11:18 libbase.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx   286620 Sep 30 11:18 libbase_i18n.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx   966296 Sep 30 11:18 libboringssl.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx   464328 Sep 30 11:18 libc++.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx    63448 Sep 30 11:18 libchrome_zlib.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx    53208 Sep 30 11:18 libcrcrypto.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx  1609404 Sep 30 11:18 libicui18n.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx  1092640 Sep 30 11:18 libicuuc.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx  5965140 Sep 30 11:19 libnet.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx   313324 Sep 30 11:18 libprotobuf_lite.cr.so</span><br><span class="line">-rwxr-xr-x  1 codezjx codezjx   104628 Sep 30 11:18 liburl.cr.so</span><br></pre></td></tr></table></figure>
+
+<p>将上面编译生成的so拷贝到项目的<code>src/main/jniLibs/armeabi-v7a</code>目录下，并抽取相关头文件拷贝至<code>src/main/cpp/include</code>中（可通过<code>gn desc</code>中返回的相关信息进行查找）。最终在<code>CMakeLists.txt</code>中设置<code>include_directories</code>与<code>link_directories</code>后即可进行调用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">set(libs_dir src/main/jniLibs/$&#123;ANDROID_ABI&#125;)</span><br><span class="line">set(libs_include_dir src/main/cpp/include)</span><br><span class="line">include_directories($&#123;libs_include_dir&#125;)</span><br><span class="line">link_directories($&#123;libs_dir&#125;)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Chromium/" rel="tag"># Chromium</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/opus-mediacodec-decode/" rel="next" title="Android上使用MediaCodec对Opus音频解码">
+                <i class="fa fa-chevron-left"></i> Android上使用MediaCodec对Opus音频解码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译环境"><span class="nav-number">1.</span> <span class="nav-text">编译环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装depot-tools"><span class="nav-number">2.</span> <span class="nav-text">安装depot_tools</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拉取Chromium源码"><span class="nav-number">3.</span> <span class="nav-text">拉取Chromium源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下载Android依赖"><span class="nav-number">4.</span> <span class="nav-text">下载Android依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置GN编译脚本"><span class="nav-number">5.</span> <span class="nav-text">配置GN编译脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GN常用指令"><span class="nav-number">6.</span> <span class="nav-text">GN常用指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看构建环境的默认参数"><span class="nav-number">6.1.</span> <span class="nav-text">查看构建环境的默认参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对历史构建进行清理"><span class="nav-number">6.2.</span> <span class="nav-text">对历史构建进行清理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看给定target或config的详细信息"><span class="nav-number">6.3.</span> <span class="nav-text">查看给定target或config的详细信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看指令帮助信息"><span class="nav-number">6.4.</span> <span class="nav-text">查看指令帮助信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译Chromium-APK"><span class="nav-number">7.</span> <span class="nav-text">编译Chromium APK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单独编译模块与使用"><span class="nav-number">8.</span> <span class="nav-text">单独编译模块与使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

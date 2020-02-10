@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Android Studio,Gradle,Gradle Plugin,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="最近终于有空升级了一下项目中的Gradle和Gradle Plugin的版本，还是踩了蛮多的坑。特别是依赖以及渠道编译这块变动较大，因此把遇到的一些问题点记录下来，分享给后人查阅~ Gradle版本升级其实当AS升级到3.0之后，Gradle Plugin和Gradle不升级也是可以继续使用的，但很多新的特性如：Java8支持、新的依赖匹配机制、AAPT2等新功能都无法正常使用~  所以长期看来，">
+<meta name="keywords" content="Android,Android Studio,Gradle,Gradle Plugin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Studio 3.0及Gradle Plugin 3.0升级注意事项">
+<meta property="og:url" content="http://yoursite.com/posts/gradle-plugin-3-0-0-migration/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="最近终于有空升级了一下项目中的Gradle和Gradle Plugin的版本，还是踩了蛮多的坑。特别是依赖以及渠道编译这块变动较大，因此把遇到的一些问题点记录下来，分享给后人查阅~ Gradle版本升级其实当AS升级到3.0之后，Gradle Plugin和Gradle不升级也是可以继续使用的，但很多新的特性如：Java8支持、新的依赖匹配机制、AAPT2等新功能都无法正常使用~  所以长期看来，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-11-23T12:29:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Studio 3.0及Gradle Plugin 3.0升级注意事项">
+<meta name="twitter:description" content="最近终于有空升级了一下项目中的Gradle和Gradle Plugin的版本，还是踩了蛮多的坑。特别是依赖以及渠道编译这块变动较大，因此把遇到的一些问题点记录下来，分享给后人查阅~ Gradle版本升级其实当AS升级到3.0之后，Gradle Plugin和Gradle不升级也是可以继续使用的，但很多新的特性如：Java8支持、新的依赖匹配机制、AAPT2等新功能都无法正常使用~  所以长期看来，">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/gradle-plugin-3-0-0-migration/">
+
+
+
+
+
+  <title>Android Studio 3.0及Gradle Plugin 3.0升级注意事项 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/gradle-plugin-3-0-0-migration/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android Studio 3.0及Gradle Plugin 3.0升级注意事项</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-23T20:14:20+08:00">
+                2017-11-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gradle/" itemprop="url" rel="index">
+                    <span itemprop="name">Gradle</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近终于有空升级了一下项目中的<code>Gradle</code>和<code>Gradle Plugin</code>的版本，还是踩了蛮多的坑。特别是依赖以及渠道编译这块变动较大，因此把遇到的一些问题点记录下来，分享给后人查阅~</p>
+<h2 id="Gradle版本升级"><a href="#Gradle版本升级" class="headerlink" title="Gradle版本升级"></a>Gradle版本升级</h2><p>其实当AS升级到3.0之后，Gradle Plugin和Gradle不升级也是可以继续使用的，但很多新的特性如：Java8支持、新的依赖匹配机制、AAPT2等新功能都无法正常使用~  所以长期看来，最后还是得升的。</p>
+<ul>
+<li><p>Gradle Plugin升级到<code>3.0.0</code>及以上，修改<code>project/build.gradle</code>文件：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">buildscript</span> &#123;</span><br><span class="line">    <span class="keyword">repositories</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// You need to add the following repository to download the</span></span><br><span class="line">        <span class="comment">// new plugin.</span></span><br><span class="line">        google()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">dependencies</span> &#123;</span><br><span class="line">        <span class="keyword">classpath</span> <span class="string">'com.android.tools.build:gradle:3.0.0'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Gradle升级到<code>4.1</code>及以上，修改<code>project/gradle/gradle-wrapper.properties</code>文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">distributionUrl=https\://services.gradle.org/distributions/gradle-4.1-all.zip</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="生成APK文件名属性outputFile变为只读"><a href="#生成APK文件名属性outputFile变为只读" class="headerlink" title="生成APK文件名属性outputFile变为只读"></a>生成APK文件名属性<code>outputFile</code>变为只读</h2><p>改完第一步后会提示如下报错：</p>
+<blockquote>
+<p>Error:(88, 0) Cannot set the value of read-only property ‘outputFile’ for ApkVariantOutputImpl_Decorated{apkData=Main{type=MAIN, fullName=appDebug, filters=[]}} of type com.android.build.gradle.internal.api.ApkVariantOutputImpl.</p>
+</blockquote>
+<p>之前改apk名字的代码类似：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">applicationVariants.all &#123; variant -&gt;</span><br><span class="line">    variant.outputs.<span class="keyword">each</span> &#123; output -&gt;</span><br><span class="line">        <span class="keyword">def</span> <span class="keyword">file</span> = output.outputFile</span><br><span class="line">        <span class="keyword">def</span> apkName = <span class="string">'xxx-xxx-xxx-signed.apk'</span></span><br><span class="line">        output.outputFile = <span class="keyword">new</span> <span class="keyword">File</span>(<span class="keyword">file</span>.parent, apkName)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于<code>outputFile</code>属性变为只读，需要进行如下修改，直接对<code>outputFileName</code>属性赋值即可：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">applicationVariants.all &#123; variant -&gt;</span><br><span class="line">    variant.outputs.all &#123;</span><br><span class="line">        <span class="keyword">def</span> apkName = <span class="string">'xxx-xxx-xxx-signed.apk'</span></span><br><span class="line">        outputFileName = apkName</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="依赖关键字的改变"><a href="#依赖关键字的改变" class="headerlink" title="依赖关键字的改变"></a>依赖关键字的改变</h2><ul>
+<li>api: 对应之前的<code>compile</code>关键字，功能一模一样。会传递依赖，导致gradle编译的时候遍历整颗依赖树</li>
+<li>implementation: 对应之前的<code>compile</code>，与<code>api</code>类似，关键区别是不会有依赖传递</li>
+<li>compileOnly: 对应之前的<code>provided</code>，依赖仅用于编译期不会打包进最终的apk中</li>
+<li>runtimeOnly: 对应之前的’apk’，与上面的<code>compileOnly</code>相反</li>
+</ul>
+<p>关于<code>implementation</code>与<code>api</code>的区别，主要在依赖是否会传递上。如：A依赖B，B依赖C，若使用<code>api</code>则A可以引用C，而<code>implementation</code>则不能引用。</p>
+<p>这里更推荐用<code>implementation</code>，一是不会间接的暴露引用，清晰知道目前项目的依赖情况；二是可以提高编译时依赖树的查找速度，进而提升编译速度。详见SO的这个回答，讲得非常详细了：<a href="https://stackoverflow.com/questions/44413952/gradle-implementation-vs-api-configuration" target="_blank" rel="noopener">https://stackoverflow.com/questions/44413952/gradle-implementation-vs-api-configuration</a></p>
+<h2 id="渠道需要声明flavor-dimensions"><a href="#渠道需要声明flavor-dimensions" class="headerlink" title="渠道需要声明flavor dimensions"></a>渠道需要声明flavor dimensions</h2><p>刚开始Sync的时候应该会报错：</p>
+<blockquote>
+<p>Error:All flavors must now belong to a named flavor dimension. Learn more at <a href="https://d.android.com/r/tools/flavorDimensions-missing-error-message.html" target="_blank" rel="noopener">https://d.android.com/r/tools/flavorDimensions-missing-error-message.html</a></p>
+</blockquote>
+<p>也就是每个flavor渠道都必须归属一个dimension维度，若只有一个维度，渠道中可以不写dimension属性，默认分配到该维度。直接添加一个默认的维度即可，如：<code>flavorDimensions &quot;dimension&quot;</code>。当然<code>flavorDimensions</code>也可以设置多个维度，详见官方实例：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Specifies two flavor dimensions.</span></span><br><span class="line">flavorDimensions <span class="string">"mode"</span>, <span class="string">"minApi"</span></span><br><span class="line"></span><br><span class="line">productFlavors &#123;</span><br><span class="line">    free &#123;</span><br><span class="line">        <span class="comment">// Assigns this product flavor to the "tier" flavor dimension. Specifying</span></span><br><span class="line">        <span class="comment">// this property is optional if you are using only one dimension.</span></span><br><span class="line">        dimension <span class="string">"mode"</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    paid &#123;</span><br><span class="line">        dimension <span class="string">"mode"</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    minApi23 &#123;</span><br><span class="line">        dimension <span class="string">"minApi"</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    minApi18 &#123;</span><br><span class="line">        dimension <span class="string">"minApi"</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="库多variant依赖方式的修改"><a href="#库多variant依赖方式的修改" class="headerlink" title="库多variant依赖方式的修改"></a>库多variant依赖方式的修改</h2><p><code>Gradle plugin 3.0.0+</code>之后引入了新的variant自动匹配机制，也就是说app的flavorDebug变体会自动匹配library的flavorDebug变体。</p>
+<p>回顾一下旧的方式，如果app在某个variant下需要依赖library相应的类型，需要按照下面的方式声明依赖：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    <span class="comment">// This is the old method and no longer works for local</span></span><br><span class="line">    <span class="comment">// library modules:</span></span><br><span class="line">    debugCompile <span class="keyword">project</span>(path: <span class="string">':library'</span>, configuration: <span class="string">'debug'</span>)</span><br><span class="line">    releaseCompile <span class="keyword">project</span>(path: <span class="string">':library'</span>, configuration: <span class="string">'release'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>新的方式，gradle会自动感知并匹配对应的variant（前提是app与library中有对应的variant类型）：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    <span class="comment">// Instead, simply use the following to take advantage of</span></span><br><span class="line">    <span class="comment">// variant-aware dependency resolution. You can learn more about</span></span><br><span class="line">    <span class="comment">// the 'implementation' configuration in the section about</span></span><br><span class="line">    <span class="comment">// new dependency configurations.</span></span><br><span class="line">    implementation <span class="keyword">project</span>(<span class="string">':library'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="处理app与lib的依赖匹配问题"><a href="#处理app与lib的依赖匹配问题" class="headerlink" title="处理app与lib的依赖匹配问题"></a>处理app与lib的依赖匹配问题</h2><p>上面我们了解到新的variant匹配机制，但若app或library中不存在对应的variant类型呢？匹配将如何进行？下面列出了可能出现的几种情形：</p>
+<h3 id="情形1：app中有某个build-type但library却木有"><a href="#情形1：app中有某个build-type但library却木有" class="headerlink" title="情形1：app中有某个build type但library却木有"></a>情形1：app中有某个build type但library却木有</h3><p>可以通过<code>matchingFallbacks</code>属性来设置回退策略，提供可能的匹配列表，代码如下：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// In the app's build.gradle file.</span></span><br><span class="line">android &#123;</span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        debug &#123;&#125;</span><br><span class="line">        release &#123;&#125;</span><br><span class="line">        staging &#123;</span><br><span class="line">            <span class="comment">// Specifies a sorted list of fallback build types that the</span></span><br><span class="line">            <span class="comment">// plugin should try to use when a dependency does not include a</span></span><br><span class="line">            <span class="comment">// "staging" build type. You may specify as many fallbacks as you</span></span><br><span class="line">            <span class="comment">// like, and the plugin selects the first build type that's</span></span><br><span class="line">            <span class="comment">// available in the dependency.</span></span><br><span class="line">            matchingFallbacks = [<span class="string">'debug'</span>, <span class="string">'qa'</span>, <span class="string">'release'</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>若希望可以针对app的每个build type都执行相同的回退策略（例如我们大量的library只有一个release的build type），则可以使用批量指令：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">buildTypes.all &#123; type -&gt;</span><br><span class="line">    type.matchingFallbacks = [<span class="string">'release'</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>（注意：在该情景下，若library中有某个build type但app却木有，不会对app有任何影响）</strong></p>
+<h3 id="情景2：在同一个dimension维度下，如：tier。若app中有某个flavor但library却木有："><a href="#情景2：在同一个dimension维度下，如：tier。若app中有某个flavor但library却木有：" class="headerlink" title="情景2：在同一个dimension维度下，如：tier。若app中有某个flavor但library却木有："></a>情景2：在同一个dimension维度下，如：tier。若app中有某个flavor但library却木有：</h3><p>同样可以通过<code>matchingFallbacks</code>属性来设置回退策略，代码如下：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// In the app's build.gradle file.</span></span><br><span class="line">android &#123;</span><br><span class="line">    defaultConfig&#123;</span><br><span class="line">    <span class="comment">// Do not configure matchingFallbacks in the defaultConfig block.</span></span><br><span class="line">    <span class="comment">// Instead, you must specify fallbacks for a given product flavor in the</span></span><br><span class="line">    <span class="comment">// productFlavors block, as shown below.</span></span><br><span class="line">    &#125;</span><br><span class="line">    flavorDimensions <span class="string">'tier'</span></span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        paid &#123;</span><br><span class="line">            dimension <span class="string">'tier'</span></span><br><span class="line">            <span class="comment">// Because the dependency already includes a "paid" flavor in its</span></span><br><span class="line">            <span class="comment">// "tier" dimension, you don't need to provide a list of fallbacks</span></span><br><span class="line">            <span class="comment">// for the "paid" flavor.</span></span><br><span class="line">        &#125;</span><br><span class="line">        free &#123;</span><br><span class="line">            dimension <span class="string">'tier'</span></span><br><span class="line">            <span class="comment">// Specifies a sorted list of fallback flavors that the plugin</span></span><br><span class="line">            <span class="comment">// should try to use when a dependency's matching dimension does</span></span><br><span class="line">            <span class="comment">// not include a "free" flavor. You may specify as many</span></span><br><span class="line">            <span class="comment">// fallbacks as you like, and the plugin selects the first flavor</span></span><br><span class="line">            <span class="comment">// that's available in the dependency's "tier" dimension.</span></span><br><span class="line">            matchingFallbacks = [<span class="string">'demo'</span>, <span class="string">'trial'</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>（注意：在该情景下，若library中有某个flavor但app却木有，不会对app有任何影响）</strong></p>
+<h3 id="情景3：library中有某个dimension维度，但app中却没有"><a href="#情景3：library中有某个dimension维度，但app中却没有" class="headerlink" title="情景3：library中有某个dimension维度，但app中却没有:"></a>情景3：library中有某个dimension维度，但app中却没有:</h3><p>可以通过<code>missingDimensionStrategy</code>属性来设置选择策略，代码如下：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// In the app's build.gradle file.</span></span><br><span class="line">android &#123;</span><br><span class="line">    defaultConfig&#123;</span><br><span class="line">    <span class="comment">// Specifies a sorted list of flavors that the plugin should try to use from</span></span><br><span class="line">    <span class="comment">// a given dimension. The following tells the plugin that, when encountering</span></span><br><span class="line">    <span class="comment">// a dependency that includes a "minApi" dimension, it should select the</span></span><br><span class="line">    <span class="comment">// "minApi18" flavor. You can include additional flavor names to provide a</span></span><br><span class="line">    <span class="comment">// sorted list of fallbacks for the dimension.</span></span><br><span class="line">    missingDimensionStrategy <span class="string">'minApi'</span>, <span class="string">'minApi18'</span>, <span class="string">'minApi23'</span></span><br><span class="line">    &#125;</span><br><span class="line">    flavorDimensions <span class="string">'tier'</span></span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        free &#123;</span><br><span class="line">            dimension <span class="string">'tier'</span></span><br><span class="line">            <span class="comment">// You can override the default selection at the product flavor</span></span><br><span class="line">            <span class="comment">// level by configuring another missingDimensionStrategy property</span></span><br><span class="line">            <span class="comment">// for the "minApi" dimension.</span></span><br><span class="line">            missingDimensionStrategy <span class="string">'minApi'</span>, <span class="string">'minApi23'</span>, <span class="string">'minApi18'</span></span><br><span class="line">        &#125;</span><br><span class="line">        paid &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明：其中<code>missingDimensionStrategy</code>属性的第一个值为dimension维度，后面的Strings为该维度下的渠道flavors。我们可以看下它的函数原型：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">missingDimensionStrategy</span><span class="params">(String dimension, String requestedValue)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">missingDimensionStrategy</span><span class="params">(String dimension, String... requestedValues)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">missingDimensionStrategy</span><span class="params">(String dimension, List&lt;String&gt; requestedValues)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>（注意：在该情景下，若app中有某个dimension维度，但library中却没有，不会对app有任何影响）</strong></p>
+<h3 id="情景4：若library没有任何dimension和flavor，则不需app做任何flavor的回退处理"><a href="#情景4：若library没有任何dimension和flavor，则不需app做任何flavor的回退处理" class="headerlink" title="情景4：若library没有任何dimension和flavor，则不需app做任何flavor的回退处理~"></a>情景4：若library没有任何dimension和flavor，则不需app做任何flavor的回退处理~</h3><p>说了这么多种场景，是不是快被绕晕了？其实诸如dimension的声明以及提供匹配回退策略都是为了实现精确的variant匹配。但是这么多的场景咋看之下还是比较晕，在遇到具体的业务依赖场景后再回来看这一块的内容，你会更加的有收获~</p>
+<h2 id="Java8特性的支持"><a href="#Java8特性的支持" class="headerlink" title="Java8特性的支持"></a>Java8特性的支持</h2><p>升级到Gradle Plugin 3.0.0之后，一直被诟病的<code>Jack</code>已经被官方弃用了，取而代之的是最新的<code>desugar</code>方案。</p>
+<p>若项目之前用了类似<code>retrolambda</code>或者<code>Jack</code>这种旧方案的话，会出现以下提示告诉你移除相关的代码：</p>
+<blockquote>
+<p>Warning:One of the plugins you are using supports Java 8 language features. To try the support built into the Android plugin, remove the following from your build.gradle: apply plugin: ‘me.tatarka.retrolambda’ To learn more, go to <a href="https://d.android.com/r/tools/java-8-support-message.html" target="_blank" rel="noopener">https://d.android.com/r/tools/java-8-support-message.html</a></p>
+</blockquote>
+<p>启用最新的<code>desugar</code>也非常简单，设置一下<code>sourceCompatibility</code>和<code>targetCompatibility</code>即可：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">// Configure only for each module that uses Java 8</span></span><br><span class="line">  <span class="comment">// language features (either in its source code or</span></span><br><span class="line">  <span class="comment">// through dependencies).</span></span><br><span class="line">  compileOptions &#123;</span><br><span class="line">    <span class="keyword">sourceCompatibility</span> JavaVersion.VERSION_1_8</span><br><span class="line">    <span class="keyword">targetCompatibility</span> JavaVersion.VERSION_1_8</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>目前所支持Java8的特性有：</p>
+<ul>
+<li>Lambda expressions</li>
+<li>Method References</li>
+<li>Type Annotations</li>
+<li>Default and static interface methods</li>
+<li>Repeating annotations</li>
+</ul>
+<p><strong>（注意：stream及function包下的api只能在API level 24+以上才可以使用）</strong></p>
+<p>禁用该特性也是分分钟的事情：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">android.enableDesugar=<span class="keyword">false</span></span><br></pre></td></tr></table></figure>
+
+<p>官方文档：<br><a href="https://developer.android.com/studio/write/java8-support.html" target="_blank" rel="noopener">https://developer.android.com/studio/write/java8-support.html</a></p>
+<h2 id="android-apt相关的异常"><a href="#android-apt相关的异常" class="headerlink" title="android-apt相关的异常"></a>android-apt相关的异常</h2><p>最后的最后很多同学会遇到以下关于<code>android-apt</code>的报错：</p>
+<p>解决方法：</p>
+<ul>
+<li><p>移除<code>android-apt</code>相关的plugin，如：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">classpath</span> <span class="string">'com.neenbedankt.gradle.plugins:android-apt:1.8'</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>依赖中的<code>apt</code>改成<code>annotationProcessor</code>，如：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">annotationProcessor <span class="string">'com.android.databinding:compiler:3.0.0'</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果有用到类似Realm这种第三方的plugin，确保升级到最新版试试（旧版的Realm用的还是<code>android-apt</code>），突然发现升级到最新版后api接口被改了，泪奔中…</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">buildscript</span> &#123;</span><br><span class="line">    <span class="keyword">repositories</span> &#123;</span><br><span class="line">        jcenter()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">dependencies</span> &#123;</span><br><span class="line">        <span class="keyword">classpath</span> <span class="string">"io.realm:realm-gradle-plugin:4.2.0"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h2><p>还有更多的迁移变化，由于项目中还没涉及到，就先不写了，大家可以参考官方文档：<br><a href="https://developer.android.com/studio/build/gradle-plugin-3-0-0-migration.html" target="_blank" rel="noopener">https://developer.android.com/studio/build/gradle-plugin-3-0-0-migration.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Android-Studio/" rel="tag"># Android Studio</a>
+          
+            <a href="/tags/Gradle/" rel="tag"># Gradle</a>
+          
+            <a href="/tags/Gradle-Plugin/" rel="tag"># Gradle Plugin</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/anr-trace-analytics/" rel="next" title="关于ANR异常捕获与分析，你所需要知道的一切">
+                <i class="fa fa-chevron-left"></i> 关于ANR异常捕获与分析，你所需要知道的一切
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/open-source-project-andlinker/" rel="prev" title="开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava">
+                开源了一款Android的IPC库AndLinker，结合了AIDL和Retrofit的特性，支持RxJava <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Gradle版本升级"><span class="nav-number">1.</span> <span class="nav-text">Gradle版本升级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成APK文件名属性outputFile变为只读"><span class="nav-number">2.</span> <span class="nav-text">生成APK文件名属性outputFile变为只读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖关键字的改变"><span class="nav-number">3.</span> <span class="nav-text">依赖关键字的改变</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#渠道需要声明flavor-dimensions"><span class="nav-number">4.</span> <span class="nav-text">渠道需要声明flavor dimensions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#库多variant依赖方式的修改"><span class="nav-number">5.</span> <span class="nav-text">库多variant依赖方式的修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理app与lib的依赖匹配问题"><span class="nav-number">6.</span> <span class="nav-text">处理app与lib的依赖匹配问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#情形1：app中有某个build-type但library却木有"><span class="nav-number">6.1.</span> <span class="nav-text">情形1：app中有某个build type但library却木有</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#情景2：在同一个dimension维度下，如：tier。若app中有某个flavor但library却木有："><span class="nav-number">6.2.</span> <span class="nav-text">情景2：在同一个dimension维度下，如：tier。若app中有某个flavor但library却木有：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#情景3：library中有某个dimension维度，但app中却没有"><span class="nav-number">6.3.</span> <span class="nav-text">情景3：library中有某个dimension维度，但app中却没有:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#情景4：若library没有任何dimension和flavor，则不需app做任何flavor的回退处理"><span class="nav-number">6.4.</span> <span class="nav-text">情景4：若library没有任何dimension和flavor，则不需app做任何flavor的回退处理~</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java8特性的支持"><span class="nav-number">7.</span> <span class="nav-text">Java8特性的支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#android-apt相关的异常"><span class="nav-number">8.</span> <span class="nav-text">android-apt相关的异常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更多"><span class="nav-number">9.</span> <span class="nav-text">更多</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

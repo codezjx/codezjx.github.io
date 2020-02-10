@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,NDK,FFmpeg,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="这段时间开始研究音视频编解码的相关知识，自然少不了学习FFmpeg这个开源项目。网上编译FFmpeg源码有很多教程，但是大部分都过时了，编译的时候还会遇到一大堆错误，踩了不少坑。因此总结了此文章，方便大家后续查阅。 下载NDK和FFmpeg编译Android平台的FFmpeg需要下载NDK和FFmpeg源码： 首先下载NDK，目前官方最新稳定版是r20的版本，但是建议不要下最新的。这里我们为了顺利">
+<meta name="keywords" content="Android,NDK,FFmpeg">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Mac上编译基于Android平台的FFmpeg源码">
+<meta property="og:url" content="http://yoursite.com/posts/compile-ffmpeg-android/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="这段时间开始研究音视频编解码的相关知识，自然少不了学习FFmpeg这个开源项目。网上编译FFmpeg源码有很多教程，但是大部分都过时了，编译的时候还会遇到一大堆错误，踩了不少坑。因此总结了此文章，方便大家后续查阅。 下载NDK和FFmpeg编译Android平台的FFmpeg需要下载NDK和FFmpeg源码： 首先下载NDK，目前官方最新稳定版是r20的版本，但是建议不要下最新的。这里我们为了顺利">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-06-21T12:55:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Mac上编译基于Android平台的FFmpeg源码">
+<meta name="twitter:description" content="这段时间开始研究音视频编解码的相关知识，自然少不了学习FFmpeg这个开源项目。网上编译FFmpeg源码有很多教程，但是大部分都过时了，编译的时候还会遇到一大堆错误，踩了不少坑。因此总结了此文章，方便大家后续查阅。 下载NDK和FFmpeg编译Android平台的FFmpeg需要下载NDK和FFmpeg源码： 首先下载NDK，目前官方最新稳定版是r20的版本，但是建议不要下最新的。这里我们为了顺利">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/compile-ffmpeg-android/">
+
+
+
+
+
+  <title>在Mac上编译基于Android平台的FFmpeg源码 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/compile-ffmpeg-android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在Mac上编译基于Android平台的FFmpeg源码</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-21T20:23:46+08:00">
+                2019-06-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/FFmpeg/" itemprop="url" rel="index">
+                    <span itemprop="name">FFmpeg</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这段时间开始研究音视频编解码的相关知识，自然少不了学习FFmpeg这个开源项目。网上编译FFmpeg源码有很多教程，但是大部分都过时了，编译的时候还会遇到一大堆错误，踩了不少坑。因此总结了此文章，方便大家后续查阅。</p>
+<h2 id="下载NDK和FFmpeg"><a href="#下载NDK和FFmpeg" class="headerlink" title="下载NDK和FFmpeg"></a>下载NDK和FFmpeg</h2><p>编译Android平台的FFmpeg需要下载NDK和FFmpeg源码：</p>
+<p>首先下载NDK，目前官方最新稳定版是r20的版本，但是建议不要下最新的。这里我们为了顺利编译，可以下载r17及以下的版本，这里我们下载了<a href="https://dl.google.com/android/repository/android-ndk-r17c-darwin-x86_64.zip" target="_blank" rel="noopener">r17c</a>版本，为什么？请看后面的报错处理环节。</p>
+<p>然后去<a href="https://ffmpeg.org/download.html" target="_blank" rel="noopener">FFmepg官网</a>下载最新的源码，目前最新版是<a href="https://ffmpeg.org/releases/ffmpeg-4.1.3.tar.bz2" target="_blank" rel="noopener">ffmpeg-4.1.3.tar.bz2</a>。</p>
+<h2 id="编写configure配置脚本"><a href="#编写configure配置脚本" class="headerlink" title="编写configure配置脚本"></a>编写configure配置脚本</h2><p>编译FFmpeg源码需要通过configure脚本来进行配置，后期根据项目需求可对FFmpeg进行各种裁剪，因此我们可以通过配置脚本来实现。通过指令<code>./configure --help</code>我们可以查看所支持的配置项，网上很多文章有介绍这里就不展开了。</p>
+<p>新建<code>build_android.sh</code>文件，并输入以下脚本内容来帮助我们编译FFmpeg。注意更新下第一行的NDK路径修改为你本地下载的r17c路径即可：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">NDK=/Users/codezjx/Android/android-ndk-r17c</span><br><span class="line">SYSROOT=$NDK/platforms/android-21/arch-arm</span><br><span class="line">ISYSROOT=$NDK/sysroot</span><br><span class="line">ASM=$ISYSROOT/usr/include/arm-linux-androideabi</span><br><span class="line">TOOLCHAIN=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64</span><br><span class="line">PREFIX=$(pwd)/android/armv7-a</span><br><span class="line">CROSS_PREFIX=$TOOLCHAIN/bin/arm-linux-androideabi-</span><br><span class="line"></span><br><span class="line">build_android()</span><br><span class="line">&#123;</span><br><span class="line">    ./configure \</span><br><span class="line">    --prefix=$PREFIX \</span><br><span class="line">    --enable-shared \</span><br><span class="line">    --disable-static \</span><br><span class="line">    --disable-doc \</span><br><span class="line">    --disable-ffmpeg \</span><br><span class="line">    --disable-ffplay \</span><br><span class="line">    --disable-ffprobe \</span><br><span class="line">    --disable-avdevice \</span><br><span class="line">    --disable-symver \</span><br><span class="line">    --cross-prefix=$CROSS_PREFIX \</span><br><span class="line">    --target-os=android \</span><br><span class="line">    --arch=arm \</span><br><span class="line">    --enable-cross-compile \</span><br><span class="line">    --sysroot=$SYSROOT \</span><br><span class="line">    --extra-cflags="-I$ASM -isysroot $ISYSROOT -D__ANDROID_API__=21 -Os -fpic -marm -march=armv7-a"</span><br><span class="line">    make clean</span><br><span class="line">    make</span><br><span class="line">    make install</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">build_android</span><br></pre></td></tr></table></figure>
+
+<h2 id="执行编译并生成-so文件"><a href="#执行编译并生成-so文件" class="headerlink" title="执行编译并生成.so文件"></a>执行编译并生成.so文件</h2><p>执行以下指令开始编译FFmpeg</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ chmod +x build_android.sh</span><br><span class="line">$ ./build_android.sh</span><br></pre></td></tr></table></figure>
+
+<p>若最后没有报错，显示以下log，则证明编译成功，会在<code>android/armv7-a</code>下生生成我们需要的.so库和相关的头文件，这个路径也正是我们在<code>--prefix</code>中配置的路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">INSTALL libavutil/twofish.h</span><br><span class="line">INSTALL libavutil/version.h</span><br><span class="line">INSTALL libavutil/xtea.h</span><br><span class="line">INSTALL libavutil/tea.h</span><br><span class="line">INSTALL libavutil/lzo.h</span><br><span class="line">INSTALL libavutil/avconfig.h</span><br><span class="line">INSTALL libavutil/ffversion.h</span><br><span class="line">INSTALL libavutil/libavutil.pc</span><br></pre></td></tr></table></figure>
+
+<p>最终<code>android/armv7-a</code>的目录结构大概是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">├── include</span><br><span class="line">│   ├── libavcodec</span><br><span class="line">│   ├── libavfilter</span><br><span class="line">│   ├── libavformat</span><br><span class="line">│   ├── libavutil</span><br><span class="line">│   ├── libswresample</span><br><span class="line">│   └── libswscale</span><br><span class="line">├── lib</span><br><span class="line">│   ├── libavcodec.so</span><br><span class="line">│   ├── libavfilter.so</span><br><span class="line">│   ├── libavformat.so</span><br><span class="line">│   ├── libavutil.so</span><br><span class="line">│   ├── libswresample.so</span><br><span class="line">│   ├── libswscale.so</span><br><span class="line">│   └── pkgconfig</span><br><span class="line">└── share</span><br><span class="line">    └── ffmpeg</span><br></pre></td></tr></table></figure>
+
+<h2 id="踩坑环节"><a href="#踩坑环节" class="headerlink" title="踩坑环节"></a>踩坑环节</h2><p>由于我们这里编译的是最新的FFmpeg源码，网上的脚本很多都过时了，要不就是跟NDK版本不搭，编译的时候会遇到很多问题，这里列出我编译时遇到的一些问题，这样大家也能更清晰的知道为什么上面的<code>build_android.sh</code>要这么配置。</p>
+<blockquote>
+<p>Tips：在编译FFmpeg的时候难免会遇到很多问题，控制台的错误信息可能不够详细，这个时候我们可以打开<code>ffbuild/config.log</code>这个log文件查看更细致的日志信息，可帮助我们更快的定位问题。</p>
+</blockquote>
+<h3 id="错误1：C-compiler-test-failed"><a href="#错误1：C-compiler-test-failed" class="headerlink" title="错误1：C compiler test failed."></a>错误1：C compiler test failed.</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/Users/codezjx/Android/android-sdk-macosx/ndk-bundle/toolchains/arm-linux-androideabi-4.9/</span><br><span class="line">prebuilt/darwin-x86_64/bin/arm-linux-androideabi-gcc is unable to create an executable file.</span><br><span class="line">C compiler test failed.</span><br></pre></td></tr></table></figure>
+
+<p>在NDK升级到r18及以后，官方移除了GCC采用了Clang作为默认的交叉编译器，具体可看这里<a href="https://github.com/android-ndk/ndk/wiki/Changelog-r18" target="_blank" rel="noopener">Changelog-r18</a>。而FFmpeg的编译默认选择的是GCC来进行编译，所以当configure脚本根据路径去查找<code>arm-linux-androideabi-gcc</code>这个可执行文件的时候，发现找不到了，这也是为啥上面我们选择r17c版本的NDK来编译的原因。</p>
+<h3 id="错误2：Unknown-option-“–disable-ffserver”"><a href="#错误2：Unknown-option-“–disable-ffserver”" class="headerlink" title="错误2：Unknown option “–disable-ffserver”"></a>错误2：Unknown option “–disable-ffserver”</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Unknown option &quot;--disable-ffserver&quot;.</span><br><span class="line">See ./configure --help for available options.</span><br></pre></td></tr></table></figure>
+
+<p>在FFmpeg4.0.x版本后已经移除掉<code>--disable-ffserver</code>这个配置项了，如果用的是网上的旧脚本，就会报这个错误，移除掉就好。</p>
+<h3 id="错误3：error-request-for-member-‘s-addr’-in-something-not-a-structure-or-union"><a href="#错误3：error-request-for-member-‘s-addr’-in-something-not-a-structure-or-union" class="headerlink" title="错误3：error: request for member ‘s_addr’ in something not a structure or union"></a>错误3：error: request for member ‘s_addr’ in something not a structure or union</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">libavformat/udp.c: In function &apos;udp_set_multicast_sources&apos;:</span><br><span class="line">libavformat/udp.c:290:28: error: request for member &apos;s_addr&apos; in something not a structure or union</span><br><span class="line">         mreqs.imr_multiaddr.s_addr = ((struct sockaddr_in *)addr)-&gt;sin_addr.s_addr;</span><br><span class="line">                            ^</span><br><span class="line">libavformat/udp.c:292:32: error: incompatible types when assigning to type &apos;__be32&apos; from type &apos;struct in_addr&apos;</span><br><span class="line">             mreqs.imr_interface= ((struct sockaddr_in *)local_addr)-&gt;sin_addr;</span><br><span class="line">                                ^</span><br><span class="line">libavformat/udp.c:294:32: error: request for member &apos;s_addr&apos; in something not a structure or union</span><br><span class="line">             mreqs.imr_interface.s_addr= INADDR_ANY;</span><br><span class="line">                                ^</span><br><span class="line">libavformat/udp.c:295:29: error: request for member &apos;s_addr&apos; in something not a structure or union</span><br><span class="line">         mreqs.imr_sourceaddr.s_addr = ((struct sockaddr_in *)&amp;sources[i])-&gt;sin_addr.s_addr;</span><br><span class="line">                             ^</span><br><span class="line">make: *** [libavformat/udp.o] Error 1</span><br></pre></td></tr></table></figure>
+
+<p>如果在<code>build_android.sh</code>脚本中使用的NDK版本是r15c或者r16b，就会报这个error，所以解决方法就是升级到r17及以上的版本就能解决。</p>
+<h3 id="错误4：No-such-file-or-directory"><a href="#错误4：No-such-file-or-directory" class="headerlink" title="错误4：No such file or directory"></a>错误4：No such file or directory</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CC  libavfilter/aeval.o</span><br><span class="line">In file included from libavfilter/aeval.c:26:0:</span><br><span class="line">./libavutil/avassert.h:30:20: fatal error: stdlib.h: No such file or directory</span><br><span class="line"> #include &lt;stdlib.h&gt;</span><br><span class="line">                    ^</span><br><span class="line">compilation terminated.</span><br><span class="line">make: *** [libavfilter/aeval.o] Error 1</span><br></pre></td></tr></table></figure>
+
+<p>这个错误是因为新版本NDK的机制引起的，因为NDK将头文件和库文件进行了分离，指定的<code>--sysroot</code>只有库文件，头文件放在NDK目录下的<code>sysroot</code>内，只需在<code>--extra-cflags</code>中添加 <code>-isysroot $NDK/sysroot</code>即可。除此之外有关汇编的头文件也进行了分离，需要根据目标平台进行指定<code>-I$NDK/sysroot/usr/include/arm-linux-androideabi</code>，将<code>arm-linux-androideabi</code>改为需要的平台就可以，后面这条也是添加到<code>--extra-cflags</code>中即可。</p>
+<h3 id="错误5：expected-identifier-or-‘-‘-before-numeric-constant"><a href="#错误5：expected-identifier-or-‘-‘-before-numeric-constant" class="headerlink" title="错误5：expected identifier or ‘(‘ before numeric constant"></a>错误5：expected identifier or ‘(‘ before numeric constant</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">libavcodec/aaccoder.c: In function &apos;search_for_ms&apos;:</span><br><span class="line">libavcodec/aaccoder.c:803:25: error: expected identifier or &apos;(&apos; before numeric constant</span><br><span class="line">                     int B0 = 0, B1 = 0;</span><br><span class="line">                         ^</span><br><span class="line">libavcodec/aaccoder.c:865:28: error: lvalue required as left operand of assignment</span><br><span class="line">                         B0 += b1+b2;</span><br><span class="line">                            ^</span><br><span class="line">libavcodec/aaccoder.c:866:25: error: &apos;B1&apos; undeclared (first use in this function)</span><br><span class="line">                         B1 += b3+b4;</span><br><span class="line">                         ^</span><br><span class="line">libavcodec/aaccoder.c:866:25: note: each undeclared identifier is reported only once for each function it appears in</span><br><span class="line">make: *** [libavcodec/aaccoder.o] Error 1</span><br></pre></td></tr></table></figure>
+
+<p>这个错误就比较悬了，跟NDK版本的变量名定义产生了冲突，在低版本的NDK是不会出现这个错误的。网上看了有一些解决方法是直接修改变量的名字-_-|||，这种方式过于暴力，以后更新FFmpeg源码的时候极有可能会产生代码冲突，感觉不是靠谱的解决方案。后面在FFmpeg官方的Reports中找到了这个错误的描述以及解决方法，其实也很简单，就是将<code>--target-os=linux</code>修改为<code>--target-os=android</code>即可，原因还有待考量，详见这里<a href="https://trac.ffmpeg.org/ticket/7130" target="_blank" rel="noopener">#7103</a>。</p>
+<h2 id="导入-so文件到Android项目"><a href="#导入-so文件到Android项目" class="headerlink" title="导入.so文件到Android项目"></a>导入.so文件到Android项目</h2><p>编译成功后，我们将拿到.so库和相关的头文件，这个时候就可以导入到Android项目中使用了。简单来说有以下几个步骤：</p>
+<h3 id="AS新建一个Native-C-类型的Project"><a href="#AS新建一个Native-C-类型的Project" class="headerlink" title="AS新建一个Native C++类型的Project"></a>AS新建一个Native C++类型的Project</h3><p>这里为了方便测试，我们直接新建一个C++类型的Project，Android Studio会帮我们生成好Native项目的目录结构和<code>CMakeLists.txt</code>文件。</p>
+<h3 id="导入-so和include头文件"><a href="#导入-so和include头文件" class="headerlink" title="导入.so和include头文件"></a>导入.so和include头文件</h3><p>将.so和include头文件分别拷贝到src对应的目录中，最后app的目录结构大致如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">├── CMakeLists.txt</span><br><span class="line">├── app.iml</span><br><span class="line">├── build.gradle</span><br><span class="line">├── proguard-rules.pro</span><br><span class="line">└── src</span><br><span class="line">    └── main</span><br><span class="line">        ├── AndroidManifest.xml</span><br><span class="line">        ├── cpp</span><br><span class="line">        │   ├── include</span><br><span class="line">        │   │   ├── libavcodec</span><br><span class="line">        │   │   ├── libavfilter</span><br><span class="line">        │   │   ├── libavformat</span><br><span class="line">        │   │   ├── libavutil</span><br><span class="line">        │   │   ├── libswresample</span><br><span class="line">        │   │   └── libswscale</span><br><span class="line">        │   └── native-lib.cpp</span><br><span class="line">        ├── java</span><br><span class="line">        ├── jniLibs</span><br><span class="line">        │   └── armeabi-v7a</span><br><span class="line">        │       ├── libavcodec.so</span><br><span class="line">        │       ├── libavfilter.so</span><br><span class="line">        │       ├── libavformat.so</span><br><span class="line">        │       ├── libavutil.so</span><br><span class="line">        │       ├── libswresample.so</span><br><span class="line">        │       └── libswscale.so</span><br><span class="line">        └── res</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改CMakeLists-txt"><a href="#修改CMakeLists-txt" class="headerlink" title="修改CMakeLists.txt"></a>修改CMakeLists.txt</h3><p>首先通过<code>include_directories</code>导入FFmpeg相关的头文件，然后通过<code>add_library()</code>和<code>set_target_properties()</code>方法添加需要导入的.so库，指定其具体位置。最后在<code>target_link_libraries()</code>中还要声明需要链接的库。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">add_library(...)</span><br><span class="line"></span><br><span class="line"><span class="meta">include_directories($</span><span class="bash">&#123;CMAKE_SOURCE_DIR&#125;/src/main/cpp/include)</span></span><br><span class="line"></span><br><span class="line">add_library(avcodec SHARED IMPORTED)</span><br><span class="line">set_target_properties( avcodec </span><br><span class="line">        PROPERTIES</span><br><span class="line">        IMPORTED_LOCATION $&#123;CMAKE_SOURCE_DIR&#125;/src/main/jniLibs/armeabi-v7a/libavcodec.so)</span><br><span class="line"></span><br><span class="line">add_library(avformat SHARED IMPORTED)</span><br><span class="line">set_target_properties( avformat</span><br><span class="line">        PROPERTIES</span><br><span class="line">        IMPORTED_LOCATION $&#123;CMAKE_SOURCE_DIR&#125;/src/main/jniLibs/armeabi-v7a/libavformat.so)</span><br><span class="line"></span><br><span class="line">add_library(avfilter SHARED IMPORTED)</span><br><span class="line">set_target_properties( avfilter</span><br><span class="line">        PROPERTIES</span><br><span class="line">        IMPORTED_LOCATION $&#123;CMAKE_SOURCE_DIR&#125;/src/main/jniLibs/armeabi-v7a/libavfilter.so )</span><br><span class="line"></span><br><span class="line">add_library(avutil SHARED IMPORTED)</span><br><span class="line">set_target_properties( avutil</span><br><span class="line">        PROPERTIES</span><br><span class="line">        IMPORTED_LOCATION $&#123;CMAKE_SOURCE_DIR&#125;/src/main/jniLibs/armeabi-v7a/libavutil.so )</span><br><span class="line"></span><br><span class="line">add_library(swresample SHARED IMPORTED)</span><br><span class="line">set_target_properties( swresample</span><br><span class="line">        PROPERTIES</span><br><span class="line">        IMPORTED_LOCATION $&#123;CMAKE_SOURCE_DIR&#125;/src/main/jniLibs/armeabi-v7a/libswresample.so )</span><br><span class="line"></span><br><span class="line">add_library(swscale SHARED IMPORTED)</span><br><span class="line">set_target_properties( swscale</span><br><span class="line">        PROPERTIES</span><br><span class="line">        IMPORTED_LOCATION $&#123;CMAKE_SOURCE_DIR&#125;/src/main/jniLibs/armeabi-v7a/libswscale.so )</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">target_link_libraries( # Specifies the target library.</span><br><span class="line">        native-lib</span><br><span class="line"></span><br><span class="line">        # Links the target library to the log library</span><br><span class="line">        # included in the NDK.</span><br><span class="line">        $&#123;log-lib&#125;</span><br><span class="line">        avcodec</span><br><span class="line">        avformat</span><br><span class="line">        avfilter</span><br><span class="line">        avutil</span><br><span class="line">        swresample</span><br><span class="line">        swscale</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Tips：注意下<code>${CMAKE_SOURCE_DIR}</code>代表了CMakeLists.txt当前所在的路径，不要设置错了。</p>
+</blockquote>
+<p>最后不要忘了在<code>build.gradle</code>中声明<code>abiFilters</code>，目前我们只编译了<code>armeabi-v7a</code>架构的.so库。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">defaultConfig &#123;</span><br><span class="line">    ...</span><br><span class="line">    ndk &#123;</span><br><span class="line">        abiFilters <span class="string">'armeabi-v7a'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改native-lib-cpp，调用FFmpeg相关函数"><a href="#修改native-lib-cpp，调用FFmpeg相关函数" class="headerlink" title="修改native-lib.cpp，调用FFmpeg相关函数"></a>修改native-lib.cpp，调用FFmpeg相关函数</h3><p>在demo代码中，我们随便导入一个FFmpeg的函数，看看是否能正常的运行。这里直接在原基础上增加一个<code>avcodec_configuration()</code>函数调用，看看是否能打印出config信息，这里一定要记得include相应的头文件。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;jni.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> &#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"libavcodec/avcodec.h"</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> JNIEXPORT jstring JNICALL</span><br><span class="line">Java_com_codezjx_ffmpegproject_MainActivity_stringFromJNI(</span><br><span class="line">        JNIEnv *env,</span><br><span class="line">        jobject <span class="comment">/* this */</span>) &#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> hello = avcodec_configuration();</span><br><span class="line">    <span class="keyword">return</span> env-&gt;NewStringUTF(hello.c_str());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行项目，最终在<code>MainActivity</code>界面中应该会输出以下信息，整个FFmpeg的编译及导入流程就结束了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">--prefix=/Users/codezjx/AndroidProjects/ffmpeg-4.1.3/android/armv7-a </span><br><span class="line">--enable-shared --disable-static --disable-doc --disable-ffmpeg </span><br><span class="line">--disable-ffplay --disable-ffprobe --disable-avdevice --disable-symver </span><br><span class="line">--cross-prefix=/Users/codezjx/Android/android-ndk-r17c/toolchains/</span><br><span class="line">arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi- </span><br><span class="line">--target-os=android --arch=arm --enable-cross-compile --sysroot=/Users/codezjx/</span><br><span class="line">Android/android-ndk-r17c/platforms/android-21/arch-arm --extra-cflags=&apos;-I/Users</span><br><span class="line">/codezjx/Android/android-ndk-r17c/sysroot/usr/include/arm-linux-androideabi </span><br><span class="line">-isysroot /Users/codezjx/Android/android-ndk-r17c/sysroot -D__ANDROID_API__=21 </span><br><span class="line">-Os -fpic -marm -march=armv7-a&apos;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/NDK/" rel="tag"># NDK</a>
+          
+            <a href="/tags/FFmpeg/" rel="tag"># FFmpeg</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/architecture-components-room/" rel="next" title="Architecture Components之Room初探">
+                <i class="fa fa-chevron-left"></i> Architecture Components之Room初探
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/scrcpy-source-code-analysis/" rel="prev" title="scrcpy投屏工具源码解析">
+                scrcpy投屏工具源码解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载NDK和FFmpeg"><span class="nav-number">1.</span> <span class="nav-text">下载NDK和FFmpeg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写configure配置脚本"><span class="nav-number">2.</span> <span class="nav-text">编写configure配置脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行编译并生成-so文件"><span class="nav-number">3.</span> <span class="nav-text">执行编译并生成.so文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#踩坑环节"><span class="nav-number">4.</span> <span class="nav-text">踩坑环节</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#错误1：C-compiler-test-failed"><span class="nav-number">4.1.</span> <span class="nav-text">错误1：C compiler test failed.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误2：Unknown-option-“–disable-ffserver”"><span class="nav-number">4.2.</span> <span class="nav-text">错误2：Unknown option “–disable-ffserver”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误3：error-request-for-member-‘s-addr’-in-something-not-a-structure-or-union"><span class="nav-number">4.3.</span> <span class="nav-text">错误3：error: request for member ‘s_addr’ in something not a structure or union</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误4：No-such-file-or-directory"><span class="nav-number">4.4.</span> <span class="nav-text">错误4：No such file or directory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#错误5：expected-identifier-or-‘-‘-before-numeric-constant"><span class="nav-number">4.5.</span> <span class="nav-text">错误5：expected identifier or ‘(‘ before numeric constant</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导入-so文件到Android项目"><span class="nav-number">5.</span> <span class="nav-text">导入.so文件到Android项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AS新建一个Native-C-类型的Project"><span class="nav-number">5.1.</span> <span class="nav-text">AS新建一个Native C++类型的Project</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#导入-so和include头文件"><span class="nav-number">5.2.</span> <span class="nav-text">导入.so和include头文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改CMakeLists-txt"><span class="nav-number">5.3.</span> <span class="nav-text">修改CMakeLists.txt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改native-lib-cpp，调用FFmpeg相关函数"><span class="nav-number">5.4.</span> <span class="nav-text">修改native-lib.cpp，调用FFmpeg相关函数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

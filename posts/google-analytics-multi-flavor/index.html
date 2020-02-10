@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Google Analytics,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="前言翻遍官方Android版Guide文档，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做广告系列来源的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现： 一、通过内置广告系列来源实现翻看Me">
+<meta name="keywords" content="Android,Google Analytics">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Google Analytics多渠道实现">
+<meta property="og:url" content="http://yoursite.com/posts/google-analytics-multi-flavor/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="前言翻遍官方Android版Guide文档，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做广告系列来源的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现： 一、通过内置广告系列来源实现翻看Me">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/posts/google-analytics-multi-flavor/20151226153109444.png">
+<meta property="og:image" content="http://yoursite.com/posts/google-analytics-multi-flavor/20151226153258276.png">
+<meta property="og:image" content="http://yoursite.com/posts/google-analytics-multi-flavor/20151226153406851.png">
+<meta property="og:image" content="http://yoursite.com/posts/google-analytics-multi-flavor/20151226153812713.png">
+<meta property="og:image" content="http://yoursite.com/posts/google-analytics-multi-flavor/20151226154032436.png">
+<meta property="og:updated_time" content="2017-08-07T15:06:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Google Analytics多渠道实现">
+<meta name="twitter:description" content="前言翻遍官方Android版Guide文档，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做广告系列来源的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现： 一、通过内置广告系列来源实现翻看Me">
+<meta name="twitter:image" content="http://yoursite.com/posts/google-analytics-multi-flavor/20151226153109444.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/google-analytics-multi-flavor/">
+
+
+
+
+
+  <title>Google Analytics多渠道实现 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/google-analytics-multi-flavor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Google Analytics多渠道实现</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-12-26T15:46:37+08:00">
+                2015-12-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Google-Analytics-Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Google Analytics Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>翻遍官方Android版<a href="https://developers.google.com/analytics/devguides/collection/android/v4/" target="_blank" rel="noopener">Guide文档</a>，你会发现一点多渠道相关的描述都木有。原因是GA（Google Analytics）里面没有多渠道这个概念，GA最初是从网页统计延伸到移动端的，在网页版的统计里面，有个叫做<strong>广告系列来源</strong>的东西，可以用来统计流量的来源。乍看之下，跟我们移动端的多渠道有点类似，用来统计不同市场的数据。经过这段时间的使用，主要有2种方式实现：</p>
+<h2 id="一、通过内置广告系列来源实现"><a href="#一、通过内置广告系列来源实现" class="headerlink" title="一、通过内置广告系列来源实现"></a>一、通过内置<strong>广告系列来源</strong>实现</h2><p>翻看<a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#cs" target="_blank" rel="noopener">Measurement Protocol</a>协议文档，你可以找到<strong>广告系列来源</strong>相关的参数支持，可以使用cs这个字段用来标记指定我们的渠道。</p>
+<p>（什么是<code>Measurement Protocol</code>？它可让开发者通过 HTTP 请求直接向 Google Analytics（分析）服务器发送原始用户互动数据。这样，开发者就可以衡量在各种环境中用户与商家互动的情况。）<br><img src="20151226153109444.png" alt="这里写图片描述"></p>
+<ul>
+<li>具体到编码上，只需几行代码：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);</span><br><span class="line">mTracker = analytics.newTracker(R.xml.ga_tracker);</span><br><span class="line">mTracker.set(&quot;&amp;cs&quot;, &quot;Flavor&quot;);</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>后续所有通过此Tracker发送到后台的数据都会带有此来源标识，如上面的Flavor渠道来源</p>
+<ul>
+<li>在GA后台统计中（以<strong>事件</strong>这个数据项为例），我们可以选择一个<strong>次级维度</strong>：次级维度-&gt;数据获取-&gt;来源。此时，数据项会在主要维度的基础下进行二次维度分级（基本所有数据项都支持<strong>次级维度</strong>），如下图：<br><img src="20151226153258276.png" alt="这里写图片描述"></li>
+</ul>
+<h2 id="二、通过自定义维度实现"><a href="#二、通过自定义维度实现" class="headerlink" title="二、通过自定义维度实现"></a>二、通过<strong>自定义维度</strong>实现</h2><p>此外，除了使用系统内置的内置维度，我们还可以使用自定义的维度，这样的话会更加灵活。如何创建自定义维度此处不细讲，大家可以参考官方文档：<a href="https://support.google.com/analytics/answer/2709829" target="_blank" rel="noopener">创建和修改自定义维度和指标</a>和<a href="https://support.google.com/analytics/answer/2709828" target="_blank" rel="noopener">自定义维度和指标</a>。</p>
+<p>继续翻看<a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#cd_" target="_blank" rel="noopener">Measurement Protocol</a>协议文档，我们可以找到<strong>自定义维度</strong>相关的参数支持，使用cd这个参数字段。注意，这里每个新建的维度会有一个index，通过cd&lt;index&gt;这样的方式指定维度key。<br><img src="20151226153406851.png" alt="这里写图片描述"></p>
+<ul>
+<li><p>新建完自定义维度后，稍等片刻即可在<strong>次级维度</strong>中看到这个选项（这里我新建的维度名为Flavor），如下图：<br><img src="20151226153812713.png" alt="这里写图片描述"></p>
+</li>
+<li><p>接着把它设置到Tracker上即可，与上面类似（下面的1是index，对应Flavor这个自定义维度）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String flavorName = &quot;wandoujia&quot;;</span><br><span class="line">mTracker.set(&quot;&amp;cd1&quot;, flavorName );</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在GA后台统计中，同样以<strong>事件</strong>这个数据项为例，次级维度中选择我们自定义的维度，即可查看详细分级结果，如下图：<br><img src="20151226154032436.png" alt="这里写图片描述"></p>
+</li>
+</ul>
+<p>通过系统的自定义维度和指标，可以实现更多的个性化数据统计。例如文档中提到的：针对游戏开发者，“关卡完成度”或“最高得分”等指标就可能比屏幕浏览量等预定义的指标更贴合需求。同时自定义维度可以在自定义报告中显示为主要维度，你也可以在标准报告中将它们用作细分和次级维度。等等等…</p>
+<p>各位不仅要看Android Guide文档，还有GA帮助文档，还有API文档…才能全面、深入的了解GA这个神器…话说知乎网页端也是用GA来做数据统计的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Google-Analytics/" rel="tag"># Google Analytics</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/google-analytics-config/" rel="next" title="Google Analytics基本参数配置">
+                <i class="fa fa-chevron-left"></i> Google Analytics基本参数配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/google-analytics-custom-exception/" rel="prev" title="Google Analytics自定义异常格式">
+                Google Analytics自定义异常格式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一、通过内置广告系列来源实现"><span class="nav-number">2.</span> <span class="nav-text">一、通过内置广告系列来源实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、通过自定义维度实现"><span class="nav-number">3.</span> <span class="nav-text">二、通过自定义维度实现</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
