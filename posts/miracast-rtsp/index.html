@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Miracast,RTSP,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="RTSP概述在上一篇博客中我们已经通过Wi-Fi P2P建立好了Source和Sink端的TCP连接，在Miracast后续的音视频传输过程中，将采用RTSP协议来对流媒体进行控制。因此接下来的步骤就到了RTSP协商、会话建立及流媒体传输的阶段。首先，什么是RTSP协议呢？ 实时流协议（Real Time Streaming Protocol，RTSP）是一种网络应用协议，专为娱乐和通信系统的使用">
+<meta name="keywords" content="Android,Miracast,RTSP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Miracast技术详解（二）：RTSP协议">
+<meta property="og:url" content="http://yoursite.com/posts/miracast-rtsp/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="RTSP概述在上一篇博客中我们已经通过Wi-Fi P2P建立好了Source和Sink端的TCP连接，在Miracast后续的音视频传输过程中，将采用RTSP协议来对流媒体进行控制。因此接下来的步骤就到了RTSP协商、会话建立及流媒体传输的阶段。首先，什么是RTSP协议呢？ 实时流协议（Real Time Streaming Protocol，RTSP）是一种网络应用协议，专为娱乐和通信系统的使用">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-rtsp/wireshark.jpg">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-rtsp/capability-negotiation.jpg">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-rtsp/wfd-session.jpg">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-rtsp/wfd-timeline.jpg">
+<meta property="og:updated_time" content="2020-02-11T17:01:31.310Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Miracast技术详解（二）：RTSP协议">
+<meta name="twitter:description" content="RTSP概述在上一篇博客中我们已经通过Wi-Fi P2P建立好了Source和Sink端的TCP连接，在Miracast后续的音视频传输过程中，将采用RTSP协议来对流媒体进行控制。因此接下来的步骤就到了RTSP协商、会话建立及流媒体传输的阶段。首先，什么是RTSP协议呢？ 实时流协议（Real Time Streaming Protocol，RTSP）是一种网络应用协议，专为娱乐和通信系统的使用">
+<meta name="twitter:image" content="http://yoursite.com/posts/miracast-rtsp/wireshark.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/miracast-rtsp/">
+
+
+
+
+
+  <title>Miracast技术详解（二）：RTSP协议 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/miracast-rtsp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Miracast技术详解（二）：RTSP协议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-05T09:15:25+08:00">
+                2020-02-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Miracast/" itemprop="url" rel="index">
+                    <span itemprop="name">Miracast</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="RTSP概述"><a href="#RTSP概述" class="headerlink" title="RTSP概述"></a>RTSP概述</h2><p>在上一篇博客中我们已经通过Wi-Fi P2P建立好了Source和Sink端的TCP连接，在Miracast后续的音视频传输过程中，将采用RTSP协议来对流媒体进行控制。因此接下来的步骤就到了RTSP协商、会话建立及流媒体传输的阶段。首先，什么是RTSP协议呢？</p>
+<p>实时流协议<code>（Real Time Streaming Protocol，RTSP）</code>是一种网络应用协议，专为娱乐和通信系统的使用，以控制流媒体服务器。该协议用于创建和控制终端之间的媒体会话。媒体服务器的客户端发布VCR命令，例如播放，录制和暂停，以便于实时控制从服务器到客户端（视频点播）或从客户端到服务器（语音录音）的媒体流。</p>
+<p>流数据本身的传输不是RTSP的任务。大多数RTSP服务器使用实时传输协议（RTP）和实时传输控制协议（RTCP）结合媒体流传输。关于流媒体传输用到的协议与过程，我们将会在下一篇博客中进行详解。</p>
+<h2 id="抓包准备"><a href="#抓包准备" class="headerlink" title="抓包准备"></a>抓包准备</h2><p>要分析RTSP的指令协商过程，最好的方法就是抓取TCP的数据包，并进行分析。Android上可以采用<code>tcpdump</code>工具抓取TCP的包，然后通过<code>Wireshark</code>工具导入进行分析。具体的工具使用不在这里介绍，大家可自行查找。最终抓取到的数据包如下图所示，通过<code>Wireshark</code>的过滤功能我们可以很方便的过滤RTSP协议的数据包：</p>
+<p><img src="wireshark.jpg" alt></p>
+<h2 id="WFD能力协商（Capability-Negotiation）"><a href="#WFD能力协商（Capability-Negotiation）" class="headerlink" title="WFD能力协商（Capability Negotiation）"></a>WFD能力协商（Capability Negotiation）</h2><p>在Source和Sink端的TCP连接成功建立之后，会马上进入到RTSP能力协商的阶段，主要涉及到<code>RTSP M1-M4</code>指令，双方将按照以下顺序发送与处理消息。</p>
+<p><img src="capability-negotiation.jpg" alt></p>
+<h3 id="RTSP-M1-Messages"><a href="#RTSP-M1-Messages" class="headerlink" title="RTSP M1 Messages"></a>RTSP M1 Messages</h3><p>由Source端发起一个<code>RTSP OPTIONS M1</code>请求，以确认Sink端所支持的RTSP方法请求。Request和Response如下所示：</p>
+<p>Request(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">OPTIONS * RTSP/1.0\r\n</span><br><span class="line">Date: Wed, 11 Dec 2019 08:31:54 +0000\r\n</span><br><span class="line">Server: stagefright/1.2 (Linux;Android 8.1.0)\r\n</span><br><span class="line">CSeq: 1\r\n</span><br><span class="line">Require: org.wfa.wfd1.0\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Response(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">CSeq: 1\r\n</span><br><span class="line">Public: org.wfa.wfd1.0, GET_PARAMETER, SET_PARAMETER\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h3 id="RTSP-M2-Messages"><a href="#RTSP-M2-Messages" class="headerlink" title="RTSP M2 Messages"></a>RTSP M2 Messages</h3><p>在Sink回复完M1指令后，会由Sink端发起一个<code>RTSP OPTIONS M2</code>请求，以确认Source端所支持的RTSP方法请求。Request和Response如下所示：</p>
+<p>Request(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">OPTIONS * RTSP/1.0\r\n</span><br><span class="line">CSeq: 0\r\n</span><br><span class="line">User-Agent: wfdsinkemu\r\n</span><br><span class="line">Require: org.wfa.wfd1.0\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Response(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">Date: Wed, 11 Dec 2019 08:31:54 +0000\r\n</span><br><span class="line">Server: stagefright/1.2 (Linux;Android 8.1.0)\r\n</span><br><span class="line">CSeq: 0\r\n</span><br><span class="line">Public: org.wfa.wfd1.0, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h3 id="RTSP-M3-Messages"><a href="#RTSP-M3-Messages" class="headerlink" title="RTSP M3 Messages"></a>RTSP M3 Messages</h3><p>在Source端回复完M2指令后，会由Source端发起<code>GET_PARAMETER M3</code>请求，以查询Sink端的属性以及能力，所查询的属性列表在请求最后。</p>
+<p>Request(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">GET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n</span><br><span class="line">Date: Wed, 11 Dec 2019 08:31:54 +0000\r\n</span><br><span class="line">Server: stagefright/1.2 (Linux;Android 8.1.0)\r\n</span><br><span class="line">CSeq: 2\r\n</span><br><span class="line">Content-type: text/parameters</span><br><span class="line">Content-length: 83</span><br><span class="line">\r\n</span><br><span class="line">Line-based text data: text/parameters (4 lines)</span><br><span class="line">    wfd_content_protection\r\n</span><br><span class="line">    wfd_video_formats\r\n</span><br><span class="line">    wfd_audio_codecs\r\n</span><br><span class="line">    wfd_client_rtp_ports\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Sink端回复M3指令，告诉Source端自身支持的属性及能力，比较重要的几个属性：RTP端口号<code>wfd_client_rtp_ports</code>（传输流媒体用）、所支持的audio及video编解码格式<code>wfd_audio_codecs</code>，<code>wfd_video_formats</code>等…</p>
+<p>Response(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">CSeq: 2\r\n</span><br><span class="line">Content-type: text/parameters</span><br><span class="line">Content-length: 848</span><br><span class="line">\r\n</span><br><span class="line">Line-based text data: text/parameters (7 lines)</span><br><span class="line">    wfd_client_rtp_ports: RTP/AVP/UDP;unicast 20011 0 mode=play\r\n</span><br><span class="line">    wfd_audio_codecs: LPCM 00000002 00, AAC 00000001 00\r\n</span><br><span class="line">    wfd_video_formats: 78 00 01 01 00008400 00000000 00000000 00 0000 0000 00 none none\r\n</span><br><span class="line">    wfd_connector_type: 07\r\n</span><br><span class="line">    wfd_uibc_capability: none\r\n</span><br><span class="line">    wfd_content_protection: none\r\n</span><br><span class="line">    wfd_idr_request_capability: 1\r\n</span><br></pre></td></tr></table></figure>
+
+<h3 id="RTSP-M4-Messages"><a href="#RTSP-M4-Messages" class="headerlink" title="RTSP M4 Messages"></a>RTSP M4 Messages</h3><p>基于Sink端回复的M3指令，将由Source端发起<code>SET_PARAMETER M4</code>指令，以最终设置此次会话里的最佳参数集（收发双方都支持的编解码器类型等等）</p>
+<p>Request(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">SET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n</span><br><span class="line">Date: Wed, 11 Dec 2019 08:31:54 +0000\r\n</span><br><span class="line">Server: stagefright/1.2 (Linux;Android 8.1.0)\r\n</span><br><span class="line">CSeq: 3\r\n</span><br><span class="line">Content-type: text/parameters</span><br><span class="line">Content-length: 247</span><br><span class="line">\r\n</span><br><span class="line">Line-based text data: text/parameters (4 lines)</span><br><span class="line">    wfd_video_formats: 00 00 01 01 00000400 00000000 00000000 00 0000 0000 00 none none\r\n</span><br><span class="line">    wfd_audio_codecs: AAC 00000001 00\r\n</span><br><span class="line">    wfd_presentation_URL: rtsp://192.168.49.5/wfd1.0/streamid=0 none\r\n</span><br><span class="line">    wfd_client_rtp_ports: RTP/AVP/UDP;unicast 20011 0 mode=play\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Response(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">CSeq: 3\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h2 id="WFD会话建立（Session-Establishment）"><a href="#WFD会话建立（Session-Establishment）" class="headerlink" title="WFD会话建立（Session Establishment）"></a>WFD会话建立（Session Establishment）</h2><p>在Sink回复完M4指令后，能力协商的过程就结束了，下一步则是WFD会话建立过程，主要涉及到<code>RTSP M5-M7</code>指令。双方将按照以下顺序发送与处理消息。</p>
+<p><img src="wfd-session.jpg" alt></p>
+<h3 id="RTSP-M5-Messages"><a href="#RTSP-M5-Messages" class="headerlink" title="RTSP M5 Messages"></a>RTSP M5 Messages</h3><p>由Source端发起<code>SET_PARAMETER M5</code>请求，通过<code>wfd_trigger_method</code>参数触发Sink端向Source端进行<code>SETUP、PLAY、PAUSE、TEARDOWN</code>等请求。如下M5 Request中设置了<code>SETUP</code>触发请求。</p>
+<p>Request(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n</span><br><span class="line">Date: Wed, 11 Dec 2019 08:31:54 +0000\r\n</span><br><span class="line">Server: stagefright/1.2 (Linux;Android 8.1.0)\r\n</span><br><span class="line">CSeq: 4\r\n</span><br><span class="line">Content-type: text/parameters</span><br><span class="line">Content-length: 27</span><br><span class="line">\r\n</span><br><span class="line">Line-based text data: text/parameters (1 lines)</span><br><span class="line">    wfd_trigger_method: SETUP\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Sink端则正常回复，表示自己已经收到<code>SETUP</code>触发请求即可。</p>
+<p>Response(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">CSeq: 4\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h3 id="RTSP-M6-Messages"><a href="#RTSP-M6-Messages" class="headerlink" title="RTSP M6 Messages"></a>RTSP M6 Messages</h3><p>上面说到了M5 Request中设置了<code>SETUP</code>触发请求，则此时应该由Sink端主动发送<code>SETUP M6</code>请求：</p>
+<p>Request(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SETUP rtsp://192.168.49.5/wfd1.0/streamid=0 RTSP/1.0\r\n</span><br><span class="line">CSeq: 1\r\n</span><br><span class="line">Transport: RTP/AVP/UDP;unicast;client_port=20011</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<p>此时Source端将完成RTSP会话的创建，并返回Session ID：</p>
+<p>Response(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">Date: Wed, 11 Dec 2019 08:31:55 +0000\r\n</span><br><span class="line">Server: stagefright/1.2 (Linux;Android 8.1.0)\r\n</span><br><span class="line">CSeq: 1\r\n</span><br><span class="line">Session: 1804289383;timeout=30</span><br><span class="line">Transport: RTP/AVP/UDP;unicast;client_port=20011;server_port=26466</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h3 id="RTSP-M7-Messages"><a href="#RTSP-M7-Messages" class="headerlink" title="RTSP M7 Messages"></a>RTSP M7 Messages</h3><p>经过M6指令交互后，RTSP会话已经完成创建。此时将由Sink端发送<code>PLAY M7</code>请求，告诉发送端可以开始发送流媒体数据了：</p>
+<p>Request(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PLAY rtsp://192.168.49.5/wfd1.0/streamid=0 RTSP/1.0\r\n</span><br><span class="line">CSeq: 2\r\n</span><br><span class="line">Session: 1804289383;timeout=30</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Source端回复M7指令，并且状态是<code>200 OK</code>时，WFD Session成功建立。</p>
+<p>Response(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">Date: Wed, 11 Dec 2019 08:31:55 +0000\r\n</span><br><span class="line">Server: stagefright/1.2 (Linux;Android 8.1.0)\r\n</span><br><span class="line">CSeq: 2\r\n</span><br><span class="line">Session: 1804289383;timeout=30</span><br><span class="line">Range: npt=now-\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<p>经过以上<code>M1-M7</code>的指令交互，且成功创建WFD会话后，Source与Sink端的协商及会话过程已完成。这个时候Source端会按照Sink指定的UDP端口发送RTP数据包，包含音视频数据。</p>
+<h2 id="WFD长连接（keep-alive）"><a href="#WFD长连接（keep-alive）" class="headerlink" title="WFD长连接（keep-alive）"></a>WFD长连接（keep-alive）</h2><p>WFD内的长连接机制主要是为了确保WFD会话处于正常的状态，有点类似于TCP长连接的心跳机制，若超时，则Source或Sink端应该断开相关的RTSP与RTP连接。根据官方文档的介绍，我们需要注意以下几点：</p>
+<ul>
+<li><p>超时的设置：Source端可以在M6的Reponse中设置<code>timeout</code>参数，以指定超时时间，格式详见上述M6 Response</p>
+</li>
+<li><p>Source端需要定期发送M16指令</p>
+</li>
+<li><p>Sink端在收到M16指令后要马上进行回复</p>
+</li>
+<li><p>若Source端在指定的超时时间内未收到至少一条M16响应消息，则Source端会主动断开RTSP与RTP连接</p>
+</li>
+<li><p>若Sink端在指定的超时时间内未收到至少一条M16请求消息，则Sink端应该主动断开RTSP与RTP连接</p>
+</li>
+<li><p>默认超时时间为60秒，如果需要自己指定，则值应该&gt;10秒</p>
+</li>
+</ul>
+<p>因此，作为Sink端，我们在收到M16指令后，需要马上进行回复，否则可能面临连接断开的风险。而且，当达到一定的超时时间后没有收到Source端的M16请求，我们也应该主动断开连接，超时时间可以通过<code>timeout</code>属性获取。（刚开始写demo的时候就是忘了这一步，导致连接过一段时间就会断掉，看了官方文档后才发现超时这个问题）</p>
+<h3 id="RTSP-M16-Messages"><a href="#RTSP-M16-Messages" class="headerlink" title="RTSP M16 Messages"></a>RTSP M16 Messages</h3><p>M16请求由Source端发起，此消息为一个空的<code>GET_PARAMETER</code>请求</p>
+<p>Request(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET_PARAMETER rtsp://localhost/wfd1.0 RTSP/1.0\r\n</span><br><span class="line">CSeq: 5\r\n</span><br><span class="line">Session: 1804289383</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Sink端收到后进行<code>200 OK</code>回复即可</p>
+<p>Response(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">CSeq: 5\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h2 id="关闭会话"><a href="#关闭会话" class="headerlink" title="关闭会话"></a>关闭会话</h2><p>在<code>RTSP M5 Messages</code>这一节中，我们谈到会由Source端发起<code>SET_PARAMETER M5</code>请求，触发Sink端发送<code>TEARDOWN</code>请求。该请求可以使得Source与Sink端的RTSP及RTP连接断开。</p>
+<h3 id="RTSP-M8-Messages"><a href="#RTSP-M8-Messages" class="headerlink" title="RTSP M8 Messages"></a>RTSP M8 Messages</h3><ul>
+<li>场景1：Source端主动关闭会话：</li>
+</ul>
+<p>首先会由Source发送M5请求，并且<code>wfd_trigger_method</code>的值为<code>TEARDOWN</code>，触发Sink端发送<code>TEARDOWN M8</code>指令：</p>
+<ul>
+<li>场景2：Sink端主动关闭会话：</li>
+</ul>
+<p>Sink端直接发送<code>TEARDOWN M8</code>指令</p>
+<p>Request(Sink -&gt; Source)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">TEARDOWN rtsp://192.168.49.5/wfd1.0/streamid=0 RTSP/1.0\r\n</span><br><span class="line">CSeq: 3\r\n</span><br><span class="line">Session: 1804289383</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<p>Response(Source -&gt; Sink)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">CSeq: 3\r\n</span><br><span class="line">Date: Tue, Dec 17 2019 07:20:28 GMT\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>针对Miracast RTSP协商、会话建立及流媒体传输，我们来进行一下总结。</p>
+<ul>
+<li>在Source和Sink端的TCP连接成功建立之后，会马上进入到RTSP能力协商的阶段，主要涉及到<code>M1-M4</code>指令</li>
+<li>能力协商的过程结束后，下一步则是WFD会话建立过程，主要涉及到<code>M5-M7</code>指令</li>
+<li>WFD会话成功建立后，将由Source端通过UDP连接发送RTP音视频数据包</li>
+<li>通过<code>PAUSE、PLAY、TEARDOWN</code>等指令控制音视频流暂停、播放、关闭</li>
+<li>通过<code>M16</code>指令来维持WFD长连接，确保会话处于正常的状态</li>
+</ul>
+<p>我们可以使用下图来对整个WFD会话的生命周期进行总结：</p>
+<p><img src="wfd-timeline.jpg" alt></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>Wi-Fi_Display_Technical_Specification_v2.1_0.pdf</p>
+<ul>
+<li>4.6 WFD Capability Negotiation</li>
+<li>4.8 WFD session establishment</li>
+<li>6.4 RTSP Messages</li>
+<li>6.5.1 WFD keep-alive</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Miracast/" rel="tag"># Miracast</a>
+          
+            <a href="/tags/RTSP/" rel="tag"># RTSP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/miracast-wifi-display/" rel="next" title="Miracast技术详解（一）：Wi-Fi Display">
+                <i class="fa fa-chevron-left"></i> Miracast技术详解（一）：Wi-Fi Display
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RTSP概述"><span class="nav-number">1.</span> <span class="nav-text">RTSP概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包准备"><span class="nav-number">2.</span> <span class="nav-text">抓包准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD能力协商（Capability-Negotiation）"><span class="nav-number">3.</span> <span class="nav-text">WFD能力协商（Capability Negotiation）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M1-Messages"><span class="nav-number">3.1.</span> <span class="nav-text">RTSP M1 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M2-Messages"><span class="nav-number">3.2.</span> <span class="nav-text">RTSP M2 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M3-Messages"><span class="nav-number">3.3.</span> <span class="nav-text">RTSP M3 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M4-Messages"><span class="nav-number">3.4.</span> <span class="nav-text">RTSP M4 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD会话建立（Session-Establishment）"><span class="nav-number">4.</span> <span class="nav-text">WFD会话建立（Session Establishment）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M5-Messages"><span class="nav-number">4.1.</span> <span class="nav-text">RTSP M5 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M6-Messages"><span class="nav-number">4.2.</span> <span class="nav-text">RTSP M6 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M7-Messages"><span class="nav-number">4.3.</span> <span class="nav-text">RTSP M7 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD长连接（keep-alive）"><span class="nav-number">5.</span> <span class="nav-text">WFD长连接（keep-alive）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M16-Messages"><span class="nav-number">5.1.</span> <span class="nav-text">RTSP M16 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭会话"><span class="nav-number">6.</span> <span class="nav-text">关闭会话</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M8-Messages"><span class="nav-number">6.1.</span> <span class="nav-text">RTSP M8 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
