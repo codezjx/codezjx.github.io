@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,Miracast,RTP,MPEG2-TS,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="Miracast音视频流概述在上一篇文章中，我们已经成功完成RTSP能力协商与会话的建立，并准备开始音视频流的传输阶段。那么下一步，就是对音视频流进行解析，并将音视频展示给用户的过程。这样整个Miracast的流程就算分析完毕了。 先简单来总结下，在Miracast底层的实现中，是采用RTP协议对MPEG2-TS数据包进行封装，其中MPEG2-TS又同时封装了Audio和Video两种ES（Ele">
+<meta name="keywords" content="Android,Miracast,RTP,MPEG2-TS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Miracast技术详解（三）：RTP &amp; MPEG2-TS">
+<meta property="og:url" content="http://yoursite.com/posts/miracast-mpeg2ts/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="Miracast音视频流概述在上一篇文章中，我们已经成功完成RTSP能力协商与会话的建立，并准备开始音视频流的传输阶段。那么下一步，就是对音视频流进行解析，并将音视频展示给用户的过程。这样整个Miracast的流程就算分析完毕了。 先简单来总结下，在Miracast底层的实现中，是采用RTP协议对MPEG2-TS数据包进行封装，其中MPEG2-TS又同时封装了Audio和Video两种ES（Ele">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-mpeg2ts/wireshark-rtp.jpg">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-mpeg2ts/ts-packet.jpg">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-mpeg2ts/pat.jpg">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-mpeg2ts/pmt.jpg">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-mpeg2ts/pes.jpg">
+<meta property="og:updated_time" content="2020-02-13T12:46:18.345Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Miracast技术详解（三）：RTP &amp; MPEG2-TS">
+<meta name="twitter:description" content="Miracast音视频流概述在上一篇文章中，我们已经成功完成RTSP能力协商与会话的建立，并准备开始音视频流的传输阶段。那么下一步，就是对音视频流进行解析，并将音视频展示给用户的过程。这样整个Miracast的流程就算分析完毕了。 先简单来总结下，在Miracast底层的实现中，是采用RTP协议对MPEG2-TS数据包进行封装，其中MPEG2-TS又同时封装了Audio和Video两种ES（Ele">
+<meta name="twitter:image" content="http://yoursite.com/posts/miracast-mpeg2ts/wireshark-rtp.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/miracast-mpeg2ts/">
+
+
+
+
+
+  <title>Miracast技术详解（三）：RTP & MPEG2-TS | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/miracast-mpeg2ts/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Miracast技术详解（三）：RTP & MPEG2-TS</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-06T10:17:45+08:00">
+                2020-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Miracast/" itemprop="url" rel="index">
+                    <span itemprop="name">Miracast</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Miracast音视频流概述"><a href="#Miracast音视频流概述" class="headerlink" title="Miracast音视频流概述"></a>Miracast音视频流概述</h2><p>在上一篇文章中，我们已经成功完成RTSP能力协商与会话的建立，并准备开始音视频流的传输阶段。那么下一步，就是对音视频流进行解析，并将音视频展示给用户的过程。这样整个Miracast的流程就算分析完毕了。</p>
+<p>先简单来总结下，在Miracast底层的实现中，是采用RTP协议对MPEG2-TS数据包进行封装，其中MPEG2-TS又同时封装了Audio和Video两种ES（Elementary Stream）。其中Audio格式一般为AAC，Video则为H.264。那么只要将RTP数据包解析成对应Audio和Video的裸流，那么在上层我们通过MediaCodec或FFmpeg进行解码，即可完成音视频的展示。</p>
+<p>而这里的关键，就是如何把RTP的数据包解析出裸流。所以接下来我们会着重对RTP与MPEG2-TS格式进行详细的分析~</p>
+<h2 id="抓包准备"><a href="#抓包准备" class="headerlink" title="抓包准备"></a>抓包准备</h2><p>跟上篇博客类似，要分析RTP与MPEG2-TS的格式，最好的方法就是抓取RTP的数据包，并对照协议文档一个个字节进行分析。Android上可以采用<code>tcpdump</code>工具抓取UDP的包，然后通过<code>Wireshark</code>工具导入进行分析。在此之前，不要忘记需要在<code>Analyze-&gt;Enabled Protocols</code>中勾选RTP/RTCP包及MPEG相关的解析选项。</p>
+<p>最终抓取到的数据包如下图所示，通过<code>Wireshark</code>的过滤功能我们可以很方便的过滤RTP协议的数据包：</p>
+<p><img src="wireshark-rtp.jpg" alt></p>
+<h2 id="RTP"><a href="#RTP" class="headerlink" title="RTP"></a>RTP</h2><p><code>实时传输协议（Real-time Transport Protocol）</code>是一个网络传输协议，此协议详细说明了在互联网上传递音频和视频的标准数据包格式。RTP协议常用于流媒体系统（配合RTSP协议），且一般情况下，RTP会搭配RTCP协议一起使用。如：WebRTC与Chromecast底层中的应用。</p>
+<p>在通信过程中，音视频的数据是通过RTP包进行传输，RTCP主要用来做数据流控制，如发送/接收端的Report，还有丢包的统计与重传等等…（因为RTP是创建在UDP协议上的）</p>
+<p>但经过多台手机的抓包测试，发现抓到的UDP数据中只包含了RTP数据包，而没有发现RTCP数据包，这也是我在测试中发现的非常不符合RTP使用标准的一个现象~  具体的原因未知，在<code>Miracast Native Sink</code>端的源码中，是有关于RTP与RTCP的相关处理代码的。同时我也反编译了一些Miracast竞品的代码，发现也没有对RTCP进行处理。Anyway，我们这里就先不考虑RTCP的处理，先着重分析RTP数据包格式。</p>
+<p>根据<a href="https://tools.ietf.org/html/rfc3550#section-5.1" target="_blank" rel="noopener">rfc3550</a>标准定义，RTP的包头定义如下，在RTP包头之后的所有数据都归属于Payload：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"> 0                   1                   2                   3</span><br><span class="line"> 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|V=2|P|X|  CC   |M|     PT      |       sequence number         |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|                           timestamp                           |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|           synchronization source (SSRC) identifier            |</span><br><span class="line">+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+</span><br><span class="line">|            contributing source (CSRC) identifiers             |</span><br><span class="line">|                             ....                              |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br></pre></td></tr></table></figure>
+
+<p>由于包头都是标准的，因此解析起来没有啥问题。其中CC包含了CSRC数目，默认为0，也就代表着CSRC为空，前面12个字节一直到SSRC我们都可以通过标准包头解析出来。而后面的Payload数据，则全部属于MPEG2-TS数据包。</p>
+<h2 id="MPEG2-TS"><a href="#MPEG2-TS" class="headerlink" title="MPEG2-TS"></a>MPEG2-TS</h2><p><a href="https://zh.wikipedia.org/wiki/MPEG2-TS" target="_blank" rel="noopener">MPEG2-TS</a>传输流（MPEG-2 Transport Stream，又称MPEG-TS、MTS、TS）是一种传输和存储包含视频、音频与通信协议各种数据的标准格式，用于数字电视广播系统，如DVB、ATSC、ISDB、IPTV等等。其中1个TS承载多个子TS，通常子TS是分组化基本流（PES, Packetized elementary stream），分组化基本流上又承载着基本流（ES，Elementary Stream）。</p>
+<h3 id="TS分组"><a href="#TS分组" class="headerlink" title="TS分组"></a>TS分组</h3><p><code>TS分组（TS Packet）</code>，长度固定为188字节，它是基本的传输单位。多个不同的ES的内容会分别被封装到TSP中通过同一个TS传输。每个TS分组以固定的同步字节起始，这个同步字节的值为<code>0x47</code>，它也是TS分组头的一部分。TS分组的固定头长度为4字节，其后为可选部分，为Payload或适配域。格式如下图所示：</p>
+<p><img src="ts-packet.jpg" alt></p>
+<p>TS Packet包头各个字段及解释如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="left">名称</th>
+<th align="left">比特数</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">同步字节（    sync byte）</td>
+<td align="left">8</td>
+<td align="left">表示TS包的开头，值固定为<code>0x47</code></td>
+</tr>
+<tr>
+<td align="left">传输错误指示位（Transport Error Indicator）</td>
+<td align="left">1</td>
+<td align="left">值为1时，表示在相关的传送包中至少有一个不可纠正的错误位</td>
+</tr>
+<tr>
+<td align="left">Payload单元开始指示位（Payload Unit Start Indicator）</td>
+<td align="left">1</td>
+<td align="left">该字段用来表示有效Payload中带有PES包或PSI数据，也代表一个完整的音视频数据帧的开始</td>
+</tr>
+<tr>
+<td align="left">传输优先级（Transport Priority）</td>
+<td align="left">1</td>
+<td align="left">值为1时，表示此包在相同PID的分组中具有更高的优先级</td>
+</tr>
+<tr>
+<td align="left">分组ID（PID）</td>
+<td align="left">13</td>
+<td align="left">用于识别TS分组的ID，音视频流分别对应不同的PID</td>
+</tr>
+<tr>
+<td align="left">传输加扰控制（Transport Scrambling control）</td>
+<td align="left">2</td>
+<td align="left">值为0时表示Payload未加密，Miracast中一般为0</td>
+</tr>
+<tr>
+<td align="left">适配域存在标志（Adaptation field exist）</td>
+<td align="left">2</td>
+<td align="left">表示在包头后面是否有适配域或Payload，其中1代表仅有载荷，2代表仅有适配域，3代表适配域和载荷都存在</td>
+</tr>
+<tr>
+<td align="left">连续性计数器（Continuity counter）</td>
+<td align="left">4</td>
+<td align="left">对于具有相同PID值的Payload而言，从0~15连续循环，用来检测是否有丢失的TS包</td>
+</tr>
+</tbody></table>
+<p>如下为<code>PID=0x0</code>的PAT包的Header示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ISO/IEC 13818-1 PID=0x0 CC=1</span><br><span class="line">    Header: 0x47400011</span><br><span class="line">        0100 0111 .... .... .... .... .... .... = Sync Byte: Correct (0x47)</span><br><span class="line">        .... .... 0... .... .... .... .... .... = Transport Error Indicator: 0</span><br><span class="line">        .... .... .1.. .... .... .... .... .... = Payload Unit Start Indicator: 1</span><br><span class="line">        .... .... ..0. .... .... .... .... .... = Transport Priority: 0</span><br><span class="line">        .... .... ...0 0000 0000 0000 .... .... = PID: Program Association Table (0x0000)</span><br><span class="line">        .... .... .... .... .... .... 00.. .... = Transport Scrambling Control: Not scrambled (0x0)</span><br><span class="line">        .... .... .... .... .... .... ..01 .... = Adaptation Field Control: Payload only (0x1)</span><br><span class="line">        .... .... .... .... .... .... .... 0001 = Continuity Counter: 1</span><br></pre></td></tr></table></figure>
+
+<h3 id="适配域"><a href="#适配域" class="headerlink" title="适配域"></a>适配域</h3><p>在MPEG2-TS中，为了传送打包后长度不足188B（包括包头）的不完整TS包，或者为了在系统层插入节目时钟参考PCR字段，需要在TS包中插入可变长字节的适配域。适配域包含对较高层次解码功能有用的相关信息，格式基于若干标识符，以表示该字段的某些特定扩展位是否存在。适配域的格式如上图<code>Adaptation Field</code>所示，各个字段及解释如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="left">名称</th>
+<th align="left">比特数</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">适配域长度（Adaptation Field Length）</td>
+<td align="left">8</td>
+<td align="left">适配域的长度，单位为字节，不包含当前字节</td>
+</tr>
+<tr>
+<td align="left">不连续指示位（Discontinuity indicator）</td>
+<td align="left">1</td>
+<td align="left">如果根据连续性计数器或PCR计算，确认当前分组处于不连续状态，则取值为1</td>
+</tr>
+<tr>
+<td align="left">随机访问指示位（Random Access indicator）</td>
+<td align="left">1</td>
+<td align="left">如果当前分组是一个PES的起始，取值为1</td>
+</tr>
+<tr>
+<td align="left">ES优先级指示位（Elementary stream priority indicator）</td>
+<td align="left">1</td>
+<td align="left">取值为1时ES优先级更高</td>
+</tr>
+<tr>
+<td align="left">PCR标识（PCR flag）</td>
+<td align="left">1</td>
+<td align="left">取值为1时表示适配域中有PCR域</td>
+</tr>
+<tr>
+<td align="left">OPCR标识（OPCR flag）</td>
+<td align="left">1</td>
+<td align="left">取值为1时表示适配域中有OPCR域</td>
+</tr>
+<tr>
+<td align="left">接续点标识（Splicing point flag）</td>
+<td align="left">1</td>
+<td align="left">取值为1时表示适配域中有接续倒数计数器域</td>
+</tr>
+<tr>
+<td align="left">传输私有数据标识    （Transport private data flag）</td>
+<td align="left">1</td>
+<td align="left">取值为1时表示适配域中有私有数据域</td>
+</tr>
+<tr>
+<td align="left">适配域扩展标识（Adaptation field extension flag）</td>
+<td align="left">1</td>
+<td align="left">取值为1时表示适配域中有适配域扩展域</td>
+</tr>
+<tr>
+<td align="left">（可选）节目时钟参考（PCR，Program Clock Reference）</td>
+<td align="left">33+6+9</td>
+<td align="left">包括一个33比特的低精度部分（90kHz）+6位的填充部分+一个9比特的高精度部分（27MHz，取值为0-299）</td>
+</tr>
+<tr>
+<td align="left">…</td>
+<td align="left">…</td>
+<td align="left">…</td>
+</tr>
+</tbody></table>
+<h3 id="PCR"><a href="#PCR" class="headerlink" title="PCR"></a>PCR</h3><p>其中适配域中的<code>节目时钟参考（PCR，Program Clock Reference）</code>使得解码后的内容可以正确地同步播放。PCR通常每隔100ms至少要被传输一次。我们可以从TS分组的适配域中得到特定节目的PCR值，PCR的PID由该节目的PMT中的<code>PCR_PID</code>域指定。</p>
+<p>PCR在MPEG-2系统中是非常重要的，因为解码器中的视频和音频抽样时钟都锁定于与PCR所相同的本地时钟，也就是说，视频和音频解码过程能否正常进行，首先取决于解码器能否准确恢复PCR。解码系统应当基于PCR生成高精度的系统定时时钟（System Timing Clock，STC），用于同步声音ES和视频ES的内容。</p>
+<p>如下为<code>PID=PCR_PID</code>的TS包头及适配域的情况，其中<code>PCR Flag</code>值为1，在其固定头后紧接着PCR的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">ISO/IEC 13818-1 PID=0x1000 CC=0</span><br><span class="line">    Header: 0x47500020</span><br><span class="line">        0100 0111 .... .... .... .... .... .... = Sync Byte: Correct (0x47)</span><br><span class="line">        .... .... 0... .... .... .... .... .... = Transport Error Indicator: 0</span><br><span class="line">        .... .... .1.. .... .... .... .... .... = Payload Unit Start Indicator: 1</span><br><span class="line">        .... .... ..0. .... .... .... .... .... = Transport Priority: 0</span><br><span class="line">        .... .... ...1 0000 0000 0000 .... .... = PID: Unknown (0x1000)</span><br><span class="line">        .... .... .... .... .... .... 00.. .... = Transport Scrambling Control: Not scrambled (0x0)</span><br><span class="line">        .... .... .... .... .... .... ..10 .... = Adaptation Field Control: Adaptation Field only (0x2)</span><br><span class="line">        .... .... .... .... .... .... .... 0000 = Continuity Counter: 0</span><br><span class="line">    [MPEG2 PCR Analysis]</span><br><span class="line">    Adaptation Field Length: 183</span><br><span class="line">    Adaptation Field</span><br><span class="line">        0... .... = Discontinuity Indicator: 0</span><br><span class="line">        .0.. .... = Random Access Indicator: 0</span><br><span class="line">        ..0. .... = Elementary Stream Priority Indicator: 0</span><br><span class="line">        ...1 .... = PCR Flag: 1</span><br><span class="line">        .... 0... = OPCR Flag: 0</span><br><span class="line">        .... .0.. = Splicing Point Flag: 0</span><br><span class="line">        .... ..0. = Transport Private Data Flag: 0</span><br><span class="line">        .... ...0 = Adaptation Field Extension Flag: 0</span><br><span class="line">        Program Clock Reference: 0x0000000084bbac4f</span><br><span class="line">        Stuffing: ffffffffffffffffffffffffffffffffffffffffffffffff…</span><br></pre></td></tr></table></figure>
+
+<h3 id="PID"><a href="#PID" class="headerlink" title="PID"></a>PID</h3><p>表示TS Packet的数据类型，每一种PSI表和每个ES都对应一个PID值。这个PID十分重要，它是辨别码流信息的关键，也是节目信息的唯一标识。除PAT表包的PID永远是0外，还有2种包的PID是协议预留的：一是空包，它主要用作码流填充，PID是0x1FFF；二是条件访问表（CAT），其PID值总是1。PID的分配可使用如下表格进行总结：</p>
+<table>
+<thead>
+<tr>
+<th align="left">PID值</th>
+<th align="left">PID值用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0x0000</td>
+<td align="left">节目关联表（PAT，Program Association Table）</td>
+</tr>
+<tr>
+<td align="left">0x0001</td>
+<td align="left">条件访问表（CAT，Conditional Access Table）</td>
+</tr>
+<tr>
+<td align="left">0x0003 ~ 0x000F</td>
+<td align="left">保留</td>
+</tr>
+<tr>
+<td align="left">0x0010 ~ 0x1FFE</td>
+<td align="left">可分配为network PID，PMT的PID，ES的PID等等…</td>
+</tr>
+<tr>
+<td align="left">0x1FFF</td>
+<td align="left">空包</td>
+</tr>
+</tbody></table>
+<h3 id="PSI"><a href="#PSI" class="headerlink" title="PSI"></a>PSI</h3><p><code>节目专用信息（PSI，Program Specific Information）</code>，描述特定节目相关的属性。MPEG-2标准规定了4种PSI：</p>
+<ul>
+<li>节目关联表（PAT，Program Association Table）</li>
+<li>节目映射表（PMT，Program Map Table）</li>
+<li>条件访问表（CAT，Conditional Access Table）</li>
+<li>网络信息表（NIT，Network Information Table）</li>
+</ul>
+<p>其中MPEG-2标准规定了PAT和PMT的具体结构，而且在<code>Miracast Sink</code>端的源码中，也只是用到了PAT和PMT。因此，我们只需对这2种PSI进行分析即可。</p>
+<h4 id="PAT"><a href="#PAT" class="headerlink" title="PAT"></a>PAT</h4><p><code>节目关联表（PAT: Program Association Table）</code>列出了该TS内所有节目，其PID固定为<code>0x0000</code>，一般在Miracast中Sink端收到的首包，就会包含PAT。PAT包的格式如下图所示：</p>
+<p><img src="pat.jpg" alt></p>
+<p>如下为<code>PID=0x0</code>的PAT包的Payload示例，其中比较重要的有Program编号与PID的映射关系表，如下编号为1的Program对应的PID为<code>0x0100</code>。拿到了Program的PID后，我们就可以根据PID找到对应的PMT：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">MPEG2 Program Association Table</span><br><span class="line">    Table ID: Program Association Table (PAT) (0x00)</span><br><span class="line">    1... .... .... .... = Syntax indicator: 1</span><br><span class="line">    .011 .... .... .... = Reserved: 0x3</span><br><span class="line">    .... 0000 0000 1101 = Length: 13</span><br><span class="line">    Transport Stream ID: 0x0000</span><br><span class="line">    11.. .... = Reserved: 0x3</span><br><span class="line">    ..00 001. = Version Number: 0x01</span><br><span class="line">    .... ...1 = Current/Next Indicator: Currently applicable</span><br><span class="line">    Section Number: 0</span><br><span class="line">    Last Section Number: 0</span><br><span class="line">    Program 0x0001 -&gt; PID 0x0100</span><br><span class="line">        Program Number: 0x0001</span><br><span class="line">        111. .... .... .... = Reserved: 0x7</span><br><span class="line">        ...0 0001 0000 0000 = Program Map PID: 0x0100</span><br><span class="line">    CRC 32: 0x2df65295 [unverified]</span><br><span class="line">    [CRC 32 Status: Unverified]</span><br></pre></td></tr></table></figure>
+
+<h4 id="PMT"><a href="#PMT" class="headerlink" title="PMT"></a>PMT</h4><p><code>节目映射表（PMT: Program Map Table）</code>包含特定节目相关的信息（如：音频、视频ES流），每一个节目有一个PMT，包含特定节目的Program编号、<code>PCR_PID</code>、以及该节目对应的所有ES的PID。PMT包的格式如下图所示：</p>
+<p><img src="pmt.jpg" alt></p>
+<p>如下为<code>PID=0x0100</code>的PMT包的Payload示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">MPEG2 Program Map Table</span><br><span class="line">    Table ID: Program Map Table (PMT) (0x02)</span><br><span class="line">    1... .... .... .... = Syntax indicator: 1</span><br><span class="line">    .011 .... .... .... = Reserved: 0x3</span><br><span class="line">    .... 0000 0010 0001 = Length: 33</span><br><span class="line">    Program Number: 0x0001</span><br><span class="line">    11.. .... = Reserved: 0x3</span><br><span class="line">    ..00 001. = Version Number: 0x01</span><br><span class="line">    .... ...1 = Current/Next Indicator: Currently applicable (0x1)</span><br><span class="line">    Section Number: 0</span><br><span class="line">    Last Section Number: 0</span><br><span class="line">    111. .... .... .... = Reserved: 0x7</span><br><span class="line">    ...1 0000 0000 0000 = PCR PID: 0x1000</span><br><span class="line">    1111 .... .... .... = Reserved: 0xf</span><br><span class="line">    .... 0000 0000 0000 = Program Info Length: 0x000</span><br><span class="line">    Stream PID=0x1011</span><br><span class="line">        Stream type: AVC video stream as defined in ITU-T Rec. H.264 | ISO/IEC 14496-10 Video (0x1b)</span><br><span class="line">        111. .... .... .... = Reserved: 0x7</span><br><span class="line">        ...1 0000 0001 0001 = Elementary PID: 0x1011</span><br><span class="line">        1111 .... .... .... = Reserved: 0xf</span><br><span class="line">        .... 0000 0000 1010 = ES Info Length: 0x00a</span><br><span class="line">        Descriptor Tag=0x28</span><br><span class="line">        Descriptor Tag=0x2a</span><br><span class="line">    Stream PID=0x1100</span><br><span class="line">        Stream type: ISO/IEC 13818-7 Audio with ADTS transport syntax (0x0f)</span><br><span class="line">        111. .... .... .... = Reserved: 0x7</span><br><span class="line">        ...1 0001 0000 0000 = Elementary PID: 0x1100</span><br><span class="line">        1111 .... .... .... = Reserved: 0xf</span><br><span class="line">        .... 0000 0000 0000 = ES Info Length: 0x000</span><br><span class="line">    CRC 32: 0x00fd72f1 [unverified]</span><br><span class="line">    [CRC 32 Status: Unverified]</span><br></pre></td></tr></table></figure>
+
+<p>经过上述包格式的分析，我们可以得出以下重要信息：</p>
+<ul>
+<li>可以根据PAT中Program编号与PID的映射关系表，对比Program编号，值为0x0001与期望一致，是匹配的Program。</li>
+<li>紧接着我们可以得到<code>PCR_PID</code>的值为0x1000，后续只要收到PID为该值的TS包，则可以解析出PCR信息。</li>
+<li>最后，我们可以看到该PMT中包含2个ES流，PID分别为<code>0x1011</code>与<code>0x1100</code>，分别对应了<code>H.264(0x1b)</code>的视频流与<code>AAC(0x0f)</code>音频流。</li>
+</ul>
+<h3 id="PES"><a href="#PES" class="headerlink" title="PES"></a>PES</h3><p><code>分组化基本流（PES, Packetized elementary stream）</code>组合了多个音频与视频ES流，一个PES包其实就是一帧音视频。但一个TS包只有188B的大小，是不可能放下一帧数据的。所以如果我们要获得一帧完整的数据，就需要把连续几个TS包里的数据全部取出来，才能组合成一个PES包。那么我们怎么知道该从哪里开始到哪里结束是一个PES包呢？</p>
+<p>前面TS分组章节我们分析了分组格式，里面有一个<code>Payload Unit Start Indicator</code>字段，值为1时代表一个完整的音视频数据包的开始。那么从这里开始，直到下一个值为1的包为止（相同PID的ES流），把所有的这些TS包组合起来就是一个PES包。</p>
+<p>有关PES包的格式，如下图所示：</p>
+<p><img src="pes.jpg" alt></p>
+<p>在这个PES结构中，最重要的部分是<code>解码时间标记DTS（Decode Time Stamp）</code>和<code>播出时间标记PTS（Presentation Time Stamp）</code>。有了DTS和PTS，解码器就可以从编码器传送的I、B与P帧中重建视频流。即DTS告诉解码器何时解码帧，而PTS则告诉解码器何时显示帧。</p>
+<p>以下为<code>PID=0x1011</code>的某个视频PES包的示例：（已完成TS包的重新组装，总共11个TS包）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[11 Message fragments (1928 bytes): #1649(184), #1649(184), #1649(184), #1649(184), #1649(184), #1649(184), #1649(184), #1650(184), #1650(184), #1650(184), #1650(88)]</span><br><span class="line">    [Frame: 1649, payload: 0-183 (184 bytes)]</span><br><span class="line">    [Frame: 1649, payload: 184-367 (184 bytes)]</span><br><span class="line">    [Frame: 1649, payload: 368-551 (184 bytes)]</span><br><span class="line">    [Frame: 1649, payload: 552-735 (184 bytes)]</span><br><span class="line">    [Frame: 1649, payload: 736-919 (184 bytes)]</span><br><span class="line">    [Frame: 1649, payload: 920-1103 (184 bytes)]</span><br><span class="line">    [Frame: 1649, payload: 1104-1287 (184 bytes)]</span><br><span class="line">    [Frame: 1650, payload: 1288-1471 (184 bytes)]</span><br><span class="line">    [Frame: 1650, payload: 1472-1655 (184 bytes)]</span><br><span class="line">    [Frame: 1650, payload: 1656-1839 (184 bytes)]</span><br><span class="line">    [Frame: 1650, payload: 1840-1927 (88 bytes)]</span><br><span class="line">    [Message fragment count: 11]</span><br><span class="line">    [Reassembled MP2T length: 1928]</span><br><span class="line">MPEG TS Packet (reassembled)</span><br><span class="line">Packetized Elementary Stream</span><br><span class="line">    prefix: 000001</span><br><span class="line">    stream: video-stream (0xe0)</span><br><span class="line">PES extension</span><br><span class="line">    length: 1922</span><br><span class="line">    1... .... must-be-one: True</span><br><span class="line">    .0.. .... must-be-zero: False</span><br><span class="line">    scrambling-control: not-scrambled (0)</span><br><span class="line">    .... 0... priority: False</span><br><span class="line">    .... .1.. data-alignment: True</span><br><span class="line">    .... ..0. copyright: False</span><br><span class="line">    .... ...0 original: False</span><br><span class="line">    1... .... pts-flag: True</span><br><span class="line">    .0.. .... dts-flag: False</span><br><span class="line">    ..0. .... escr-flag: False</span><br><span class="line">    ...0 .... es-rate-flag: False</span><br><span class="line">    .... 0... dsm-trick-mode-flag: False</span><br><span class="line">    .... .0.. additional-copy-info-flag: False</span><br><span class="line">    .... ..0. crc-flag: False</span><br><span class="line">    .... ...0 extension-flag: False</span><br><span class="line">    header-data-length: 5</span><br><span class="line">PES header data: 2101c5c1a9</span><br><span class="line">    presentation time stamp (PTS): 82.559511111 seconds</span><br><span class="line">PES data: 0000000141ea0138738cc32a650a996299f6299c847d3f3d…</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>pts-flag: True</code>，我们可以从<code>PES header data</code>前5个字节取出PTS，剩下的字节则为<code>PES data</code>，也就是一帧裸流数据。  剩下的工作就是把视频流数据送到应用层做解码，然后展示，整个过程结束~</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>从RTP数据包解析出音视频的裸流，主要经过以下几个步骤：</p>
+<ul>
+<li>解析RTP固定12字节头，取出其后的Payload数据（MPEG2-TS包）</li>
+<li>以188B的大小裁剪出N个TS包</li>
+<li>解析TS包，查找<code>PID=0</code>的PAT包并解析，得到PMT的PID</li>
+<li>根据PID查找到PMT包并解析，得到<code>PCR_PID</code>与音视频ES流的PID</li>
+<li>根据音视频ES流的PID解析出对应的音视频TS包</li>
+<li>根据<code>Payload Unit Start Indicator</code>字段，组装同一个PES下的TS包</li>
+<li>对完整的PES包进行解析，得到<code>PTS/DTS</code>与最终的音视频裸流数据，流程结束</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>《数字电视业务信息及其编码》- 方涛 编著</li>
+<li>ISO_IEC_13818-1_2007_PDF_version_(en).pdf</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Miracast/" rel="tag"># Miracast</a>
+          
+            <a href="/tags/RTP/" rel="tag"># RTP</a>
+          
+            <a href="/tags/MPEG2-TS/" rel="tag"># MPEG2-TS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/miracast-rtsp/" rel="next" title="Miracast技术详解（二）：RTSP协议">
+                <i class="fa fa-chevron-left"></i> Miracast技术详解（二）：RTSP协议
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Miracast音视频流概述"><span class="nav-number">1.</span> <span class="nav-text">Miracast音视频流概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包准备"><span class="nav-number">2.</span> <span class="nav-text">抓包准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RTP"><span class="nav-number">3.</span> <span class="nav-text">RTP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MPEG2-TS"><span class="nav-number">4.</span> <span class="nav-text">MPEG2-TS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TS分组"><span class="nav-number">4.1.</span> <span class="nav-text">TS分组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#适配域"><span class="nav-number">4.2.</span> <span class="nav-text">适配域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PCR"><span class="nav-number">4.3.</span> <span class="nav-text">PCR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PID"><span class="nav-number">4.4.</span> <span class="nav-text">PID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PSI"><span class="nav-number">4.5.</span> <span class="nav-text">PSI</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PAT"><span class="nav-number">4.5.1.</span> <span class="nav-text">PAT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PMT"><span class="nav-number">4.5.2.</span> <span class="nav-text">PMT</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PES"><span class="nav-number">4.6.</span> <span class="nav-text">PES</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
