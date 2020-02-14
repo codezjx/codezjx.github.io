@@ -274,6 +274,151 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/google-analytics-custom-exception/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/posts/google-analytics-custom-exception/" itemprop="url">Google Analytics自定义异常格式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-08T21:39:46+08:00">
+                2016-01-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Google-Analytics-Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Google Analytics Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          自动配置可以在xml配置文件中直接配置以下字段，即可开启异常捕获与上传：
+1&lt;bool name="ga_reportUncaughtExceptions"&gt;true&lt;/bool&gt;
+
+问题来了用系统的默认ExceptionParser会有下面2个问题：    1. 格式是按照GA默认的样式    2. 如果开启了混淆，就无法知道那个类文件出问题了
+默认格式如下：异常名 (@类名:方法名:行数) {所在线程}
+1NullPointerException (@c:run:35
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/posts/google-analytics-custom-exception/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/google-analytics-multi-flavor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1552,149 +1697,6 @@ Tab不用4个空格Code Style-&gt;Java-&gt;Tabs and Indents-&gt;Use tab characte
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/android-studio-manual-import-from-eclipse/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="codezjx">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="codezjx's Home">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/android-studio-manual-import-from-eclipse/" itemprop="url">Android Studio中手动导入Eclipse Project</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2014-08-29T21:34:22+08:00">
-                2014-08-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Android-Studio/" itemprop="url" rel="index">
-                    <span itemprop="name">Android Studio</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          导入步骤RT，这应该是很多朋友刚从Eclipse转到Android Studio后遇到最大的一个问题，首先我们需要重新认识AS里面的目录结构，在我前一篇帖子里面也有提到（Android Studio中的Project相当于Eclipse中的Workspace，Module则相当于Eclipse中的Project）。所以我们手动导入Project，其实就是导入AS里面的Module。主要有以下几个步骤：
-
-复制build.gradle到需要导入的项目中
-复制你需要导入的项目至AS Project根
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/posts/android-studio-manual-import-from-eclipse/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1743,7 +1745,7 @@ Tab不用4个空格Code Style-&gt;Java-&gt;Tabs and Indents-&gt;Use tab characte
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-count">44</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1765,7 +1767,7 @@ Tab不用4个空格Code Style-&gt;Java-&gt;Tabs and Indents-&gt;Use tab characte
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

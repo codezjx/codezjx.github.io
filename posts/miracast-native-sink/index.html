@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Android,RTFSC,Miracast,Sink,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="Sink源码概述Miracast Sink端源码最早出现在Android 4.2.2上，通过googlesource可以很方便的查看：https://android.googlesource.com/platform/frameworks/av/+/android-4.2.2_r1.2/media/libstagefright/wifi-display/sink/ 但是在Android 4.3以后">
+<meta name="keywords" content="Android,RTFSC,Miracast,Sink">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Miracast技术详解（四）：Sink源码解析">
+<meta property="og:url" content="http://yoursite.com/posts/miracast-native-sink/index.html">
+<meta property="og:site_name" content="codezjx&#39;s Home">
+<meta property="og:description" content="Sink源码概述Miracast Sink端源码最早出现在Android 4.2.2上，通过googlesource可以很方便的查看：https://android.googlesource.com/platform/frameworks/av/+/android-4.2.2_r1.2/media/libstagefright/wifi-display/sink/ 但是在Android 4.3以后">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/posts/miracast-native-sink/as-sink.jpg">
+<meta property="og:updated_time" content="2020-02-14T12:39:07.264Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Miracast技术详解（四）：Sink源码解析">
+<meta name="twitter:description" content="Sink源码概述Miracast Sink端源码最早出现在Android 4.2.2上，通过googlesource可以很方便的查看：https://android.googlesource.com/platform/frameworks/av/+/android-4.2.2_r1.2/media/libstagefright/wifi-display/sink/ 但是在Android 4.3以后">
+<meta name="twitter:image" content="http://yoursite.com/posts/miracast-native-sink/as-sink.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/posts/miracast-native-sink/">
+
+
+
+
+
+  <title>Miracast技术详解（四）：Sink源码解析 | codezjx's Home</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">codezjx's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/posts/miracast-native-sink/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="codezjx">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="codezjx's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Miracast技术详解（四）：Sink源码解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-07T09:34:16+08:00">
+                2020-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Miracast/" itemprop="url" rel="index">
+                    <span itemprop="name">Miracast</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Sink源码概述"><a href="#Sink源码概述" class="headerlink" title="Sink源码概述"></a>Sink源码概述</h2><p>Miracast Sink端源码最早出现在<code>Android 4.2.2</code>上，通过<code>googlesource</code>可以很方便的查看：<br><a href="https://android.googlesource.com/platform/frameworks/av/+/android-4.2.2_r1.2/media/libstagefright/wifi-display/sink/" target="_blank" rel="noopener">https://android.googlesource.com/platform/frameworks/av/+/android-4.2.2_r1.2/media/libstagefright/wifi-display/sink/</a></p>
+<p>但是在<code>Android 4.3</code>以后，Google却移除掉了这部分源码，详细的commit记录在：<br><a href="https://android.googlesource.com/platform/frameworks/av/+/c4bd06130e4c3068ab58a0be88a4f765c2267563" target="_blank" rel="noopener">https://android.googlesource.com/platform/frameworks/av/+/c4bd06130e4c3068ab58a0be88a4f765c2267563</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Remove all traces of wifi display sink implementation and supporting code.</span><br><span class="line"></span><br><span class="line">Change-Id: I64b681b7e3df1ef0dd80c0d261cacae293d5e684</span><br><span class="line">related-to-bug: 8698812</span><br></pre></td></tr></table></figure>
+
+<p>虽然移除了Sink端代码，但是Source端源码是还在的，我们可以通过Android手机的投射功能实现Miracast投屏发送端。</p>
+<h2 id="导入源码"><a href="#导入源码" class="headerlink" title="导入源码"></a>导入源码</h2><p>这里推荐使用Android Studio进行源码查看，为了方便使用IDE的代码提示及类/方法跳转等相关功能，我们需要搭建好源码环境。首先新建一个<code>Native Project</code>，然后把整个<code>libstagefright</code>相关的源码拷贝到cpp目录中，最好把相关的<code>include</code>头文件也一起导入（因为涉及到很多依赖），然后在<code>CMakeLists.txt</code>中添加这部分源码。重新sync一次，这样就能引用到相关的类与头文件，并且支持代码提示，提高我们查看源码的效率。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">include_directories(include)</span><br><span class="line"></span><br><span class="line">file(GLOB_RECURSE MIRACASTSRC</span><br><span class="line">        &quot;media/libstagefright/*.h&quot;</span><br><span class="line">        &quot;media/libstagefright/*.cpp&quot;</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">add_library( # Sets the name of the library.</span><br><span class="line">        native-lib</span><br><span class="line"></span><br><span class="line">        # Sets the library as a shared library.</span><br><span class="line">        SHARED</span><br><span class="line"></span><br><span class="line">        # Provides a relative path to your source file(s).</span><br><span class="line">        native-lib.cpp $&#123;MIRACASTSRC&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="as-sink.jpg" alt></p>
+<h2 id="RTFSC"><a href="#RTFSC" class="headerlink" title="RTFSC"></a>RTFSC</h2><p>Sink端源码主要的核心类就这3个：<code>WifiDisplaySink.cpp</code>、<code>RTPSink.cpp</code>、<code>TunnelRenderer.cpp</code>。我们可以从<code>wfd.cpp</code>这个可执行程序的<code>main()</code>方法看起，看Sink端是如何进行初始化的。</p>
+<p>最重要的几行初始化代码在<code>main()</code>函数的最后，几个需要关注的点：</p>
+<ul>
+<li>创建了<code>ANetworkSession</code>对象，并启动了内部的<code>NetworkThread</code>，此类主要用来管理通信相关的TCP和UDP连接。</li>
+<li>创建并启动了<code>ALooper</code>，并将<code>WifiDisplaySink</code>通过<code>registerHandler()</code>方法关联起来。其中<code>WifiDisplaySink</code>、<code>RTPSink</code>、<code>TunnelRenderer</code>都继承了<code>AHandlr</code>，都实现了<code>onMessageReceived()</code>，可以用来处理异步消息。</li>
+<li>整个程序采用了<code>ALooper</code>，<code>AHandler</code>，<code>AMessage</code>这几个类配合完成的异步消息机制，它是<code>Android Native</code>层实现的一个异步消息机制，跟应用层的<code>Handler</code>那一套有点类似。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">sp&lt;ANetworkSession&gt; session = <span class="keyword">new</span> ANetworkSession;</span><br><span class="line">session-&gt;start();</span><br><span class="line"></span><br><span class="line">sp&lt;ALooper&gt; looper = <span class="keyword">new</span> ALooper;</span><br><span class="line"></span><br><span class="line">sp&lt;WifiDisplaySink&gt; sink = <span class="keyword">new</span> WifiDisplaySink(session);</span><br><span class="line">looper-&gt;registerHandler(sink);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (connectToPort &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">    sink-&gt;start(connectToHost.c_str(), connectToPort);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    sink-&gt;start(uri.c_str());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">looper-&gt;start(<span class="literal">true</span> <span class="comment">/* runOnCallingThread */</span>);</span><br></pre></td></tr></table></figure>
+
+<p>最后通过关键的<code>sink-&gt;start()</code>方法启动<code>WifiDisplaySink</code>，我们来看下里面的操作，以ip和端口这个<code>start()</code>方法为例，post了一个类型为<code>kWhatStart</code>的<code>AMessage</code>对象：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WifiDisplaySink::start</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *sourceHost, <span class="keyword">int32_t</span> sourcePort)</span> </span>&#123;</span><br><span class="line">    sp&lt;AMessage&gt; msg = <span class="keyword">new</span> AMessage(kWhatStart, id());</span><br><span class="line">    msg-&gt;setString(<span class="string">"sourceHost"</span>, sourceHost);</span><br><span class="line">    msg-&gt;setInt32(<span class="string">"sourcePort"</span>, sourcePort);</span><br><span class="line">    msg-&gt;post();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="RTSP通讯"><a href="#RTSP通讯" class="headerlink" title="RTSP通讯"></a>RTSP通讯</h3><p>前面我们说到了<code>WifiDisplaySink</code>继承了<code>AHandler</code>，因此消息最终会回调到<code>onMessageReceived()</code>方法中去处理。这里通过<code>createRTSPClient()</code>方法创建了RTSP的TCP连接，并传入了一个<code>AMessage</code>对象，以用作后面的连接状态与数据的异步通知：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WifiDisplaySink::onMessageReceived</span><span class="params">(<span class="keyword">const</span> sp&lt;AMessage&gt; &amp;msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (msg-&gt;what()) &#123;</span><br><span class="line">        <span class="keyword">case</span> kWhatStart:</span><br><span class="line">        &#123;</span><br><span class="line">            ...</span><br><span class="line">            sp&lt;AMessage&gt; notify = <span class="keyword">new</span> AMessage(kWhatRTSPNotify, id());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">status_t</span> err = mNetSession-&gt;createRTSPClient(</span><br><span class="line">                    mRTSPHost.c_str(), sourcePort, notify, &amp;mSessionID);</span><br><span class="line">            CHECK_EQ(err, (<span class="keyword">status_t</span>)OK);</span><br><span class="line"></span><br><span class="line">            mState = CONNECTING;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当RTSP连接失败或成功后，会通过<code>kWhatError</code>与<code>kWhatConnected</code>进行通知回调。若连接成功建立，则后续会通过<code>kWhatData</code>收到RTSP相关的数据包。这个时候就正式开始RTSP协商与会话建立，涉及到RTSP的<code>M1-M7</code>指令处理。具体的Rqeuest及Response流程可以看前面的RTSP协议分析文章，这里不详细展开。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WifiDisplaySink::onMessageReceived</span><span class="params">(<span class="keyword">const</span> sp&lt;AMessage&gt; &amp;msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (msg-&gt;what()) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">case</span> kWhatRTSPNotify:</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int32_t</span> reason;</span><br><span class="line">            CHECK(msg-&gt;findInt32(<span class="string">"reason"</span>, &amp;reason));</span><br><span class="line"></span><br><span class="line">            <span class="keyword">switch</span> (reason) &#123;</span><br><span class="line">                <span class="keyword">case</span> ANetworkSession::kWhatError:</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// 处理网络异常状态，忽略</span></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">case</span> ANetworkSession::kWhatConnected:</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// 网络连接成功回调，并设置状态为已连接</span></span><br><span class="line">                    ALOGI(<span class="string">"We're now connected."</span>);</span><br><span class="line">                    mState = CONNECTED;</span><br><span class="line">                    ...</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">case</span> ANetworkSession::kWhatData:</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// 处理接收到的RTSP数据包</span></span><br><span class="line">                    onReceiveClientData(msg);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先判断消息类型，看看是Request还是Response，这里的做法有点暴力，判断<code>RTSP/</code>开头则认为是Response。详细解析看注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WifiDisplaySink::onReceiveClientData</span><span class="params">(<span class="keyword">const</span> sp&lt;AMessage&gt; &amp;msg)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> (method.startsWith(<span class="string">"RTSP/"</span>)) &#123;</span><br><span class="line">        <span class="comment">// This is a response.</span></span><br><span class="line"></span><br><span class="line">        ResponseID id;</span><br><span class="line">        id.mSessionID = sessionID;</span><br><span class="line">        id.mCSeq = cseq;</span><br><span class="line">        <span class="comment">// mResponseHandlers是key-value结构，用来存储对应请求的ResponseHandler</span></span><br><span class="line">        <span class="comment">// 根据RTSP的交互流程，在调用sendM2, sendSetup(M6), sendPlay(M7)的时候由Sink主动发起Request</span></span><br><span class="line">        <span class="comment">// 这个时候会调用mResponseHandlers.add()添加对应请求的ResponseHandler</span></span><br><span class="line">        <span class="keyword">ssize_t</span> index = mResponseHandlers.indexOfKey(id);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (index &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            ALOGW(<span class="string">"Received unsolicited server response, cseq %d"</span>, cseq);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 取出对应ResponseID的HandleRTSPResponseFunc，并从映射表中移除</span></span><br><span class="line">        HandleRTSPResponseFunc func = mResponseHandlers.valueAt(index);</span><br><span class="line">        mResponseHandlers.removeItemsAt(index);</span><br><span class="line">        <span class="comment">// 调用对应的HandleRTSPResponseFunc进行回调，这个func我们可以看做一个callback</span></span><br><span class="line">        <span class="keyword">status_t</span> err = (<span class="keyword">this</span>-&gt;*func)(sessionID, data);</span><br><span class="line">        CHECK_EQ(err, (<span class="keyword">status_t</span>)OK);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        AString version;</span><br><span class="line">        data-&gt;getRequestField(<span class="number">2</span>, &amp;version);</span><br><span class="line">        <span class="comment">// RTSP version合法性判断</span></span><br><span class="line">        <span class="keyword">if</span> (!(version == AString(<span class="string">"RTSP/1.0"</span>))) &#123;</span><br><span class="line">            sendErrorResponse(sessionID, <span class="string">"505 RTSP Version not supported"</span>, cseq);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (method == <span class="string">"OPTIONS"</span>) &#123;</span><br><span class="line">            <span class="comment">// 对应Source端发起的OPTIONS M1请求</span></span><br><span class="line">            onOptionsRequest(sessionID, cseq, data);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method == <span class="string">"GET_PARAMETER"</span>) &#123;</span><br><span class="line">            <span class="comment">// 对应GET_PARAMETER M3请求</span></span><br><span class="line">            onGetParameterRequest(sessionID, cseq, data);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method == <span class="string">"SET_PARAMETER"</span>) &#123;</span><br><span class="line">            <span class="comment">// 对应SET_PARAMETER M4与M5请求</span></span><br><span class="line">            onSetParameterRequest(sessionID, cseq, data);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            sendErrorResponse(sessionID, <span class="string">"405 Method Not Allowed"</span>, cseq);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>针对Request部分，我们继续根据RTSP流程进行细化，<code>onOptionsRequest()</code>主要处理Source端M1请求，并且响应完后马上执行<code>sendM2()</code>方法，以确认Source端所支持的RTSP方法请求。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WifiDisplaySink::onOptionsRequest</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int32_t</span> sessionID,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int32_t</span> cseq,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">const</span> sp&lt;ParsedMessage&gt; &amp;data)</span> </span>&#123;</span><br><span class="line">    AString response = <span class="string">"RTSP/1.0 200 OK\r\n"</span>;</span><br><span class="line">    AppendCommonResponse(&amp;response, cseq);</span><br><span class="line">    response.append(<span class="string">"Public: org.wfa.wfd1.0, GET_PARAMETER, SET_PARAMETER\r\n"</span>);</span><br><span class="line">    response.append(<span class="string">"\r\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err = mNetSession-&gt;sendRequest(sessionID, response.c_str());</span><br><span class="line">    CHECK_EQ(err, (<span class="keyword">status_t</span>)OK);</span><br><span class="line"></span><br><span class="line">    err = sendM2(sessionID);</span><br><span class="line">    CHECK_EQ(err, (<span class="keyword">status_t</span>)OK);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>onGetParameterRequest()</code>则是处理Source端M3请求，并返回自持自身支持的属性及能力，比较重要的几个属性：RTP端口号（传输流媒体用）、所支持的audio及video编解码格式等…</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WifiDisplaySink::onGetParameterRequest</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int32_t</span> sessionID,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int32_t</span> cseq,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">const</span> sp&lt;ParsedMessage&gt; &amp;data)</span> </span>&#123;</span><br><span class="line">    AString body =</span><br><span class="line">        <span class="string">"wfd_video_formats: xxx\r\n"</span></span><br><span class="line">        <span class="string">"wfd_audio_codecs: xxx\r\n"</span></span><br><span class="line">        <span class="string">"wfd_client_rtp_ports: RTP/AVP/UDP;unicast xxx 0 mode=play\r\n"</span>;</span><br><span class="line"></span><br><span class="line">    AString response = <span class="string">"RTSP/1.0 200 OK\r\n"</span>;</span><br><span class="line">    AppendCommonResponse(&amp;response, cseq);</span><br><span class="line">    response.append(<span class="string">"Content-Type: text/parameters\r\n"</span>);</span><br><span class="line">    response.append(StringPrintf(<span class="string">"Content-Length: %d\r\n"</span>, body.size()));</span><br><span class="line">    response.append(<span class="string">"\r\n"</span>);</span><br><span class="line">    response.append(body);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err = mNetSession-&gt;sendRequest(sessionID, response.c_str());</span><br><span class="line">    CHECK_EQ(err, (<span class="keyword">status_t</span>)OK);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>onSetParameterRequest()</code>则是处理Source端M4与M5请求，对于M4请求，直接进行常规的Response即可。对于M5，除了Response之外，因为请求中带有<code>wfd_trigger_method: SETUP</code>，会触发Sink端向Source端发送SETUP请求。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WifiDisplaySink::onSetParameterRequest</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int32_t</span> sessionID,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int32_t</span> cseq,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">const</span> sp&lt;ParsedMessage&gt; &amp;data)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *content = data-&gt;getContent();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">strstr</span>(content, <span class="string">"wfd_trigger_method: SETUP\r\n"</span>) != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">status_t</span> err =</span><br><span class="line">            sendSetup(</span><br><span class="line">                    sessionID,</span><br><span class="line">                    <span class="string">"rtsp://x.x.x.x:x/wfd1.0/streamid=0"</span>);</span><br><span class="line"></span><br><span class="line">        CHECK_EQ(err, (<span class="keyword">status_t</span>)OK);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    AString response = <span class="string">"RTSP/1.0 200 OK\r\n"</span>;</span><br><span class="line">    AppendCommonResponse(&amp;response, cseq);</span><br><span class="line">    response.append(<span class="string">"\r\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err = mNetSession-&gt;sendRequest(sessionID, response.c_str());</span><br><span class="line">    CHECK_EQ(err, (<span class="keyword">status_t</span>)OK);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>sendSetup()</code>方法中，有两个比较重要的点。一是我们初始化了<code>RTPSink</code>，主要用于后续建立UDP连接与处理RTP包。二是在发送完<code>Setup M6</code>请求后，注册了<code>onReceiveSetupResponse()</code>回调。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">WifiDisplaySink::sendSetup</span><span class="params">(<span class="keyword">int32_t</span> sessionID, <span class="keyword">const</span> <span class="keyword">char</span> *uri)</span> </span>&#123;</span><br><span class="line">    mRTPSink = <span class="keyword">new</span> RTPSink(mNetSession, mSurfaceTex);</span><br><span class="line">    looper()-&gt;registerHandler(mRTPSink);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err = mRTPSink-&gt;init(sUseTCPInterleaving);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (err != OK) &#123;</span><br><span class="line">        looper()-&gt;unregisterHandler(mRTPSink-&gt;id());</span><br><span class="line">        mRTPSink.clear();</span><br><span class="line">        <span class="keyword">return</span> err;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    err = mNetSession-&gt;sendRequest(sessionID, request.c_str(), request.size());</span><br><span class="line">    ...</span><br><span class="line">    registerResponseHandler(</span><br><span class="line">            sessionID, mNextCSeq, &amp;WifiDisplaySink::onReceiveSetupResponse);</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>onReceiveSetupResponse()</code>方法的最后我们完成了RTSP中的最后一步，发送<code>PLAY M7</code>请求，告诉发送端可以开始发送流媒体数据了。这个时候Source端会按照Sink指定的UDP端口（SETUP指令中指定）发送RTP数据包，包含音视频数据。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">WifiDisplaySink::sendPlay</span><span class="params">(<span class="keyword">int32_t</span> sessionID, <span class="keyword">const</span> <span class="keyword">char</span> *uri)</span> </span>&#123;</span><br><span class="line">    AString request = StringPrintf(<span class="string">"PLAY %s RTSP/1.0\r\n"</span>, uri);</span><br><span class="line"></span><br><span class="line">    AppendCommonResponse(&amp;request, mNextCSeq);</span><br><span class="line"></span><br><span class="line">    request.append(StringPrintf(<span class="string">"Session: %s\r\n"</span>, mPlaybackSessionID.c_str()));</span><br><span class="line">    request.append(<span class="string">"\r\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err =</span><br><span class="line">        mNetSession-&gt;sendRequest(sessionID, request.c_str(), request.size());</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过以上代码，RTSP的协商与会话建立就已经完成了，并且能在指定的UDP端口中收到音视频RTP数据包。看完这部分Native代码，我们完全可以在应用层用Socket或者Netty这样的第三方网络框架实现。下面我们继续分析<code>RTPSink</code>中是如何处理RTP的数据包的。</p>
+<h3 id="RTP通讯"><a href="#RTP通讯" class="headerlink" title="RTP通讯"></a>RTP通讯</h3><p>前面我们提到，在<code>sendSetup()</code>方法中，我们初始化了<code>RTPSink</code>，并且在<code>onReceiveSetupResponse()</code>回调中调用<code>configureTransport()</code>方法，根据对应的RTP与RTCP端口，调用<code>mRTPSink-&gt;connect()</code>方法建立UDP连接。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">WifiDisplaySink::configureTransport</span><span class="params">(<span class="keyword">const</span> sp&lt;ParsedMessage&gt; &amp;msg)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">int</span> rtpPort, rtcpPort;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">sscanf</span>(serverPortStr.c_str(), <span class="string">"%d-%d"</span>, &amp;rtpPort, &amp;rtcpPort) != <span class="number">2</span></span><br><span class="line">            || rtpPort &lt;= <span class="number">0</span> || rtpPort &gt; <span class="number">65535</span></span><br><span class="line">            || rtcpPort &lt;=<span class="number">0</span> || rtcpPort &gt; <span class="number">65535</span></span><br><span class="line">            || rtcpPort != rtpPort + <span class="number">1</span>) &#123;</span><br><span class="line">        ALOGE(<span class="string">"Invalid server_port description '%s'."</span>,</span><br><span class="line">                serverPortStr.c_str());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ERROR_MALFORMED;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rtpPort &amp; <span class="number">1</span>) &#123;</span><br><span class="line">        ALOGW(<span class="string">"Server picked an odd numbered RTP port."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> mRTPSink-&gt;connect(sourceHost.c_str(), rtpPort, rtcpPort);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>connect()</code>方法中，通过<code>ANetworkSession</code>完成对应RTP与RTCP连接的connect操作。其中RTP与RTCP的Session在init()方法调用的时候已经创建完毕，这里不再展示。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">RTPSink::connect</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">const</span> <span class="keyword">char</span> *host, <span class="keyword">int32_t</span> remoteRtpPort, <span class="keyword">int32_t</span> remoteRtcpPort)</span> </span>&#123;</span><br><span class="line">    ALOGI(<span class="string">"connecting RTP/RTCP sockets to %s:&#123;%d,%d&#125;"</span>,</span><br><span class="line">          host, remoteRtpPort, remoteRtcpPort);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err =</span><br><span class="line">        mNetSession-&gt;connectUDPSession(mRTPSessionID, host, remoteRtpPort);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (err != OK) &#123;</span><br><span class="line">        <span class="keyword">return</span> err;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    err = mNetSession-&gt;connectUDPSession(mRTCPSessionID, host, remoteRtcpPort);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (err != OK) &#123;</span><br><span class="line">        <span class="keyword">return</span> err;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>前面我们提到了<code>RTPSink</code>继承了<code>AHandler</code>，因此创建相关<code>UDPSession</code>传入的<code>kWhatRTPNotify</code>与<code>kWhatRTCPNotify</code>消息最终会回调到<code>onMessageReceived()</code>方法中去处理。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">RTPSink::onMessageReceived</span><span class="params">(<span class="keyword">const</span> sp&lt;AMessage&gt; &amp;msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (msg-&gt;what()) &#123;</span><br><span class="line">        <span class="keyword">case</span> kWhatRTPNotify:</span><br><span class="line">        <span class="keyword">case</span> kWhatRTCPNotify:</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">int32_t</span> reason;</span><br><span class="line">            CHECK(msg-&gt;findInt32(<span class="string">"reason"</span>, &amp;reason));</span><br><span class="line"></span><br><span class="line">            <span class="keyword">switch</span> (reason) &#123;</span><br><span class="line">                <span class="keyword">case</span> ANetworkSession::kWhatError:</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// 处理网络异常状态，忽略</span></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">case</span> ANetworkSession::kWhatDatagram:</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">int32_t</span> sessionID;</span><br><span class="line">                    CHECK(msg-&gt;findInt32(<span class="string">"sessionID"</span>, &amp;sessionID));</span><br><span class="line"></span><br><span class="line">                    sp&lt;ABuffer&gt; data;</span><br><span class="line">                    <span class="comment">// 取出ABuffer中的RTP或者RTCP数据包</span></span><br><span class="line">                    CHECK(msg-&gt;findBuffer(<span class="string">"data"</span>, &amp;data));</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">status_t</span> err;</span><br><span class="line">                    <span class="comment">// 根据消息类型分别进行RTP与RTCP包的解析</span></span><br><span class="line">                    <span class="keyword">if</span> (msg-&gt;what() == kWhatRTPNotify) &#123;</span><br><span class="line">                        err = parseRTP(data);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        err = parseRTCP(data);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在前面的文章中我们也提到，经过多台手机的抓包测试，发现抓到的UDP数据中只包含了RTP数据包，而没有发现RTCP数据包。因此我们这里的分析先不考虑RTCP数据包的处理，直接看RTP包的解析即可。详细解析看注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">RTPSink::parseRTP</span><span class="params">(<span class="keyword">const</span> sp&lt;ABuffer&gt; &amp;buffer)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">size_t</span> size = buffer-&gt;size();</span><br><span class="line">    <span class="keyword">if</span> (size &lt; <span class="number">12</span>) &#123;</span><br><span class="line">        <span class="comment">// Too short to be a valid RTP header.</span></span><br><span class="line">        <span class="comment">// RTP的固定包头至少12字节，包含CSRC的时候会超过12字节</span></span><br><span class="line">        <span class="keyword">return</span> ERROR_MALFORMED;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">uint8_t</span> *data = buffer-&gt;data();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 按照以下RTP固定包头进行解析</span></span><br><span class="line">    <span class="comment">//  0                   1                   2                   3</span></span><br><span class="line">    <span class="comment">//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span></span><br><span class="line">    <span class="comment">// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span></span><br><span class="line">    <span class="comment">// |V=2|P|X|  CC   |M|     PT      |       sequence number         |</span></span><br><span class="line">    <span class="comment">// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span></span><br><span class="line">    <span class="comment">// |                           timestamp                           |</span></span><br><span class="line">    <span class="comment">// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span></span><br><span class="line">    <span class="comment">// |           synchronization source (SSRC) identifier            |</span></span><br><span class="line">    <span class="comment">// +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+</span></span><br><span class="line">    <span class="comment">// |            contributing source (CSRC) identifiers             |</span></span><br><span class="line">    <span class="comment">// |                             ....                              |</span></span><br><span class="line">    <span class="comment">// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将解析出来的ssrc、timestamp、payload type、marker等属性设置进buffer的meta域</span></span><br><span class="line">    sp&lt;AMessage&gt; meta = buffer-&gt;meta();</span><br><span class="line">    meta-&gt;setInt32(<span class="string">"ssrc"</span>, srcId);</span><br><span class="line">    meta-&gt;setInt32(<span class="string">"rtp-time"</span>, rtpTime);</span><br><span class="line">    meta-&gt;setInt32(<span class="string">"PT"</span>, data[<span class="number">1</span>] &amp; <span class="number">0x7f</span>);</span><br><span class="line">    meta-&gt;setInt32(<span class="string">"M"</span>, data[<span class="number">1</span>] &gt;&gt; <span class="number">7</span>);</span><br><span class="line">    <span class="comment">// 包头后剩下的字节为MPEG2-TS Payload</span></span><br><span class="line">    buffer-&gt;setRange(payloadOffset, size - payloadOffset);</span><br><span class="line">    <span class="comment">// 根据SSRC获取对应的Source，在一个RTP传输周期内，相同的同步源将具有相同的SSRC</span></span><br><span class="line">    <span class="keyword">ssize_t</span> index = mSources.indexOfKey(srcId);</span><br><span class="line">    <span class="comment">// 若mSources中查找不到，则创建新的Source并加入到映射表中</span></span><br><span class="line">    <span class="keyword">if</span> (index &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (mRenderer == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            sp&lt;AMessage&gt; notifyLost = <span class="keyword">new</span> AMessage(kWhatPacketLost, id());</span><br><span class="line">            notifyLost-&gt;setInt32(<span class="string">"ssrc"</span>, srcId);</span><br><span class="line">            <span class="comment">// 创建TunnelRenderer，为后续的音视频渲染做准备</span></span><br><span class="line">            mRenderer = <span class="keyword">new</span> TunnelRenderer(notifyLost, mSurfaceTex);</span><br><span class="line">            looper()-&gt;registerHandler(mRenderer);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        sp&lt;AMessage&gt; queueBufferMsg =</span><br><span class="line">            <span class="keyword">new</span> AMessage(TunnelRenderer::kWhatQueueBuffer, mRenderer-&gt;id());</span><br><span class="line"></span><br><span class="line">        sp&lt;Source&gt; source = <span class="keyword">new</span> Source(seqNo, buffer, queueBufferMsg);</span><br><span class="line">        mSources.add(srcId, source);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 若已经创建好了Source，直接将buffer入队</span></span><br><span class="line">        mSources.valueAt(index)-&gt;updateSeq(seqNo, buffer);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>updateSeq()</code>方法中，会对sequence包序列号进行一些处理，如：丢包间隙过大、重复包、64K周期循环处理等，最终通过<code>queuePacket()</code>方法将MPEG2-TS数据包入队。其中<code>mQueueBufferMsg</code>为<code>TunnelRenderer::kWhatQueueBuffer</code>类型的消息，最终会在<code>TunnelRenderer</code>中进行处理。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> RTPSink::Source::queuePacket(<span class="keyword">const</span> sp&lt;ABuffer&gt; &amp;buffer) &#123;</span><br><span class="line">    sp&lt;AMessage&gt; msg = mQueueBufferMsg-&gt;dup();</span><br><span class="line">    msg-&gt;setBuffer(<span class="string">"buffer"</span>, buffer);</span><br><span class="line">    msg-&gt;post();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="播放阶段"><a href="#播放阶段" class="headerlink" title="播放阶段"></a>播放阶段</h3><p>数据包来到了<code>TunnelRenderer</code>，它代表一个呈现通道，会接收<code>queuePacket()</code>解包出来的MPEG2-TS音视频流，然后进行播放。其中<code>TunnelRenderer</code>继承了<code>AHandler</code>，因此消息最终会回调到<code>onMessageReceived()</code>方法中去处理。里面的处理也比较简单，主要是buffer入队操作及环境初始化。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">TunnelRenderer::onMessageReceived</span><span class="params">(<span class="keyword">const</span> sp&lt;AMessage&gt; &amp;msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (msg-&gt;what()) &#123;</span><br><span class="line">        <span class="keyword">case</span> kWhatQueueBuffer:</span><br><span class="line">        &#123;</span><br><span class="line">            sp&lt;ABuffer&gt; buffer;</span><br><span class="line">            CHECK(msg-&gt;findBuffer(<span class="string">"buffer"</span>, &amp;buffer));</span><br><span class="line">            <span class="comment">// 将buffer数据入队</span></span><br><span class="line">            queueBuffer(buffer);</span><br><span class="line">            <span class="comment">// 判断StreamSource为空则初始化MediaPlayerService等渲染环境</span></span><br><span class="line">            <span class="keyword">if</span> (mStreamSource == <span class="literal">NULL</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (mTotalBytesQueued &gt; <span class="number">0l</span>l) &#123;</span><br><span class="line">                    initPlayer();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    ALOGI(<span class="string">"Have %lld bytes queued..."</span>, mTotalBytesQueued);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 主要是将TS数据出队，并解析成音视频裸流进行渲染</span></span><br><span class="line">                mStreamSource-&gt;doSomeWork();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>queueBuffer()</code>操作主要将TS包添加到<code>mPackets</code>列表中，其中还对包进行了一些去重与重排序，保证包序列递增。而<code>initPlayer()</code>则对播放环境进行了初始化。详细注释如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">TunnelRenderer::initPlayer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 若mSurfaceTex为空（初始化WifiDisplaySink的时候没有传递mSurfaceTex），则由TunnelRenderer自行创建</span></span><br><span class="line">    <span class="comment">// 这里也意味着想要实现自己的Sink端，我们可以在应用层创建好SurfaceTexture，并一步步传递下来</span></span><br><span class="line">    <span class="keyword">if</span> (mSurfaceTex == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        mComposerClient = <span class="keyword">new</span> SurfaceComposerClient;</span><br><span class="line">        CHECK_EQ(mComposerClient-&gt;initCheck(), (<span class="keyword">status_t</span>)OK);</span><br><span class="line"></span><br><span class="line">        DisplayInfo info;</span><br><span class="line">        SurfaceComposerClient::getDisplayInfo(<span class="number">0</span>, &amp;info);</span><br><span class="line">        <span class="keyword">ssize_t</span> displayWidth = info.w;</span><br><span class="line">        <span class="keyword">ssize_t</span> displayHeight = info.h;</span><br><span class="line">        <span class="comment">// 创建SurfaceControl，并从中获取Surface实例</span></span><br><span class="line">        mSurfaceControl =</span><br><span class="line">            mComposerClient-&gt;createSurface(</span><br><span class="line">                    String8(<span class="string">"A Surface"</span>),</span><br><span class="line">                    displayWidth,</span><br><span class="line">                    displayHeight,</span><br><span class="line">                    PIXEL_FORMAT_RGB_565,</span><br><span class="line">                    <span class="number">0</span>);</span><br><span class="line">        ...</span><br><span class="line">        mSurface = mSurfaceControl-&gt;getSurface();</span><br><span class="line">        CHECK(mSurface != <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 通过系统MediaPlayerService创建MediaPlayer实例</span></span><br><span class="line">    mPlayer = service-&gt;create(getpid(), mPlayerClient, <span class="number">0</span>);</span><br><span class="line">    CHECK(mPlayer != <span class="literal">NULL</span>);</span><br><span class="line">    <span class="comment">// 设置DataSource数据流</span></span><br><span class="line">    CHECK_EQ(mPlayer-&gt;setDataSource(mStreamSource), (<span class="keyword">status_t</span>)OK);</span><br><span class="line">    <span class="comment">// 对MediaPlayer设置SurfaceTexture，这样就能在对应的Surface上播放视频了</span></span><br><span class="line">    mPlayer-&gt;setVideoSurfaceTexture(</span><br><span class="line">            mSurfaceTex != <span class="literal">NULL</span> ? mSurfaceTex : mSurface-&gt;getSurfaceTexture());</span><br><span class="line">    <span class="comment">// 启动MediaPlayer，开始播放</span></span><br><span class="line">    mPlayer-&gt;start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>TS包入队之后，会通过<code>mStreamSource-&gt;doSomeWork()</code>方法将TS包出队，并解析成音视频裸流进行渲染。详细解释如下注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> TunnelRenderer::StreamSource::doSomeWork() &#123;</span><br><span class="line">    <span class="function">Mutex::Autolock <span class="title">autoLock</span><span class="params">(mLock)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (!mIndicesAvailable.empty()) &#123;</span><br><span class="line">        <span class="comment">// 将TS包出队</span></span><br><span class="line">        sp&lt;ABuffer&gt; srcBuffer = mOwner-&gt;dequeueBuffer();</span><br><span class="line">        <span class="keyword">if</span> (srcBuffer == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">        ALOGV(<span class="string">"dequeue TS packet of size %d"</span>, srcBuffer-&gt;size());</span><br><span class="line">        <span class="comment">// 获取可用buffer的index</span></span><br><span class="line">        <span class="keyword">size_t</span> index = *mIndicesAvailable.begin();</span><br><span class="line">        mIndicesAvailable.erase(mIndicesAvailable.begin());</span><br><span class="line">        <span class="comment">// 获取buffer对应的IMemory对象</span></span><br><span class="line">        sp&lt;IMemory&gt; mem = mBuffers.itemAt(index);</span><br><span class="line">        CHECK_LE(srcBuffer-&gt;size(), mem-&gt;size());</span><br><span class="line">        <span class="comment">// 检查Buffer大小，必须是188整数倍，因为单个TS包大小为188B</span></span><br><span class="line">        CHECK_EQ((srcBuffer-&gt;size() % <span class="number">188</span>), <span class="number">0u</span>);</span><br><span class="line">        <span class="comment">// 通过内存拷贝的形式，将buffer发送到MediaPlayer进行解码与播放</span></span><br><span class="line">        <span class="built_in">memcpy</span>(mem-&gt;pointer(), srcBuffer-&gt;data(), srcBuffer-&gt;size());</span><br><span class="line">        mListener-&gt;queueBuffer(index, srcBuffer-&gt;size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="MPEG2-TS解析"><a href="#MPEG2-TS解析" class="headerlink" title="MPEG2-TS解析"></a>MPEG2-TS解析</h3><p>在<code>Native Sink</code>源码中，最终会通过<code>ATSParser.cpp</code>对TS包进行解析，拿出最终的音视频裸流。首先我们来看下调用的入口，在<code>MPEG2TSExtractor::feedMore()</code>方法中，会把数据包切割成一个个188B的标准TS包，并通过<code>feedTSPacket()</code>送入<code>ATSParser</code>开始解析。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">MPEG2TSExtractor::feedMore</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">Mutex::Autolock <span class="title">autoLock</span><span class="params">(mLock)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">uint8_t</span> packet[kTSPacketSize];</span><br><span class="line">    <span class="keyword">ssize_t</span> n = mDataSource-&gt;readAt(mOffset, packet, kTSPacketSize);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (n &lt; (<span class="keyword">ssize_t</span>)kTSPacketSize) &#123;</span><br><span class="line">        <span class="keyword">return</span> (n &lt; <span class="number">0</span>) ? (<span class="keyword">status_t</span>)n : ERROR_END_OF_STREAM;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mOffset += n;</span><br><span class="line">    <span class="keyword">return</span> mParser-&gt;feedTSPacket(packet, kTSPacketSize);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">ATSParser::feedTSPacket</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *data, <span class="keyword">size_t</span> size)</span> </span>&#123;</span><br><span class="line">    CHECK_EQ(size, kTSPacketSize);</span><br><span class="line"></span><br><span class="line">    <span class="function">ABitReader <span class="title">br</span><span class="params">((<span class="keyword">const</span> <span class="keyword">uint8_t</span> *)data, kTSPacketSize)</span></span>;</span><br><span class="line">    <span class="keyword">return</span> parseTS(&amp;br);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>开始解析TS包（对TS包格式不熟悉的，可以查看之前MPEG2-TS流解析文章），详细解析过程如下注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">ATSParser::parseTS</span><span class="params">(ABitReader *br)</span> </span>&#123;</span><br><span class="line">    ALOGV(<span class="string">"---"</span>);</span><br><span class="line">    <span class="comment">// 检查TS包头的8位同步字节，固定为0x47</span></span><br><span class="line">    <span class="keyword">unsigned</span> sync_byte = br-&gt;getBits(<span class="number">8</span>);</span><br><span class="line">    CHECK_EQ(sync_byte, <span class="number">0x47</span>u);</span><br><span class="line"></span><br><span class="line">    MY_LOGV(<span class="string">"transport_error_indicator = %u"</span>, br-&gt;getBits(<span class="number">1</span>));</span><br><span class="line">    <span class="comment">// 获取payload_unit_start_indicator，标记是否为一帧的起始</span></span><br><span class="line">    <span class="keyword">unsigned</span> payload_unit_start_indicator = br-&gt;getBits(<span class="number">1</span>);</span><br><span class="line">    ALOGV(<span class="string">"payload_unit_start_indicator = %u"</span>, payload_unit_start_indicator);</span><br><span class="line"></span><br><span class="line">    MY_LOGV(<span class="string">"transport_priority = %u"</span>, br-&gt;getBits(<span class="number">1</span>));</span><br><span class="line">    <span class="comment">// 获取TS包的PID</span></span><br><span class="line">    <span class="keyword">unsigned</span> PID = br-&gt;getBits(<span class="number">13</span>);</span><br><span class="line">    ALOGV(<span class="string">"PID = 0x%04x"</span>, PID);</span><br><span class="line"></span><br><span class="line">    MY_LOGV(<span class="string">"transport_scrambling_control = %u"</span>, br-&gt;getBits(<span class="number">2</span>));</span><br><span class="line">    <span class="comment">// 获取适配域</span></span><br><span class="line">    <span class="keyword">unsigned</span> adaptation_field_control = br-&gt;getBits(<span class="number">2</span>);</span><br><span class="line">    ALOGV(<span class="string">"adaptation_field_control = %u"</span>, adaptation_field_control);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">unsigned</span> continuity_counter = br-&gt;getBits(<span class="number">4</span>);</span><br><span class="line">    ALOGV(<span class="string">"PID = 0x%04x, continuity_counter = %u"</span>, PID, continuity_counter);</span><br><span class="line">    <span class="comment">// 判断适配域，'10'表示仅有适配域，'11'表示适配域和Payload都存在</span></span><br><span class="line">    <span class="keyword">if</span> (adaptation_field_control == <span class="number">2</span> || adaptation_field_control == <span class="number">3</span>) &#123;</span><br><span class="line">        <span class="comment">// 开始解析适配域</span></span><br><span class="line">        parseAdaptationField(br, PID);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">status_t</span> err = OK;</span><br><span class="line">    <span class="comment">// 判断适配域，'01'表示仅有Payload，'11'表示适配域和Payload都存在</span></span><br><span class="line">    <span class="keyword">if</span> (adaptation_field_control == <span class="number">1</span> || adaptation_field_control == <span class="number">3</span>) &#123;</span><br><span class="line">        <span class="comment">// 开始根据PID解析Payload</span></span><br><span class="line">        err = parsePID(</span><br><span class="line">                br, PID, continuity_counter, payload_unit_start_indicator);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ++mNumTSPacketsParsed;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中对适配域的解析<code>parseAdaptationField()</code>中比较关键的就是对PCR时钟的解析：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ATSParser::parseAdaptationField</span><span class="params">(ABitReader *br, <span class="keyword">unsigned</span> PID)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> adaptation_field_length = br-&gt;getBits(<span class="number">8</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (adaptation_field_length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// 解析PCR flag，判断适配域头后是否有PCR时钟</span></span><br><span class="line">        <span class="keyword">unsigned</span> PCR_flag = br-&gt;getBits(<span class="number">1</span>);</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">if</span> (PCR_flag) &#123;</span><br><span class="line">            br-&gt;skipBits(<span class="number">4</span>);</span><br><span class="line">            <span class="comment">// 解析33比特的低精度部分</span></span><br><span class="line">            <span class="keyword">uint64_t</span> PCR_base = br-&gt;getBits(<span class="number">32</span>);</span><br><span class="line">            PCR_base = (PCR_base &lt;&lt; <span class="number">1</span>) | br-&gt;getBits(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">            br-&gt;skipBits(<span class="number">6</span>);</span><br><span class="line">            <span class="comment">// 解析9比特的高精度部分</span></span><br><span class="line">            <span class="keyword">unsigned</span> PCR_ext = br-&gt;getBits(<span class="number">9</span>);</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 计算出最终的PCR时钟</span></span><br><span class="line">            <span class="keyword">uint64_t</span> PCR = PCR_base * <span class="number">300</span> + PCR_ext;</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment">// 更新本地PCR时钟统计</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; mPrograms.size(); ++i) &#123;</span><br><span class="line">                updatePCR(PID, PCR, byteOffsetFromStart);</span><br><span class="line">            &#125;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>ATSParser::parsePID()</code>方法开始根据PID对PAT与PMT进行解析，详细解析如下注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">status_t</span> <span class="title">ATSParser::parsePID</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        ABitReader *br, <span class="keyword">unsigned</span> PID,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">unsigned</span> continuity_counter,</span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">unsigned</span> payload_unit_start_indicator)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 首先根据PID找出PSI，目前只用到了PAT与PMT这两类PSI</span></span><br><span class="line">    <span class="comment">// 其中PAT的PID固定为0，在ATSParser初始化初期已经add进去</span></span><br><span class="line">    <span class="keyword">ssize_t</span> sectionIndex = mPSISections.indexOfKey(PID);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (sectionIndex &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">const</span> sp&lt;PSISection&gt; &amp;section = mPSISections.valueAt(sectionIndex);</span><br><span class="line">        ...</span><br><span class="line">        <span class="function">ABitReader <span class="title">sectionBits</span><span class="params">(section-&gt;data(), section-&gt;size())</span></span>;</span><br><span class="line">        <span class="comment">// 若PID为0，则以PAT的格式进行解析</span></span><br><span class="line">        <span class="keyword">if</span> (PID == <span class="number">0</span>) &#123;</span><br><span class="line">            parseProgramAssociationTable(&amp;sectionBits);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 否则将以PMT的格式进行解析</span></span><br><span class="line">            <span class="keyword">bool</span> handled = <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; mPrograms.size(); ++i) &#123;</span><br><span class="line">                <span class="keyword">status_t</span> err;</span><br><span class="line">                <span class="comment">// parsePSISection()会调用parseProgramMap()解析PMT</span></span><br><span class="line">                <span class="keyword">if</span> (!mPrograms.editItemAt(i)-&gt;parsePSISection(</span><br><span class="line">                            PID, &amp;sectionBits, &amp;err)) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 处理成功则移除PID对应的PSISections</span></span><br><span class="line">            <span class="keyword">if</span> (!handled) &#123;</span><br><span class="line">                mPSISections.removeItem(PID);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 遍历所有节目，对音视频的ES流进行解析</span></span><br><span class="line">    <span class="keyword">bool</span> handled = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; mPrograms.size(); ++i) &#123;</span><br><span class="line">        <span class="keyword">status_t</span> err;</span><br><span class="line">        <span class="keyword">if</span> (mPrograms.editItemAt(i)-&gt;parsePID(</span><br><span class="line">                    PID, continuity_counter, payload_unit_start_indicator,</span><br><span class="line">                    br, &amp;err)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (err != OK) &#123;</span><br><span class="line">                <span class="keyword">return</span> err;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            handled = <span class="literal">true</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们先来分析下PAT的解析过程，主要是完成<code>[节目编号-&gt;PID]</code>的映射解析，详见注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ATSParser::parseProgramAssociationTable</span><span class="params">(ABitReader *br)</span> </span>&#123;</span><br><span class="line">    ... <span class="comment">// 此处省略PAT常规字段的解析</span></span><br><span class="line">    <span class="comment">// 遍历节目列表进行[节目编号-&gt;PID]的映射解析</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; numProgramBytes / <span class="number">4</span>; ++i) &#123;</span><br><span class="line">        <span class="keyword">unsigned</span> program_number = br-&gt;getBits(<span class="number">16</span>);</span><br><span class="line">        ALOGV(<span class="string">"    program_number = %u"</span>, program_number);</span><br><span class="line"></span><br><span class="line">        MY_LOGV(<span class="string">"    reserved = %u"</span>, br-&gt;getBits(<span class="number">3</span>));</span><br><span class="line">        <span class="comment">// 节目编号0的时候为network_PID，这里没有用到，忽略</span></span><br><span class="line">        <span class="keyword">if</span> (program_number == <span class="number">0</span>) &#123;</span><br><span class="line">            MY_LOGV(<span class="string">"    network_PID = 0x%04x"</span>, br-&gt;getBits(<span class="number">13</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 开始对应[节目编号-&gt;PID]的映射解析</span></span><br><span class="line">            <span class="keyword">unsigned</span> programMapPID = br-&gt;getBits(<span class="number">13</span>);</span><br><span class="line"></span><br><span class="line">            ALOGV(<span class="string">"    program_map_PID = 0x%04x"</span>, programMapPID);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">bool</span> found = <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">size_t</span> index = <span class="number">0</span>; index &lt; mPrograms.size(); ++index) &#123;</span><br><span class="line">                <span class="keyword">const</span> sp&lt;Program&gt; &amp;program = mPrograms.itemAt(index);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (program-&gt;number() == program_number) &#123;</span><br><span class="line">                    program-&gt;updateProgramMapPID(programMapPID);</span><br><span class="line">                    found = <span class="literal">true</span>;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 添加节目列表</span></span><br><span class="line">            <span class="keyword">if</span> (!found) &#123;</span><br><span class="line">                mPrograms.push(</span><br><span class="line">                        <span class="keyword">new</span> Program(<span class="keyword">this</span>, program_number, programMapPID));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 添加节目对应的PSISection</span></span><br><span class="line">            <span class="keyword">if</span> (mPSISections.indexOfKey(programMapPID) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                mPSISections.add(programMapPID, <span class="keyword">new</span> PSISection);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>紧接着是PMT的解析，主要是完成<code>[ES流-&gt;PID]</code>的映射解析，并创建对应的<code>Stream</code>对象，详见注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">status_t</span> ATSParser::Program::parseProgramMap(ABitReader *br) &#123;</span><br><span class="line">    ... <span class="comment">// 此处省略PMT常规字段的解析</span></span><br><span class="line">    <span class="comment">// infoBytesRemaining is the number of bytes that make up the</span></span><br><span class="line">    <span class="comment">// variable length section of ES_infos. It does not include the</span></span><br><span class="line">    <span class="comment">// final CRC.</span></span><br><span class="line">    <span class="keyword">size_t</span> infoBytesRemaining = section_length - <span class="number">9</span> - program_info_length - <span class="number">4</span>;</span><br><span class="line">    <span class="comment">// 遍历所有Stream，完成[ES流-&gt;PID]的映射解析</span></span><br><span class="line">    <span class="keyword">while</span> (infoBytesRemaining &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        CHECK_GE(infoBytesRemaining, <span class="number">5u</span>);</span><br><span class="line">        <span class="comment">// 这里最重要的就是streamType与PID的解析</span></span><br><span class="line">        <span class="keyword">unsigned</span> streamType = br-&gt;getBits(<span class="number">8</span>);</span><br><span class="line">        ALOGV(<span class="string">"    stream_type = 0x%02x"</span>, streamType);</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">unsigned</span> elementaryPID = br-&gt;getBits(<span class="number">13</span>);</span><br><span class="line">        ALOGV(<span class="string">"    elementary_PID = 0x%04x"</span>, elementaryPID);</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// 添加StreamInfo到列表中</span></span><br><span class="line">        StreamInfo info;</span><br><span class="line">        info.mType = streamType;</span><br><span class="line">        info.mPID = elementaryPID;</span><br><span class="line">        infos.push(info);</span><br><span class="line"></span><br><span class="line">        infoBytesRemaining -= <span class="number">5</span> + ES_info_length;</span><br><span class="line">    &#125;</span><br><span class="line">    ... <span class="comment">// 此处省略PID改变导致的异常的处理，基本可以忽略</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历StreamInfo，根据PID添加对应的音视频Stream</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; infos.size(); ++i) &#123;</span><br><span class="line">        StreamInfo &amp;info = infos.editItemAt(i);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">ssize_t</span> index = mStreams.indexOfKey(info.mPID);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (index &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            sp&lt;Stream&gt; stream = <span class="keyword">new</span> Stream(</span><br><span class="line">                    <span class="keyword">this</span>, info.mPID, info.mType, PCR_PID);</span><br><span class="line"></span><br><span class="line">            mStreams.add(info.mPID, stream);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后就到了音视频流的解析，调用对应<code>Stream</code>的<code>parse()</code>方法开始进行解析：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> ATSParser::Program::parsePID(</span><br><span class="line">        <span class="keyword">unsigned</span> pid, <span class="keyword">unsigned</span> continuity_counter,</span><br><span class="line">        <span class="keyword">unsigned</span> payload_unit_start_indicator,</span><br><span class="line">        ABitReader *br, <span class="keyword">status_t</span> *err) &#123;</span><br><span class="line">    *err = OK;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">ssize_t</span> index = mStreams.indexOfKey(pid);</span><br><span class="line">    <span class="keyword">if</span> (index &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 根据PID查找出对应的Stream，开始解析</span></span><br><span class="line">    *err = mStreams.editValueAt(index)-&gt;parse(</span><br><span class="line">            continuity_counter, payload_unit_start_indicator, br);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Stream</code>解析的过程中，最重要的是<code>payload_unit_start_indicator</code>这个参数。前面我们说到，要获得一帧完整的数据，就需要把连续几个TS包里的Payload数据全部取出来，才能组合成一个PES包。那么<code>payload_unit_start_indicator</code>值为1时代表一个完整的音视频数据包的开始。那么从这里开始，直到下一个值为1的包为止（相同PID的ES流），把所有的这些TS包组合起来就是一个完整的PES包。了解了这个要点，看下面的代码就比较简单了：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">status_t</span> ATSParser::Stream::parse(</span><br><span class="line">        <span class="keyword">unsigned</span> continuity_counter,</span><br><span class="line">        <span class="keyword">unsigned</span> payload_unit_start_indicator, ABitReader *br) &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> (payload_unit_start_indicator) &#123;</span><br><span class="line">        <span class="comment">// payload_unit_start_indicator值为1并且之前已经started了，则触发flush()开始解析PES</span></span><br><span class="line">        <span class="comment">// 因为这个时候已经组装完一个完成的PES包了</span></span><br><span class="line">        <span class="keyword">if</span> (mPayloadStarted) &#123;</span><br><span class="line">            <span class="comment">// Otherwise we run the danger of receiving the trailing bytes</span></span><br><span class="line">            <span class="comment">// of a PES packet that we never saw the start of and assuming</span></span><br><span class="line">            <span class="comment">// we have a a complete PES packet.</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">status_t</span> err = flush();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (err != OK) &#123;</span><br><span class="line">                <span class="keyword">return</span> err;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mPayloadStarted = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!mPayloadStarted) &#123;</span><br><span class="line">        <span class="keyword">return</span> OK;</span><br><span class="line">    &#125;</span><br><span class="line">    ... <span class="comment">// 这部分省略的代码主要是对PES的buffer进行组装</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>flush()</code>操作调用了<code>parsePES()</code>开始对PES包进行解析，然后解析出<code>PES data</code>，详细解析如下注释：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">status_t</span> ATSParser::Stream::parsePES(ABitReader *br) &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 解析Stream ID</span></span><br><span class="line">    <span class="keyword">unsigned</span> stream_id = br-&gt;getBits(<span class="number">8</span>);</span><br><span class="line">    ALOGV(<span class="string">"stream_id = 0x%02x"</span>, stream_id);</span><br><span class="line">    <span class="comment">// 获取PES包的长度，注意这里的长度为后续Payload长度，不包含自身，单位为字节</span></span><br><span class="line">    <span class="keyword">unsigned</span> PES_packet_length = br-&gt;getBits(<span class="number">16</span>);</span><br><span class="line">    ALOGV(<span class="string">"PES_packet_length = %u"</span>, PES_packet_length);</span><br><span class="line">    <span class="comment">// 过滤掉非音视频PES，开始解析</span></span><br><span class="line">    <span class="keyword">if</span> (stream_id != <span class="number">0xbc</span>  <span class="comment">// program_stream_map</span></span><br><span class="line">            &amp;&amp; stream_id != <span class="number">0xbe</span>  <span class="comment">// padding_stream</span></span><br><span class="line">            &amp;&amp; stream_id != <span class="number">0xbf</span>  <span class="comment">// private_stream_2</span></span><br><span class="line">            &amp;&amp; stream_id != <span class="number">0xf0</span>  <span class="comment">// ECM</span></span><br><span class="line">            &amp;&amp; stream_id != <span class="number">0xf1</span>  <span class="comment">// EMM</span></span><br><span class="line">            &amp;&amp; stream_id != <span class="number">0xff</span>  <span class="comment">// program_stream_directory</span></span><br><span class="line">            &amp;&amp; stream_id != <span class="number">0xf2</span>  <span class="comment">// DSMCC</span></span><br><span class="line">            &amp;&amp; stream_id != <span class="number">0xf8</span>) &#123;  <span class="comment">// H.222.1 type E</span></span><br><span class="line">        ... <span class="comment">// 省略部分Header字段解析</span></span><br><span class="line">        <span class="keyword">if</span> (PTS_DTS_flags == <span class="number">2</span> || PTS_DTS_flags == <span class="number">3</span>) &#123;</span><br><span class="line">            ... <span class="comment">// 解析PTS，其中2代表'10'，只有PTS；3代表'11'，PTS与DTS都有</span></span><br><span class="line">            ALOGV(<span class="string">"PTS = 0x%016llx (%.2f)"</span>, PTS, PTS / <span class="number">90000.0</span>);</span><br><span class="line"></span><br><span class="line">            optional_bytes_remaining -= <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (PTS_DTS_flags == <span class="number">3</span>) &#123;</span><br><span class="line">                ... <span class="comment">// 解析DTS</span></span><br><span class="line">                ALOGV(<span class="string">"DTS = %llu"</span>, DTS);</span><br><span class="line"></span><br><span class="line">                optional_bytes_remaining -= <span class="number">5</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ... <span class="comment">// 省略部分Header字段解析</span></span><br><span class="line">        <span class="comment">// ES data follows.</span></span><br><span class="line">        <span class="comment">// 开始解析PES data</span></span><br><span class="line">        <span class="keyword">if</span> (PES_packet_length != <span class="number">0</span>) &#123;</span><br><span class="line">            CHECK_GE(PES_packet_length, PES_header_data_length + <span class="number">3</span>);</span><br><span class="line">            <span class="comment">// PES data大小：包长度 - PES固定头长度3 - Header的data长度</span></span><br><span class="line">            <span class="keyword">unsigned</span> dataLength =</span><br><span class="line">                PES_packet_length - <span class="number">3</span> - PES_header_data_length;</span><br><span class="line">            <span class="comment">// 对剩余字节数进行校验，确保与上面的dataLength一致</span></span><br><span class="line">            <span class="keyword">if</span> (br-&gt;numBitsLeft() &lt; dataLength * <span class="number">8</span>) &#123;</span><br><span class="line">                ALOGE(<span class="string">"PES packet does not carry enough data to contain "</span></span><br><span class="line">                     <span class="string">"payload. (numBitsLeft = %d, required = %d)"</span>,</span><br><span class="line">                     br-&gt;numBitsLeft(), dataLength * <span class="number">8</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> ERROR_MALFORMED;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            CHECK_GE(br-&gt;numBitsLeft(), dataLength * <span class="number">8</span>);</span><br><span class="line">            <span class="comment">// 通过onPayloadData()回调音视频PES data</span></span><br><span class="line">            onPayloadData(</span><br><span class="line">                    PTS_DTS_flags, PTS, DTS, br-&gt;data(), dataLength);</span><br><span class="line"></span><br><span class="line">            br-&gt;skipBits(dataLength * <span class="number">8</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// PES_packet_length为0的情况下，把剩余的字节当做PES data</span></span><br><span class="line">            onPayloadData(</span><br><span class="line">                    PTS_DTS_flags, PTS, DTS,</span><br><span class="line">                    br-&gt;data(), br-&gt;numBitsLeft() / <span class="number">8</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">size_t</span> payloadSizeBits = br-&gt;numBitsLeft();</span><br><span class="line">            CHECK_EQ(payloadSizeBits % <span class="number">8</span>, <span class="number">0u</span>);</span><br><span class="line"></span><br><span class="line">            ALOGV(<span class="string">"There's %d bytes of payload."</span>, payloadSizeBits / <span class="number">8</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> OK;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最终，通过<code>onPayloadData()</code>回调音视频裸流给<code>MediaPlayer</code>进行解码，进行音视频数据的播放，整个<code>Native Sink</code>端的流程就到此结束了。相信看完上面所有源码解析后，自己写这部分逻辑也不是难事，当然更好的办法肯定是基于Sink端的代码进行移植。</p>
+<p>移植<code>Native Sink</code>的难点主要是对Native相关的依赖代码进行隔离，如：<code>ALooper</code>与<code>AHandler</code>异步消息机制、<code>ANetworkSession</code>网络连接部分与<code>foundation</code>包下的相关的实现等，且移植需要一定的C/C++与NDK开发能力。这里建议可以通过Android应用层实现RTSP连接（Socket/Netty）、音视频解码（MediaCodec/FFmpeg）与渲染（SurfaceView/TextureView），然后把底层的RTP、MPEG2-TS解析部分的代码进行移植，这样可以大大减少Native相关的依赖，提高移植效率。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/RTFSC/" rel="tag"># RTFSC</a>
+          
+            <a href="/tags/Miracast/" rel="tag"># Miracast</a>
+          
+            <a href="/tags/Sink/" rel="tag"># Sink</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/miracast-mpeg2ts/" rel="next" title="Miracast技术详解（三）：RTP & MPEG2-TS">
+                <i class="fa fa-chevron-left"></i> Miracast技术详解（三）：RTP & MPEG2-TS
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="codezjx">
+          <p class="site-author-name" itemprop="name">codezjx</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/codezjx" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/codezjx" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://stackoverflow.com/users/3919425" target="_blank" title="StackOverflow">
+                  
+                    <i class="fa fa-fw fa-stack-overflow"></i>
+                  
+                  StackOverflow
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/2350975412" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Sink源码概述"><span class="nav-number">1.</span> <span class="nav-text">Sink源码概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导入源码"><span class="nav-number">2.</span> <span class="nav-text">导入源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RTFSC"><span class="nav-number">3.</span> <span class="nav-text">RTFSC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP通讯"><span class="nav-number">3.1.</span> <span class="nav-text">RTSP通讯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTP通讯"><span class="nav-number">3.2.</span> <span class="nav-text">RTP通讯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#播放阶段"><span class="nav-number">3.3.</span> <span class="nav-text">播放阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MPEG2-TS解析"><span class="nav-number">3.4.</span> <span class="nav-text">MPEG2-TS解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">codezjx</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
