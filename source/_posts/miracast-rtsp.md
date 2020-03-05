@@ -136,6 +136,116 @@ CSeq: 3\r\n
 \r\n
 ```
 
+### wfd_video_formats格式解析
+
+在官方[WifiDisplaySource.cpp][1]源码中，有对`wfd_video_formats`格式做了详细解释，各个字段的含义如下：
+```java
+// wfd_video_formats:
+// 1 byte "native"
+// 1 byte "preferred-display-mode-supported" 0 or 1
+// one or more avc codec structures
+//   1 byte profile
+//   1 byte level
+//   4 byte CEA mask
+//   4 byte VESA mask
+//   4 byte HH mask
+//   1 byte latency
+//   2 byte min-slice-slice
+//   2 byte slice-enc-params
+//   1 byte framerate-control-support
+//   max-hres (none or 2 byte)
+//   max-vres (none or 2 byte)
+```
+
+其中比较重要的几个字段解释如下图所示：
+
+| Field | Size (octets) | Description |
+| :-----| :---- | :---- |
+| Native Resolutions/Refresh Rates bitmap | 1 | Bitmap defined in Table 37 detailing native display resolutions and refresh rates supported by the WFD Sink.
+| Profiles bitmap | 1 | Bitmap defined in Table 38 detailing the H.264 profile indicated by this instance of the WFD Video Formats subelement.
+| Levels bitmap | 1 | Bitmap defined in Table 39 detailing the H.264 level indicated by this instance of the WFD Video Formats subelement.
+| CEA Resolutions/Refresh Rates bitmap | 4 | Bitmap defined in Table 34 detailing CEA resolutions and refresh rates supported by the CODEC.
+| VESA Resolutions/Refresh Rates bitmap | 4 | Bitmap defined in Table 35 detailing VESA resolutions and refresh rates supported by the CODEC.
+| HH Resolutions/Refresh Rates bitmap | 4 | Bitmap defined in Table 36 detailing HH resolutions and refresh rates supported by the CODEC.
+
+#### Native Resolutions/Refresh Rates Bitmap
+
+该字段描述了Sink端设备当前的分辨率与刷新率，占1字节，其中低3位代表了分辨率模式选择位，高5位则代表当前分辨率与刷新率在表中的index。其中000代表选用CEA标准分辨率，而001则代表VESA标准分辨率，详见下表：
+
+| Bits | Name | Interpretation |
+| :-----| :---- | :---- |
+|2:0 |Table Selection bits |0b000: Resolution/Refresh rate table selection: Index to CEA resolution/refresh rates (Table 34)<br>0b001: Resolution/Refresh rate table selection: Index VESA resolution/refresh rates (Table 35)<br>0b010: Resolution/Refresh rate table selection: Index HH resolutions/refresh rates (Table 36)<br>0b011~0b111: Reserved
+|7:3 |Index bits |Index into resolution/refresh rate table selected by [B2:B0]
+
+#### CEA Resolutions/Refresh Rates Bitmap
+
+该字段描述了当前Sink端设备所支持的分辨率与刷新率，占4个字节，总共32位，其中每一位都是一个flag，值为1代表支持该标志位对应的分辨率与刷新率。其中可以同时对多个标志位置1，代表同时支持这几种分辨率与刷新率。
+
+| Bits | Index | Interpretation |
+| :-----| :---- | :---- |
+|0 |0 |640x480 p60
+|1 |1 |720x480 p60
+|2 |2 |720x480 i60
+|3 |3 |720x576 p50
+|4 |4 |720x576 i50
+|5 |5 |1280x720 p30
+|6 |6 |1280x720 p60
+|7 |7 |1920x1080 p30
+|8 |8 |1920x1080 p60
+|9 |9 |1920x1080 i60
+|10 |10 |1280x720 p25
+|11 |11 |1280x720 p50
+|12 |12 |1920x1080 p25
+|13 |13 |1920x1080 p50
+|14 |14 |1920x1080 i50
+|15 |15 |1280x720 p24
+|16 |16 |1920x1080 p24
+|31:17 |- |Reserved
+
+#### Profiles Bitmap
+
+该字段描述了当前Sink端设备所支持的H.264 profile配置，占1字节，低0位与低1位分别是CBP(Constrained Baseline Profile)与CHP(Constrained High Profile)标志位，置1时代表支持该配置，剩下的6位则为保留位。
+
+| Bits | Name | Interpretation |
+| :-----| :---- | :---- |
+|0 |CBP bit |0b0: Constrained Baseline Profile (CBP) not supported<br>0b1: CBP supported
+|1 |CHP bit |0b0: Constrained High Profile (CHP) not supported<br>0b1: CHP supported
+|7:2 |Reserved |Set to all zeros
+
+#### Levels Bitmap
+
+该字段描述了当前Sink端设备所支持的H.264 level限制。其中level是一组特定的约束，表示一个profile所需的解码性能。占1字节，低5位代表了各个level的flag位，置1时表示支持该level。关于H.264中profile与level的介绍不在这里详细展开，有兴趣的可以自行了解。
+
+| Bits | Name | Interpretation |
+| :-----| :---- | :---- |
+|0 |H.264 Level 3.1 bit |0b0: H.264 Level 3.1 not supported<br>0b1: H.264 Level 3.1 supported
+|1 |H.264 Level 3.2 bit |0b0: H.264 Level 3.2 not supported<br>0b1: H.264 Level 3.2 supported
+|2 |H.264 Level 4 bit |0b0: H.264 Level 4 not supported<br>0b1: H.264 Level 4 supported
+|3 |H.264 Level 4.1 bit |0b0: H.264 Level 4.1 not supported<br>0b1: H.264 Level 4.1 supported
+|4 |H.264 Level 4.2 bit |0b0: H.264 Level 4.2 not supported<br>0b1: H.264 Level 4.2 supported
+|7:5 |Reserved |Set to all zeros
+
+#### Example
+
+我们这里拿几个官方的Example来帮助大家理解，如第一组数据`30 00 02 02 00000040 ...`对应为`720p/60`帧，其中
+- `Native 30`二进制表示为`0011 0000`，低3位为0，代表CEA标准分辨率；高5位为分辨率index，00110换算为6，对应CEA分辨率表中的Index 6`1280x720 p60`
+- `Profile 02`二进制表示为`0000 0010`，表示支持Constrained High Profile
+- `Levels 02`二进制表示为`0000 0010`，表示支持H.264 Level 3.2
+- `CEA 00000040`二进制`0000 0000 0000 0000 0000 0000 0100 0000`，也就是第6位flag置1，对应CEA分辨率表中的Index 6`1280x720 p60`。此外，CEA字段可以同时对多个标志位置1，代表同时支持这几种分辨率与刷新率。
+
+其他的几个Example大家可以按照上面的思路一一分析，这里不再展开。
+
+```
+// For 720p60:
+//   use "30 00 02 02 00000040 00000000 00000000 00 0000 0000 00 none none\r\n"
+// For 720p30:
+//   use "28 00 02 02 00000020 00000000 00000000 00 0000 0000 00 none none\r\n"
+// For 720p24:
+//   use "78 00 02 02 00008000 00000000 00000000 00 0000 0000 00 none none\r\n"
+// For 1080p30:
+//   use "38 00 02 02 00000080 00000000 00000000 00 0000 0000 00 none none\r\n"
+```
+
 ## WFD会话建立（Session Establishment）
 
 在Sink回复完M4指令后，能力协商的过程就结束了，下一步则是WFD会话建立过程，主要涉及到`RTSP M5-M7`指令。双方将按照以下顺序发送与处理消息。
@@ -310,3 +420,5 @@ Wi-Fi_Display_Technical_Specification_v2.1_0.pdf
 - 4.8 WFD session establishment
 - 6.4 RTSP Messages
 - 6.5.1 WFD keep-alive
+
+[1]: https://android.googlesource.com/platform/frameworks/av/+/android-4.2.2_r1.2/media/libstagefright/wifi-display/source/WifiDisplaySource.cpp
