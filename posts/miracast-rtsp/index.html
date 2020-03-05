@@ -105,7 +105,7 @@
 <meta property="og:image" content="http://yoursite.com/posts/miracast-rtsp/capability-negotiation.jpg">
 <meta property="og:image" content="http://yoursite.com/posts/miracast-rtsp/wfd-session.jpg">
 <meta property="og:image" content="http://yoursite.com/posts/miracast-rtsp/wfd-timeline.jpg">
-<meta property="og:updated_time" content="2020-02-11T17:01:31.310Z">
+<meta property="og:updated_time" content="2020-03-05T13:46:19.584Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Miracast技术详解（二）：RTSP协议">
 <meta name="twitter:description" content="RTSP概述在上一篇博客中我们已经通过Wi-Fi P2P建立好了Source和Sink端的TCP连接，在Miracast后续的音视频传输过程中，将采用RTSP协议来对流媒体进行控制。因此接下来的步骤就到了RTSP协商、会话建立及流媒体传输的阶段。首先，什么是RTSP协议呢？ 实时流协议（Real Time Streaming Protocol，RTSP）是一种网络应用协议，专为娱乐和通信系统的使用">
@@ -408,6 +408,244 @@
 
 <p>Response(Sink -&gt; Source)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RTSP/1.0 200 OK\r\n</span><br><span class="line">CSeq: 3\r\n</span><br><span class="line">\r\n</span><br></pre></td></tr></table></figure>
+
+<h3 id="wfd-video-formats格式解析"><a href="#wfd-video-formats格式解析" class="headerlink" title="wfd_video_formats格式解析"></a>wfd_video_formats格式解析</h3><p>在官方<a href="https://android.googlesource.com/platform/frameworks/av/+/android-4.2.2_r1.2/media/libstagefright/wifi-display/source/WifiDisplaySource.cpp" target="_blank" rel="noopener">WifiDisplaySource.cpp</a>源码中，有对<code>wfd_video_formats</code>格式做了详细解释，各个字段的含义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// wfd_video_formats:</span></span><br><span class="line"><span class="comment">// 1 byte "native"</span></span><br><span class="line"><span class="comment">// 1 byte "preferred-display-mode-supported" 0 or 1</span></span><br><span class="line"><span class="comment">// one or more avc codec structures</span></span><br><span class="line"><span class="comment">//   1 byte profile</span></span><br><span class="line"><span class="comment">//   1 byte level</span></span><br><span class="line"><span class="comment">//   4 byte CEA mask</span></span><br><span class="line"><span class="comment">//   4 byte VESA mask</span></span><br><span class="line"><span class="comment">//   4 byte HH mask</span></span><br><span class="line"><span class="comment">//   1 byte latency</span></span><br><span class="line"><span class="comment">//   2 byte min-slice-slice</span></span><br><span class="line"><span class="comment">//   2 byte slice-enc-params</span></span><br><span class="line"><span class="comment">//   1 byte framerate-control-support</span></span><br><span class="line"><span class="comment">//   max-hres (none or 2 byte)</span></span><br><span class="line"><span class="comment">//   max-vres (none or 2 byte)</span></span><br></pre></td></tr></table></figure>
+
+<p>其中比较重要的几个字段解释如下图所示：</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Size (octets)</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Native Resolutions/Refresh Rates bitmap</td>
+<td align="left">1</td>
+<td align="left">Bitmap defined in Table 37 detailing native display resolutions and refresh rates supported by the WFD Sink.</td>
+</tr>
+<tr>
+<td align="left">Profiles bitmap</td>
+<td align="left">1</td>
+<td align="left">Bitmap defined in Table 38 detailing the H.264 profile indicated by this instance of the WFD Video Formats subelement.</td>
+</tr>
+<tr>
+<td align="left">Levels bitmap</td>
+<td align="left">1</td>
+<td align="left">Bitmap defined in Table 39 detailing the H.264 level indicated by this instance of the WFD Video Formats subelement.</td>
+</tr>
+<tr>
+<td align="left">CEA Resolutions/Refresh Rates bitmap</td>
+<td align="left">4</td>
+<td align="left">Bitmap defined in Table 34 detailing CEA resolutions and refresh rates supported by the CODEC.</td>
+</tr>
+<tr>
+<td align="left">VESA Resolutions/Refresh Rates bitmap</td>
+<td align="left">4</td>
+<td align="left">Bitmap defined in Table 35 detailing VESA resolutions and refresh rates supported by the CODEC.</td>
+</tr>
+<tr>
+<td align="left">HH Resolutions/Refresh Rates bitmap</td>
+<td align="left">4</td>
+<td align="left">Bitmap defined in Table 36 detailing HH resolutions and refresh rates supported by the CODEC.</td>
+</tr>
+</tbody></table>
+<h4 id="Native-Resolutions-Refresh-Rates-Bitmap"><a href="#Native-Resolutions-Refresh-Rates-Bitmap" class="headerlink" title="Native Resolutions/Refresh Rates Bitmap"></a>Native Resolutions/Refresh Rates Bitmap</h4><p>该字段描述了Sink端设备当前的分辨率与刷新率，占1字节，其中低3位代表了分辨率模式选择位，高5位则代表当前分辨率与刷新率在表中的index。其中000代表选用CEA标准分辨率，而001则代表VESA标准分辨率，详见下表：</p>
+<table>
+<thead>
+<tr>
+<th align="left">Bits</th>
+<th align="left">Name</th>
+<th align="left">Interpretation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">2:0</td>
+<td align="left">Table Selection bits</td>
+<td align="left">0b000: Resolution/Refresh rate table selection: Index to CEA resolution/refresh rates (Table 34)<br>0b001: Resolution/Refresh rate table selection: Index VESA resolution/refresh rates (Table 35)<br>0b010: Resolution/Refresh rate table selection: Index HH resolutions/refresh rates (Table 36)<br>0b011~0b111: Reserved</td>
+</tr>
+<tr>
+<td align="left">7:3</td>
+<td align="left">Index bits</td>
+<td align="left">Index into resolution/refresh rate table selected by [B2:B0]</td>
+</tr>
+</tbody></table>
+<h4 id="CEA-Resolutions-Refresh-Rates-Bitmap"><a href="#CEA-Resolutions-Refresh-Rates-Bitmap" class="headerlink" title="CEA Resolutions/Refresh Rates Bitmap"></a>CEA Resolutions/Refresh Rates Bitmap</h4><p>该字段描述了当前Sink端设备所支持的分辨率与刷新率，占4个字节，总共32位，其中每一位都是一个flag，值为1代表支持该标志位对应的分辨率与刷新率。其中可以同时对多个标志位置1，代表同时支持这几种分辨率与刷新率。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Bits</th>
+<th align="left">Index</th>
+<th align="left">Interpretation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">640x480 p60</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">720x480 p60</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">2</td>
+<td align="left">720x480 i60</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">3</td>
+<td align="left">720x576 p50</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">4</td>
+<td align="left">720x576 i50</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">5</td>
+<td align="left">1280x720 p30</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">6</td>
+<td align="left">1280x720 p60</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">1920x1080 p30</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="left">8</td>
+<td align="left">1920x1080 p60</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">9</td>
+<td align="left">1920x1080 i60</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">10</td>
+<td align="left">1280x720 p25</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">11</td>
+<td align="left">1280x720 p50</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">12</td>
+<td align="left">1920x1080 p25</td>
+</tr>
+<tr>
+<td align="left">13</td>
+<td align="left">13</td>
+<td align="left">1920x1080 p50</td>
+</tr>
+<tr>
+<td align="left">14</td>
+<td align="left">14</td>
+<td align="left">1920x1080 i50</td>
+</tr>
+<tr>
+<td align="left">15</td>
+<td align="left">15</td>
+<td align="left">1280x720 p24</td>
+</tr>
+<tr>
+<td align="left">16</td>
+<td align="left">16</td>
+<td align="left">1920x1080 p24</td>
+</tr>
+<tr>
+<td align="left">31:17</td>
+<td align="left">-</td>
+<td align="left">Reserved</td>
+</tr>
+</tbody></table>
+<h4 id="Profiles-Bitmap"><a href="#Profiles-Bitmap" class="headerlink" title="Profiles Bitmap"></a>Profiles Bitmap</h4><p>该字段描述了当前Sink端设备所支持的H.264 profile配置，占1字节，低0位与低1位分别是CBP(Constrained Baseline Profile)与CHP(Constrained High Profile)标志位，置1时代表支持该配置，剩下的6位则为保留位。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Bits</th>
+<th align="left">Name</th>
+<th align="left">Interpretation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">CBP bit</td>
+<td align="left">0b0: Constrained Baseline Profile (CBP) not supported<br>0b1: CBP supported</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">CHP bit</td>
+<td align="left">0b0: Constrained High Profile (CHP) not supported<br>0b1: CHP supported</td>
+</tr>
+<tr>
+<td align="left">7:2</td>
+<td align="left">Reserved</td>
+<td align="left">Set to all zeros</td>
+</tr>
+</tbody></table>
+<h4 id="Levels-Bitmap"><a href="#Levels-Bitmap" class="headerlink" title="Levels Bitmap"></a>Levels Bitmap</h4><p>该字段描述了当前Sink端设备所支持的H.264 level限制。其中level是一组特定的约束，表示一个profile所需的解码性能。占1字节，低5位代表了各个level的flag位，置1时表示支持该level。关于H.264中profile与level的介绍不在这里详细展开，有兴趣的可以自行了解。</p>
+<table>
+<thead>
+<tr>
+<th align="left">Bits</th>
+<th align="left">Name</th>
+<th align="left">Interpretation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">H.264 Level 3.1 bit</td>
+<td align="left">0b0: H.264 Level 3.1 not supported<br>0b1: H.264 Level 3.1 supported</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">H.264 Level 3.2 bit</td>
+<td align="left">0b0: H.264 Level 3.2 not supported<br>0b1: H.264 Level 3.2 supported</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">H.264 Level 4 bit</td>
+<td align="left">0b0: H.264 Level 4 not supported<br>0b1: H.264 Level 4 supported</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">H.264 Level 4.1 bit</td>
+<td align="left">0b0: H.264 Level 4.1 not supported<br>0b1: H.264 Level 4.1 supported</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">H.264 Level 4.2 bit</td>
+<td align="left">0b0: H.264 Level 4.2 not supported<br>0b1: H.264 Level 4.2 supported</td>
+</tr>
+<tr>
+<td align="left">7:5</td>
+<td align="left">Reserved</td>
+<td align="left">Set to all zeros</td>
+</tr>
+</tbody></table>
+<h4 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h4><p>我们这里拿几个官方的Example来帮助大家理解，如第一组数据<code>30 00 02 02 00000040 ...</code>对应为<code>720p/60</code>帧，其中</p>
+<ul>
+<li><code>Native 30</code>二进制表示为<code>0011 0000</code>，低3位为0，代表CEA标准分辨率；高5位为分辨率index，00110换算为6，对应CEA分辨率表中的Index 6<code>1280x720 p60</code></li>
+<li><code>Profile 02</code>二进制表示为<code>0000 0010</code>，表示支持Constrained High Profile</li>
+<li><code>Levels 02</code>二进制表示为<code>0000 0010</code>，表示支持H.264 Level 3.2</li>
+<li><code>CEA 00000040</code>二进制<code>0000 0000 0000 0000 0000 0000 0100 0000</code>，也就是第6位flag置1，对应CEA分辨率表中的Index 6<code>1280x720 p60</code>。此外，CEA字段可以同时对多个标志位置1，代表同时支持这几种分辨率与刷新率。</li>
+</ul>
+<p>其他的几个Example大家可以按照上面的思路一一分析，这里不再展开。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// For 720p60:</span><br><span class="line">//   use &quot;30 00 02 02 00000040 00000000 00000000 00 0000 0000 00 none none\r\n&quot;</span><br><span class="line">// For 720p30:</span><br><span class="line">//   use &quot;28 00 02 02 00000020 00000000 00000000 00 0000 0000 00 none none\r\n&quot;</span><br><span class="line">// For 720p24:</span><br><span class="line">//   use &quot;78 00 02 02 00008000 00000000 00000000 00 0000 0000 00 none none\r\n&quot;</span><br><span class="line">// For 1080p30:</span><br><span class="line">//   use &quot;38 00 02 02 00000080 00000000 00000000 00 0000 0000 00 none none\r\n&quot;</span><br></pre></td></tr></table></figure>
 
 <h2 id="WFD会话建立（Session-Establishment）"><a href="#WFD会话建立（Session-Establishment）" class="headerlink" title="WFD会话建立（Session Establishment）"></a>WFD会话建立（Session Establishment）</h2><p>在Sink回复完M4指令后，能力协商的过程就结束了，下一步则是WFD会话建立过程，主要涉及到<code>RTSP M5-M7</code>指令。双方将按照以下顺序发送与处理消息。</p>
 <p><img src="wfd-session.jpg" alt></p>
@@ -716,7 +954,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RTSP概述"><span class="nav-number">1.</span> <span class="nav-text">RTSP概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包准备"><span class="nav-number">2.</span> <span class="nav-text">抓包准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD能力协商（Capability-Negotiation）"><span class="nav-number">3.</span> <span class="nav-text">WFD能力协商（Capability Negotiation）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M1-Messages"><span class="nav-number">3.1.</span> <span class="nav-text">RTSP M1 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M2-Messages"><span class="nav-number">3.2.</span> <span class="nav-text">RTSP M2 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M3-Messages"><span class="nav-number">3.3.</span> <span class="nav-text">RTSP M3 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M4-Messages"><span class="nav-number">3.4.</span> <span class="nav-text">RTSP M4 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD会话建立（Session-Establishment）"><span class="nav-number">4.</span> <span class="nav-text">WFD会话建立（Session Establishment）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M5-Messages"><span class="nav-number">4.1.</span> <span class="nav-text">RTSP M5 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M6-Messages"><span class="nav-number">4.2.</span> <span class="nav-text">RTSP M6 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M7-Messages"><span class="nav-number">4.3.</span> <span class="nav-text">RTSP M7 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD长连接（keep-alive）"><span class="nav-number">5.</span> <span class="nav-text">WFD长连接（keep-alive）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M16-Messages"><span class="nav-number">5.1.</span> <span class="nav-text">RTSP M16 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭会话"><span class="nav-number">6.</span> <span class="nav-text">关闭会话</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M8-Messages"><span class="nav-number">6.1.</span> <span class="nav-text">RTSP M8 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RTSP概述"><span class="nav-number">1.</span> <span class="nav-text">RTSP概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抓包准备"><span class="nav-number">2.</span> <span class="nav-text">抓包准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD能力协商（Capability-Negotiation）"><span class="nav-number">3.</span> <span class="nav-text">WFD能力协商（Capability Negotiation）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M1-Messages"><span class="nav-number">3.1.</span> <span class="nav-text">RTSP M1 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M2-Messages"><span class="nav-number">3.2.</span> <span class="nav-text">RTSP M2 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M3-Messages"><span class="nav-number">3.3.</span> <span class="nav-text">RTSP M3 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M4-Messages"><span class="nav-number">3.4.</span> <span class="nav-text">RTSP M4 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wfd-video-formats格式解析"><span class="nav-number">3.5.</span> <span class="nav-text">wfd_video_formats格式解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Native-Resolutions-Refresh-Rates-Bitmap"><span class="nav-number">3.5.1.</span> <span class="nav-text">Native Resolutions/Refresh Rates Bitmap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CEA-Resolutions-Refresh-Rates-Bitmap"><span class="nav-number">3.5.2.</span> <span class="nav-text">CEA Resolutions/Refresh Rates Bitmap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Profiles-Bitmap"><span class="nav-number">3.5.3.</span> <span class="nav-text">Profiles Bitmap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Levels-Bitmap"><span class="nav-number">3.5.4.</span> <span class="nav-text">Levels Bitmap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Example"><span class="nav-number">3.5.5.</span> <span class="nav-text">Example</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD会话建立（Session-Establishment）"><span class="nav-number">4.</span> <span class="nav-text">WFD会话建立（Session Establishment）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M5-Messages"><span class="nav-number">4.1.</span> <span class="nav-text">RTSP M5 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M6-Messages"><span class="nav-number">4.2.</span> <span class="nav-text">RTSP M6 Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M7-Messages"><span class="nav-number">4.3.</span> <span class="nav-text">RTSP M7 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WFD长连接（keep-alive）"><span class="nav-number">5.</span> <span class="nav-text">WFD长连接（keep-alive）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M16-Messages"><span class="nav-number">5.1.</span> <span class="nav-text">RTSP M16 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭会话"><span class="nav-number">6.</span> <span class="nav-text">关闭会话</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RTSP-M8-Messages"><span class="nav-number">6.1.</span> <span class="nav-text">RTSP M8 Messages</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
