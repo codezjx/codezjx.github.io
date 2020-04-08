@@ -245,18 +245,50 @@ public void clearWfdInfo() {
 
 在发送端搜索到Miracast设备，并点击对应设备后，就进入到了连接过程。此时Sink端应该会弹出一个[连接邀请]的授权窗口，可以选择拒绝或者接受。选择接受后，若是第一次连接，则会进入到GO协商的过程。
 
-#### GO协商（Group Owner）
-GO协商是一个复杂的过程，共包含三个类型的Action帧：GO Req、GO Resp、GO Confirm，经过这几个帧的交互最终确认是Sink端还是Source端作为Group Owner，因此谁做GO是不确定的（关于GO协商的过程，有兴趣的可以查看`Wi-Fi P2P Technical Specification`文档的`3.1.4.2 Group Owner Negotiation`这章）。
+#### GO协商（Group Owner Negotiation）
+GO协商是一个复杂的过程，共包含三个类型的Action帧：GO Req、GO Resp、GO Confirm，经过这几个帧的交互最终确认是Sink端还是Source端作为Group Owner，因此谁做GO是不确定的。那具体的协商规则是怎样的呢？官方的流程图清晰地给出了答案：
+![](go-determination-flowchart.jpg)
 
-发送端在`connect()`的时候，可通过`groupOwnerIntent`字段设置GO的优先级的（范围从0-15，0表示最小优先级），方法如下：
+首先通过`Group Owner Intent`的值进行协商，值大者为GO。若Intent值相同就需要判断Req帧中`Tie breaker`位，置1者为GO。若2台设备都设置了Intent为最大值，都希望能成为GO，则这次协商失败。
+
+那么，如何设置这个Intent值呢？发送端在`connect()`的时候，可通过`groupOwnerIntent`字段设置GO的优先级的（范围从0-15，0表示最小优先级），方法如下：
 ```java
 WifiP2pConfig config = new WifiP2pConfig();
 ...
 config.groupOwnerIntent = 15; // I want this device to become the owner
 mManager.connect(mChannel, config, actionListener);
 ```
+>PS: 对GO完整协商过程感兴趣的童鞋可以查看`Wi-Fi P2P Technical Specification`文档的`3.1.4.2 Group Owner Negotiation`这章
 
-但Miracast Sink端的场景为接收端，因此不能通过`groupOwnerIntent`字段来设置GO优先级。在接收到`WIFI_P2P_CONNECTION_CHANGED_ACTION`这个广播时，我们可以调用 `requestConnectionInfo()`，并在`onConnectionInfoAvailable()`回调中通过`isGroupOwner`字段来判断当前设备是Group Owner，还是Peer。通过`groupOwnerAddress`，我们可以很方便的获取到Group Owner的IP地址。
+Miracast Sink端的场景为接收端，因此不能通过`groupOwnerIntent`字段来设置GO优先级。那么还有其他方式可以让Sink端成为GO吗？毕竟在多台设备通过Miracast投屏的时候，Sink端是必须作为GO才能实现的。答案其实也很简单，就是自己创建一个组，自己成为GO，让其他Client加进来，在连接前直接调用`createGroup()`方法即可完成建组操作：
+```java
+mManager.createGroup(mChannel, new WifiP2pManager.ActionListener() {
+    @Override
+    public void onSuccess() {
+        Log.d(TAG, "createGroup onSuccess");
+    }
+
+    @Override
+    public void onFailure(int reason) {
+        Log.d(TAG, "createGroup onFailure:" + reason);
+    }
+});
+```
+
+建组成功后我们可以通过`requestGroupInfo()`方法来查看组的基本信息，以及组内Client的情况：
+```java
+mManager.requestGroupInfo(mChannel, wifiP2pGroup -> {
+    Log.d(TAG, "onGroupInfoAvailable detail:\n" + wifiP2pGroup.toString());
+    Collection<WifiP2pDevice> clientList = wifiP2pGroup.getClientList();
+    if (clientList != null) {
+        int size = clientList.size();
+        Log.d(TAG, "onGroupInfoAvailable - client count:" + size);
+        // Handle all p2p client devices
+    }
+});
+```
+
+GO协商完毕，并且`Wi-Fi Direct`连接成功的时候，我们将会收到`WIFI_P2P_CONNECTION_CHANGED_ACTION`这个广播，此时我们可以调用 `requestConnectionInfo()`，并在`onConnectionInfoAvailable()`回调中通过`isGroupOwner`字段来判断当前设备是Group Owner，还是Peer。通过`groupOwnerAddress`，我们可以很方便的获取到Group Owner的IP地址。
 ```java
 @Override
 public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
@@ -270,7 +302,7 @@ public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
 }
 ```
 
-GO协商完之后，受WiFi P2P API的限制，各设备获取到的MAC和IP地址情况如下图所示：
+受WiFi P2P API的限制，各设备获取到的MAC和IP地址情况如下图所示：
 ![](groupOwner.jpg)
 
 由于在后续RTSP进行指令通讯的时候，需要通过Socket与Source端建立连接，也就是我们需要先知道Source端的IP地址与端口。根据上图，我们可能出现以下2种情况：
