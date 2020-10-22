@@ -275,7 +275,7 @@ mRTCClient = new DirectRTCClient(new AppRTCClient.SignalingCallback() {
 
 ## 展示远端视频流
 
-当点对点连接建立起来后，我们就可以开始获取音视频流数据了。`PeerConnection.Observer`会回调`onAddStream()`方法，并提供`MediaStream`对象，其中包含远端的音视频轨`AudioTracks`与`VideoTracks`。前面我们添加了一条录屏的视频轨，因此直接获取第一条`VideoTrack`对象即可，然后跟之前一样通过`addSink()`即可与`SurfaceViewRenderer`的绑定，从而渲染出视频流。
+当点对点连接建立起来后，我们就可以开始获取音视频流数据了。之前在`createPeerConnection()`中传入的`PeerConnection.Observer`会回调`onAddStream()`方法（注意此方法会在收到远端SDP并调用`setRemoteDescription()`后，就会回调了，不用等连接真正建立，与`onAddTrack()`一致），并提供`MediaStream`对象，其中包含远端的音视频轨`AudioTracks`与`VideoTracks`。前面我们添加了一条录屏的视频轨，因此直接获取第一条`VideoTrack`对象即可，然后跟之前一样通过`addSink()`即可与`SurfaceViewRenderer`的绑定，从而渲染出视频流。
 
 ```java
 @Override
